@@ -760,11 +760,25 @@ fn view_for(s: &Surface, opts: &Opts, prefs: &prefs::Prefs, topic: &str) -> Valu
     } else {
         0.0
     };
+    // never wider than the free region the card is aimed at (less the margin and gap): the page zooms DOWN to fit it, but not below its zoom floor
+    // (MIN_ZOOM), so a card compromises on size before it overlaps the active window or leaves its region
+    let maxw = {
+        let cap = work.w() as f64 / sf * opts.max_frac.unwrap_or(0.5).clamp(0.3, 0.92);
+        match reg {
+            Some((rw, _)) => {
+                let pol = policy::load(); // margin and gap come from prefs/placement.json, not a number in the code
+                cap.min((rw as f64 - (pol.margin + pol.gap) as f64) / sf).max(200.0)
+            }
+            None => cap,
+        }
+    };
     json!({
         "scale": (imp * prefs::get(prefs, topic, "size_bias")).clamp(0.5, 2.2),
         "fill": opts.fill,
         // default cap: 1/4 of the usable area = half the width x half the height; working windows (graphs) ask for more via max_frac
-        "maxw": work.w() as f64 / sf * opts.max_frac.unwrap_or(0.5).clamp(0.3, 0.92),
+        // never wider than the free region the card is aimed at (less the margin and gap): the page zooms DOWN to fit it, but not below its zoom floor
+        // (MIN_ZOOM), so a card compromises on size before it ever overlaps the active window or leaves its region
+        "maxw": maxw,
         "maxh": work.h() as f64 / sf * opts.max_frac.unwrap_or(0.5).clamp(0.3, 0.92),
         "theme_default": prefs.theme.clone().unwrap_or_else(|| "coral".into()),
         "debug": std::env::var("MORC_DEBUG").is_ok(),
