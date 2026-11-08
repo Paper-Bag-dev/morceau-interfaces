@@ -68,6 +68,15 @@ stage.addEventListener('pointerleave', () => {
 });
 
 // Smooth grow/shrink: scale the whole surface from one factor to another (top-left origin) so hover growth is an animation, not a jump.
+// A size change that the HOST asks for (e.g. a card yields room to the one in use) animates with the same default motion as hover growth, so the intent
+// shows: shrinking eases down first and then the window follows; growing makes the window big first and eases up to it.
+export function setViewSmooth(v) {
+  const target = Math.max(MIN_ZOOM, v.scale || 1), z1 = zoom;
+  if (Math.abs(target - z1) / z1 < 0.01) { setView(v); return; }
+  if (target < z1) morph(1, target / z1, () => setView(v));
+  else { setView(v); measure(); morph(z1 / zoom, 1); }
+}
+
 function morph(from, to, done) {
   const surf = document.getElementById('surface');
   if (!surf || reduced) { if (done) done(); return; }

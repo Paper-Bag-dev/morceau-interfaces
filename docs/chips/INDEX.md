@@ -18,7 +18,10 @@ one big blocker. Several small cards spread into the free space (`--region auto`
 3. **Count BEFORE you push.** For each card take its size at `min_importance` (text at the floor). Add them up against the free regions. Never open more
    than fits; never push first and look after.
 4. **Group by kind.** Text becomes one flex row (`stat-strip`) for a strip above/below; charts become one merged window (`chart-stack`) for a tall side.
-5. **Assign.** Biggest free area first, as a side (corners only after the sides are used). Each card starts at the very edge of its quadrant next to the
+5. **Assign.** Always fill the FOUR MAIN SIDES first (left, right, above, below; resize and merge cards to fit them) and only then expand into the corners
+   or mixed quadrants. Never start in a corner. Fill every side before reaching for a corner (a free top row must be used before anything goes elsewhere).
+   Before opening a new card ask: can it be merged into a card already on screen (a donut into the older chart window, a fact into an existing row)? Merge first.
+   Biggest free side first (corners only after the sides are used). Each card starts at the very edge of its quadrant next to the
    active window (`dx`/`dy`), then fills outward. Tier 0 = free of every window and card.
 6. **Not enough room? Give up things in THIS order:** (a) merge cards of the same kind; (b) trim data (5 bars, not 7); (c) shrink the card down to its
    `min_importance` (never the text floor, never icon or component minimums); (d) use the remaining Tier 0 spaces, corners included; (e) Tier 1: the free
@@ -38,7 +41,10 @@ one big blocker. Several small cards spread into the free space (`--region auto`
    Compact by default with the detail behind it ("show more" via prefetch + `reveal`) is how a card is made expandable.
 7. **Write, then push in small batches.** `morc card` for each, then `morc push` three or four at a time. Slowly: re-count after each batch.
 8. **Verify with numbers.** `morc status` rects: no overlap with the active window or another card. Look at the screen only when the user has asked.
-9. **Fix in JSON.** If something is off, change the card's file (chip, region, importance, dx/dy, data), re-push, and write down what worked.
+9. **Motion shows intent.** Every size or position change a card makes (shrinking to give another card room, growing on interaction, moving to make space)
+   is animated with the default card motion (the ease used for hover growth: scale over about 220 ms), never an instant jump. Shrink eases down first and then the
+   window follows; grow makes the window big first and eases up to it. A different animation is allowed only if it says something else on purpose.
+10. **Fix in JSON.** If something is off, change the card's file (chip, region, importance, dx/dy, data), re-push, and write down what worked.
 Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not skip rungs.
 
 **The design mentality (confirmed working, 11-08; follow it for every push):**
@@ -84,6 +90,7 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 | `donut-card` | a share-of-a-whole donut | title, values, labels | [donut-card.md](donut-card.md) |
 | `chart-stack` | two charts in ONE window (donut over bars) for a tall free side | pie, bars | [chart-stack.md](chart-stack.md) |
 | `stat-strip` | four numbers in ONE flex row for the strip above or below the active window | a, b, c, d | [stat-strip.md](stat-strip.md) |
+| `stat-line` | up to six short text facts in ONE low row, for the THIN strips (about 100 px high) | t1 .. t6 (strings) | [stat-line.md](stat-line.md) |
 | `stat-card-min` | one big number with a label and unit | h.label, h.value, h.unit | (data only: `{"h": {"label": "New today", "value": 4.4, "unit": "M"}}`) |
 | `week-chart` | any 7-point bar or line chart | title, values, labels, unit | [week-chart.md](week-chart.md) |
 | `ask-permission` | an urgent yes/no for the user | title, body, yes, no, ctx | [ask-permission.md](ask-permission.md) |
@@ -93,3 +100,4 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 
 **Rules that apply to every chip** (details in `../design.md` and `../learnings.md`): never clip, size within the container, text at least 15 px, explain each
 metric in a line, one card per kind of thing (do not stack unlike things in one card), short `ttl`, never cover your own cards.
+

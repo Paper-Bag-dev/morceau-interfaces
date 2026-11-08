@@ -201,7 +201,8 @@ fn candidates<'a>(regs: &'a [Region], wanted: Option<&str>, tiers: u8) -> Vec<&'
         // "auto" = go where the room is: the biggest free region first (the active window is on one side, the free side is the other),
         // not a fixed right-first order that puts cards over a busy side while the other side is empty
         let mut here: Vec<&Region> = regs.iter().filter(|r| r.tier == tier).collect();
-        here.sort_by_key(|r| std::cmp::Reverse(r.rect.w() as i64 * r.rect.h() as i64));
+        // the four main sides (left, right, above, below) always come first, biggest first; corners and the merged column/row variants only after
+        here.sort_by_key(|r| (!matches!(r.name.as_str(), "left" | "right" | "above" | "below"), std::cmp::Reverse(r.rect.w() as i64 * r.rect.h() as i64)));
         order.extend(here);
     }
     let _ = ORDER;

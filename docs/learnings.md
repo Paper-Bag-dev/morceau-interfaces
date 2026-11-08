@@ -31,6 +31,9 @@ Short, so an agent or contributor can read it before touching the UI or the wake
 ## The ladder (what the overload test taught)
 Pushing 12 full-size cards with no sums first piled them onto the terminal and into corners while a side still had room, and cards already placed moved when new ones arrived. So: count the room before you push, give things up in a fixed order (merge, trim data, shrink to the floor, remaining Tier 0, Tier 1 background windows only, hold back), push in small batches. Full ladder: docs/chips/INDEX.md. When space is short, merge same-kind cards and make the card expandable (compact by default, detail on interaction, others yield space, reset afterwards, expire when idle): rung 6b; only part of it is built (hover growth, prefetch, reveal).
 
+## Sides first, merge first, animate (11-08)
+Fill the four main sides (left, right, above, below) before any corner or mixed quadrant, and use a free top row before anything else; the host now orders candidate regions that way (`regions.rs`). Before opening a card, try merging it into one already on screen. Every size or position change animates with the default card motion (`setViewSmooth` in `bridge.js`, same ease as hover growth); a jump is a bug.
+
 ## The design mentality (the loop that works)
 Look first (`morc free`). Biggest free area first, as a side, not a corner: rearrange or merge cards so they fit it; corners only after the sides are used. Group by kind: text as one flex row in a strip above/below the active window (`stat-strip`), charts merged in one window on a tall side (`chart-stack`). Start at the very edge of the quadrant next to the active window (card `dx`/`dy`). Compromise on size down to `min_importance` and on data (fewer bars), never on text size. Check the rects after pushing; if anything overlaps, change the card JSON and re-push. Full text: docs/chips/INDEX.md.
 

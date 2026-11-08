@@ -169,6 +169,9 @@ fn launch(w: &worker::Worker) -> std::io::Result<std::process::Child> {
     // its own scratch folder: the temp spec files it writes never end up in the repo or your data folder
     let work = paths::runtime_dir().join("agent");
     let _ = fs::create_dir_all(&work);
+    // it may read the install and data folders (docs/chips/INDEX.md, the ladder, the cards): its own working folder is only a scratch space
+    let (app_dir, home_dir) = (paths::app_dir().display().to_string(), paths::home_dir().display().to_string());
+    cmd.args(["--add-dir", &app_dir, "--add-dir", &home_dir]);
     cmd.args(["--allowedTools", &allow, &allow_ps, "Read", "Write", "--append-system-prompt", &persona])
         .current_dir(&work)
         .env("PATH", child_path)

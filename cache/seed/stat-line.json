@@ -1,0 +1,112 @@
+{
+    "t":  "save",
+    "name":  "stat-line",
+    "desc":  "Up to six short text facts in ONE low flex row, no buttons (the corner x closes it): fits the thin strip below or above the active window. Pass /t1 .. /t6 as ready-made strings such as \"Cost today $4.20\"; leave unused ones empty.",
+    "params":  [
+                   "/t1",
+                   "/t2",
+                   "/t3",
+                   "/t4",
+                   "/t5",
+                   "/t6"
+               ],
+    "opts":  {
+                 "min":  [
+                             320,
+                             40
+                         ],
+                 "ttl":  90,
+                 "topic":  "stats.line",
+                 "importance":  "0.85",
+                 "max_frac":  0.9
+             },
+    "components":  [
+                       {
+                           "id":  "root",
+                           "type":  "row",
+                           "gap":  8,
+                           "children":  [
+                                            "t1",
+                                            "t2",
+                                            "t3",
+                                            "t4",
+                                            "t5",
+                                            "t6"
+                                        ]
+                       },
+                       {
+                           "id":  "t1",
+                           "type":  "text",
+                           "size":  "lg",
+                           "bold":  true,
+                           "text":  "{/t1}",
+                           "when":  {
+                                        "path":  "/t1",
+                                        "truthy":  true
+                                    }
+                       },
+                       {
+                           "id":  "t2",
+                           "type":  "text",
+                           "size":  "lg",
+                           "bold":  true,
+                           "text":  "{/t2}",
+                           "when":  {
+                                        "path":  "/t2",
+                                        "truthy":  true
+                                    }
+                       },
+                       {
+                           "id":  "t3",
+                           "type":  "text",
+                           "size":  "lg",
+                           "bold":  true,
+                           "text":  "{/t3}",
+                           "when":  {
+                                        "path":  "/t3",
+                                        "truthy":  true
+                                    }
+                       },
+                       {
+                           "id":  "t4",
+                           "type":  "text",
+                           "size":  "lg",
+                           "bold":  true,
+                           "text":  "{/t4}",
+                           "when":  {
+                                        "path":  "/t4",
+                                        "truthy":  true
+                                    }
+                       },
+                       {
+                           "id":  "t5",
+                           "type":  "text",
+                           "size":  "lg",
+                           "bold":  true,
+                           "text":  "{/t5}",
+                           "when":  {
+                                        "path":  "/t5",
+                                        "truthy":  true
+                                    }
+                       },
+                       {
+                           "id":  "t6",
+                           "type":  "text",
+                           "size":  "lg",
+                           "bold":  true,
+                           "text":  "{/t6}",
+                           "when":  {
+                                        "path":  "/t6",
+                                        "truthy":  true
+                                    }
+                       }
+                   ],
+    "data":  {
+                 "t1":  "",
+                 "t2":  "",
+                 "t3":  "",
+                 "t4":  "",
+                 "t5":  "",
+                 "t6":  ""
+             }
+}

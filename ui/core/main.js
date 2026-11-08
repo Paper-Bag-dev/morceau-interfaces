@@ -1,7 +1,7 @@
 // Entry point. Registers the catalog, then answers the host.
 
 import { Renderer } from './render.js';
-import { send, measureSoon, dropped, setView } from './bridge.js';
+import { send, measureSoon, dropped, setView, setViewSmooth } from './bridge.js';
 import { enter, leave, pulse, reduced, setReduced } from './motion.js';
 import { pick as pickTheme, apply as applyTheme, adaptToBackdrop, setBoldness } from './theme.js';
 import * as literacy from './literacy.js';
@@ -54,7 +54,7 @@ window.morc = {
         if (ready) root.classList.add('on');   // refresh of an on-screen surface: stay visible
         measureSoon();
         break;
-      case 'view': setView(m.view); break;   // the host re-sizes this card (crowded screen: another card is in use)
+      case 'view': setViewSmooth(m.view); break;   // the host re-sizes this card (crowded screen: another card is in use)
       case 'patch':
         // test hook: `morc patch <id> /__hover true|false` plays the pointer entering/leaving the card (hover-grow) without touching the user's mouse
         if (m.data && '/__hover' in m.data) { stage.dispatchEvent(new PointerEvent(m.data['/__hover'] ? 'pointerenter' : 'pointerleave')); break; }
