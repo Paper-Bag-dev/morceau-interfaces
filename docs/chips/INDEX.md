@@ -2,6 +2,10 @@
 
 A **chip** is a ready-made card: a JSON file (the layout, already built) plus a short md next to this index. You do not write component code.
 
+**STRICT RULE: no visual size is hardcoded in CSS or code.** Every size that is a choice (min widths, radii, type sizes, paddings, text floors) is a token in
+`ui/tokens.json` (overridable in your `prefs/ui.json`), sent to each card as a CSS variable and read as `var(--name, fallback)` / `floor()`. Need a new size? Add
+a token and read it; never type the number into `theme.css` or a chart file. Chart heights and widths are fields of the chip's JSON.
+
 **STRICT RULE: every component is modular and controlled by a JSON file.** Whenever you make or change any component or chip: its layout is one JSON
 in `cache/seed/`, and everything that can vary (data, `align` left/right, `importance`, `min_importance`, `region`, `ttl`, `chip`) is a field in the card's
 JSON (`cards/<name>.json`, written with `morc card`). Nothing about one component is hardcoded in Python or Rust. A new knob is a new field read

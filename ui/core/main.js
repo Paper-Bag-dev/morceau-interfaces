@@ -46,6 +46,8 @@ window.morc = {
           window.__debug = !!m.view.debug;
           setView(m.view);
         }
+        // design tokens from JSON (ui/tokens.json + your prefs/ui.json) become CSS variables: nothing visual is hardcoded in the CSS or the chart code
+        for (const [k, v] of Object.entries((m.view && m.view.tokens) || {})) document.documentElement.style.setProperty('--' + k, String(v));
         applyTheme(stage, pickTheme(m.opts && m.opts.topic, m.opts && m.opts.theme, m.view && m.view.theme_default));
         literacy.set(m.literacy);
         // card-level alignment from the card's JSON ("align": "right"): titles, rows, text, charts and Close all start from the same edge

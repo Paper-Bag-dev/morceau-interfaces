@@ -765,6 +765,23 @@ fn scope_of(topic: &str) -> &str {
     topic.split('.').next().unwrap_or(topic)
 }
 
+/// Design tokens as CSS variables: shipped defaults in <install>/ui/tokens.json, overridden by <data>/prefs/ui.json. Keys become `--key` on every card;
+/// the CSS and the chart code read them with fallbacks, so no size is a constant in the code. "about" is documentation, not a token.
+fn ui_tokens() -> Value {
+    let read = |p: std::path::PathBuf| std::fs::read_to_string(p).ok().and_then(|s| serde_json::from_str::<Value>(s.trim_start_matches('\u{feff}')).ok()).unwrap_or(json!({}));
+    let mut base = read(paths::ui_dir().join("tokens.json"));
+    let over = read(paths::prefs_dir().join("ui.json"));
+    if let (Some(b), Some(o)) = (base.as_object_mut(), over.as_object()) {
+        for (k, v) in o {
+            b.insert(k.clone(), v.clone());
+        }
+    }
+    if let Some(b) = base.as_object_mut() {
+        b.remove("about");
+    }
+    base
+}
+
 /// How this surface should be drawn: scale (importance x size_bias), the 1/4-screen cap, motion, boldness, simplicity.
 fn view_for(s: &Surface, opts: &Opts, prefs: &prefs::Prefs, topic: &str) -> Value {
     let imp = match opts.importance.as_deref() {
@@ -812,6 +829,7 @@ fn view_for(s: &Surface, opts: &Opts, prefs: &prefs::Prefs, topic: &str) -> Valu
         // never wider than the free region the card is aimed at (less the margin and gap): the page zooms DOWN to fit it, but not below its zoom floor
         // (MIN_ZOOM), so a card compromises on size before it ever overlaps the active window or leaves its region
         "maxw": maxw,
+        "tokens": ui_tokens(),
         "maxh": work.h() as f64 / sf * opts.max_frac.unwrap_or(0.5).clamp(0.3, 0.92),
         "theme_default": prefs.theme.clone().unwrap_or_else(|| "coral".into()),
         "debug": std::env::var("MORC_DEBUG").is_ok(),

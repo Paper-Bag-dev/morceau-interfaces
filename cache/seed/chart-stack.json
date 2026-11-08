@@ -42,7 +42,7 @@
                                           "bind":  "/pie/labels"
                                       },
                            "unit":  "M",
-                           "height":  100
+                           "height":  140
                        },
                        {
                            "id":  "bars",
@@ -56,7 +56,7 @@
                                           "bind":  "/bars/labels"
                                       },
                            "unit":  "M",
-                           "height":  110
+                           "height":  130
                        },
                        {
                            "id":  "ok",
