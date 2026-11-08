@@ -11,7 +11,7 @@ import * as literacy from '../core/literacy.js';
 // Feedback: every click gives an immediate response (ripple + press-bounce, and a tick that morphs in for non-closing
 // actions) on top of the causal change the action itself makes. The linter (src/lint.rs) refuses dead buttons.
 
-const LEARN_AFTER = 2;
+const LEARN_AFTER = 8;   // uses before an icon is trusted to stand alone: slow on purpose, a "+" or a check is easy to misread early
 
 register('button', (c, ctx) => {
   const b = document.createElement('button');
