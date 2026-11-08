@@ -8,6 +8,7 @@
 | `agent.md` | the system prompt for the screen and chore agent (replace it in your data folder to add your own rules) |
 | `chore-prompt.md` | the wake prompt the host gives the headless chore agent (placeholders `{reason} {note} {activity} {cli}`) |
 | `design.md` | the design tokens and the reasoning (one accent, type floors, what is deliberately absent) |
+| `learnings.md` | what went wrong and the rule each thing became: clipping and chart width, placement, the background agent, tooling |
 | `charts.md` | choosing a chart by the question; the chart kinds and props |
 | `graphs.md` | the node-link graph pipeline: exporter schema, code-graph source, layers and routes |
 | `phases.md` | what exists and what is planned |
