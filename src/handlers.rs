@@ -73,7 +73,12 @@ pub fn run(surface: &str, topic: &str, action: &Value, proxy: &Proxy) -> Effect 
         }
         "wake" => {
             inbox::push(surface, topic, "wake", &action["payload"]);
-            Effect::Wake(action["payload"].clone())
+            // the agent needs to know which surface to patch: add it to the payload it is woken with
+            let mut p = action["payload"].clone();
+            if let Some(o) = p.as_object_mut() {
+                o.entry("surface").or_insert_with(|| Value::String(surface.to_string()));
+            }
+            Effect::Wake(p)
         }
         _ => Effect::None,
     }

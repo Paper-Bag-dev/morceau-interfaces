@@ -12,17 +12,21 @@ use serde_json::{json, Value};
 use std::fs;
 use std::process::Command;
 
-fn gate(w: &worker::Worker, chore: bool) -> Result<Vec<u128>, &'static str> {
+/// `direct` = the user just clicked a button that asked for background work (payload "bg": true). They are plainly at the PC, so the
+/// live-session and idle gates are skipped; the enabled switch and the rate limit still apply.
+fn gate(w: &worker::Worker, chore: bool, direct: bool) -> Result<Vec<u128>, &'static str> {
     if !w.enabled {
         return Err("disabled");
     }
-    if let Some(age) = inbox::session_age_s() {
-        if age < w.session_fresh_s {
-            return Err("session-live");
+    if !direct {
+        if let Some(age) = inbox::session_age_s() {
+            if age < w.session_fresh_s {
+                return Err("session-live");
+            }
         }
-    }
-    if worker::idle_seconds() > w.idle_s {
-        return Err("pc-idle");
+        if worker::idle_seconds() > w.idle_s {
+            return Err("pc-idle");
+        }
     }
     let now = util::now_ms();
     let log = fs::read_to_string(paths::wake_log_file()).unwrap_or_default();
@@ -67,13 +71,17 @@ fn exe_path() -> String {
 /// The user acted on a widget that needs the agent.
 pub fn maybe_wake(payload: &Value) -> &'static str {
     let w = worker::load();
-    let recent = match gate(&w, false) {
+    let direct = payload["bg"].as_bool().unwrap_or(false);
+    let recent = match gate(&w, false, direct) {
         Ok(r) => r,
         Err(why) => return why,
     };
+    // an optional "task" in the payload says exactly what to build (e.g. "add 3 graph cards from FILE, patch them into the surface")
+    let task = payload["task"].as_str().map(|t| format!("\nTask: {t}")).unwrap_or_default();
     let prompt = format!(
-        "The user just acted on a floating morc window on their screen. Event: {payload}\n\
-         Handle it as the screen agent. Use only the CLI at {} (show/patch/use/close). Be brief; reply on screen, not in text.",
+        "The user just acted on a floating morc window on their screen. Event: {payload}{task}\n\
+         Handle it as the screen agent. Use only the CLI at {} (show/patch/use/close). Show things as graphs, big numbers and pictures, not text. \
+         Be brief; reply on screen, not in text. Patch the surface named in the event; when done set its /state to \"ready\".",
         exe_path()
     );
     spawn(&w, &prompt, recent, false)
@@ -82,7 +90,7 @@ pub fn maybe_wake(payload: &Value) -> &'static str {
 /// A chore wake: the PC is in use, no interactive session is open, and something (a trigger rule, an external tool) says it is time.
 pub fn chore(reason: &str, note: &Value) -> &'static str {
     let w = worker::load();
-    let recent = match gate(&w, true) {
+    let recent = match gate(&w, true, false) {
         Ok(r) => r,
         Err(why) => return why,
     };

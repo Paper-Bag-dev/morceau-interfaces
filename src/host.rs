@@ -369,7 +369,14 @@ impl Host {
                     }
                 }
                 if let Some(p) = wake_payload {
-                    util::log(&format!("wake: {}", wake::maybe_wake(&p)));
+                    let r = wake::maybe_wake(&p);
+                    util::log(&format!("wake: {r}"));
+                    // a click that asked for background work but got nobody (agent off, rate limited): put the button back instead of leaving skeletons forever
+                    if p["bg"].as_bool().unwrap_or(false) && !matches!(r, "headless-spawned" | "dry-run") {
+                        if let Some(s) = self.surfaces.get(&key) {
+                            s.send(&json!({"t": "patch", "data": {"/state": "idle"}}));
+                        }
+                    }
                 }
             }
             "close" => {
