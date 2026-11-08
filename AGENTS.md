@@ -6,7 +6,7 @@ Rust engine (tao + wry/WebView2 + the `windows` crate) + an ES-module web UI ser
 ## Layout (what lives where)
 | path | what |
 |---|---|
-| `src/` | the Rust engine: `host/` (one file per concern, see its README), protocol, placement/regions, policy, worker (chore agent), lint, cache, CLI client |
+| `src/` | the Rust engine, one folder per responsibility (`cli/ host/ placement/ surface/ agent/ learning/ ipc/ data/ platform/`); each folder has a README with a table of its files; start at `src/README.md` |
 | `ui/` | the page runtime served to every WebView: `core/` (store, renderer, bridge, motion, theme), `components/`, `charts/`, `models/` (3D), `plugins/`, `vendor/` |
 | `tools/cli/*.py` | CLI plugins: any script here becomes `morc <name>`; files starting with `_` are helpers. `tools/graph_export.py` feeds `morc graph` |
 | `cache/seed/`, `cache/fragments/`, `cache/recipes/` | shipped generic components, reusable sub-trees, example recipes |

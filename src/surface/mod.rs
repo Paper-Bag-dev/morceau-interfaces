@@ -1,6 +1,7 @@
 //! One floating surface: a borderless transparent window + its webview + its lifetime state.
 
-use crate::{assets, ev::{Ev, Proxy}, lifetime::Life, placement::R, protocol::Opts, winstyle};
+use crate::{assets, ev::{Ev, Proxy}, placement::R, protocol::Opts, winstyle};
+use self::lifetime::Life;
 use serde_json::Value;
 use std::time::Instant;
 use tao::{
@@ -137,3 +138,8 @@ impl Surface {
         Some(R { l: p.x, t: p.y, r: p.x + s.width as i32, b: p.y + s.height as i32 })
     }
 }
+
+// Submodules: a card's lifetime, the actions its buttons run, and the spec linter.
+pub mod actions;
+pub mod lifetime;
+pub mod lint;
