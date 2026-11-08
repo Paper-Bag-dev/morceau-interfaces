@@ -55,12 +55,18 @@ fn spawn(w: &worker::Worker, prompt: &str, mut recent: Vec<u128>, chore: bool) -
     }
     let allow = format!("Bash({exe}:*)");
     let turns = w.max_turns.to_string();
-    let spawned = util::hidden(
-        Command::new("claude")
-            .args(["-p", prompt, "--model", &w.model, "--max-turns", &turns, "--allowedTools", &allow, "--append-system-prompt", &persona])
-            .current_dir(paths::home_dir()),
-    )
-    .spawn();
+    // the agent's own words and errors go to <runtime>/agent.log, so a silent failure can be read afterwards
+    let log = fs::OpenOptions::new().create(true).append(true).open(paths::runtime_dir().join("agent.log"));
+    let mut cmd = Command::new("claude");
+    // Read/Write: it builds spec files to pass to `morc show --file` (inline JSON loses its quotes on Windows)
+    cmd.args(["-p", prompt, "--model", &w.model, "--max-turns", &turns, "--allowedTools", &allow, "Read", "Write", "--append-system-prompt", &persona])
+        .current_dir(paths::home_dir());
+    if let Ok(f) = log {
+        if let Ok(f2) = f.try_clone() {
+            cmd.stdout(f).stderr(f2);
+        }
+    }
+    let spawned = util::hidden(&mut cmd).spawn();
     if spawned.is_ok() { "headless-spawned" } else { "spawn-failed" }
 }
 
