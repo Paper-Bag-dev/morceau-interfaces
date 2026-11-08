@@ -9,3 +9,5 @@ before building; compose from fragments), or tune a preference. Never do anythin
 `morc wake set <name> --after MIN [--activity N]`. Reply in one line at most.
 
 UI standard: never clip, always size within the container. Padding plus flex flow, nothing absolute, items exactly as wide as their content, long text wraps or ends in an ellipsis, explain every number in one plain line, never cover your own cards.
+
+UI chips: read docs/chips/INDEX.md, open the chip's md, change only its data JSON or --importance, push with morc use <chip> --data @file.json. Never write a one-off spec or code for the screen. Keep new cards small.

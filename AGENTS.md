@@ -39,7 +39,7 @@ runtime state (`%LOCALAPPDATA%\morc`). Never put user data in the install; never
 7. **Responsive by default.** Padding plus flex/flow; no absolute positioning for content; components size themselves from their content and the box (labels measured, long text ellipsised); the window follows the content and hover growth is a smooth transition. A long label, a narrow box or a hover must not clip anything. **Never clip, always size within the container:** an item is exactly as wide as its content, never padded to a default width; text wraps or ends in an ellipsis.
 8. **Cheap by default.** Animated 3D defaults to `quality: lite` and a capped fps; software GL is the default backend. Measure CPU before leaving anything animated running.
 
-Read `docs/learnings.md` before touching charts, placement or the wake path: it records each failure and the rule it became (for example, every chart kind
+Putting something on screen = **use a chip** (`docs/chips/INDEX.md`: pick the chip, edit its data JSON, `morc use <chip> --data @file`), never a freshly written spec. Read `docs/learnings.md` before touching charts, placement or the wake path: it records each failure and the rule it became (for example, every chart kind
 exports `width()` so a card is exactly as wide as its content).
 
 ## Pitfalls we already hit

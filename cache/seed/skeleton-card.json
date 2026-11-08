@@ -1,0 +1,60 @@
+{
+    "components":  [
+                       {
+                           "children":  [
+                                            "a",
+                                            "b"
+                                        ],
+                           "gap":  8,
+                           "id":  "root",
+                           "type":  "column"
+                       },
+                       {
+                           "h":  150,
+                           "id":  "a",
+                           "type":  "skeleton",
+                           "variant":  "chart",
+                           "w":  300
+                       },
+                       {
+                           "h":  44,
+                           "id":  "b",
+                           "type":  "skeleton",
+                           "variant":  "text",
+                           "w":  300
+                       }
+                   ],
+    "data":  null,
+    "desc":  "An empty placeholder popup (shimmering skeleton). Shown under the id the real card will use; when that card is built with the same id it replaces this one in place.",
+    "name":  "skeleton-card",
+    "opts":  {
+                 "align":  null,
+                 "anchor":  null,
+                 "at":  null,
+                 "auto":  false,
+                 "contrast":  null,
+                 "dx":  null,
+                 "dy":  null,
+                 "fill":  false,
+                 "force":  false,
+                 "importance":  null,
+                 "lint":  null,
+                 "max_frac":  null,
+                 "min":  [
+                             320,
+                             220
+                         ],
+                 "prefetch":  null,
+                 "region":  null,
+                 "sticky":  false,
+                 "theme":  null,
+                 "topic":  "recap",
+                 "ttl":  40.0,
+                 "urgent":  false
+             },
+    "params":  [
+
+               ],
+    "sources":  null,
+    "t":  "save"
+}
