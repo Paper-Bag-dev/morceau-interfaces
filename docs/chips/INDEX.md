@@ -39,6 +39,14 @@ one big blocker. Several small cards spread into the free space (`--region auto`
       others shrink to `crowd_yield` (0.8 in `prefs/placement.json`, never below the zoom floor) and return when the pointer leaves. Teach it what you treat as
       crowded: `morc annoy nudge crowd 0.8 --why "too crowded"` lowers the limit, `morc annoy nudge crowd 1.2 --why "fine"` raises it (per topic or global).
    Compact by default with the detail behind it ("show more" via prefetch + `reveal`) is how a card is made expandable.
+6c. **Tier 1 means you must readjust the OLDER cards, not just the new one.** When the free sides are used up, re-pack what is already on screen first: merge
+   same-kind cards, trim data, shrink to `min_importance`, move them (`morc card` + `morc push` the whole list), animated (rung 9). Only after that is
+   there room, or is it clear there is none.
+6d. **No room even after re-packing: you MAY put the card on top of the active window,** but it is temporary: give it a SHORT `ttl` (about 20 s), keep it
+   small, never on top of one of our own cards, and let it go when the user looks away. It is the last step, not a habit.
+6e. **Attention costs annoyance.** The learned `crowd` limit and the user's patience are budgets. Once they are used up, do not open another card: send the
+   blue pulse on an existing relevant card (`morc patch <id> /__pulse true`) or hold the item and pulse later, so the user chooses when to look. Long things
+   (a paper) wait behind that nudge. Live status from other apps (downloads, an update) goes in ONE `progress-card`, updated with `morc patch`, not a new card each time.
 7. **Write, then push in small batches.** `morc card` for each, then `morc push` three or four at a time. Slowly: re-count after each batch.
 8. **Verify with numbers.** `morc status` rects: no overlap with the active window or another card. Look at the screen only when the user has asked.
 9. **Motion shows intent.** Every size or position change a card makes (shrinking to give another card room, growing on interaction, moving to make space)
@@ -91,6 +99,7 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 | `chart-stack` | two charts in ONE window (donut over bars) for a tall free side | pie, bars | [chart-stack.md](chart-stack.md) |
 | `stat-strip` | four numbers in ONE flex row for the strip above or below the active window | a, b, c, d | [stat-strip.md](stat-strip.md) |
 | `stat-line` | up to six short text facts in ONE low row, for the THIN strips (about 100 px high) | t1 .. t6 (strings) | [stat-line.md](stat-line.md) |
+| `progress-card` | loading / download status: up to three live progress bars (update with `morc patch <id> /a/value N`) | title, a, b, c | [progress-card.md](progress-card.md) |
 | `stat-card-min` | one big number with a label and unit | h.label, h.value, h.unit | (data only: `{"h": {"label": "New today", "value": 4.4, "unit": "M"}}`) |
 | `week-chart` | any 7-point bar or line chart | title, values, labels, unit | [week-chart.md](week-chart.md) |
 | `ask-permission` | an urgent yes/no for the user | title, body, yes, no, ctx | [ask-permission.md](ask-permission.md) |

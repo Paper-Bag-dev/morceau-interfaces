@@ -57,6 +57,8 @@ window.morc = {
       case 'view': setViewSmooth(m.view); break;   // the host re-sizes this card (crowded screen: another card is in use)
       case 'patch':
         // test hook: `morc patch <id> /__hover true|false` plays the pointer entering/leaving the card (hover-grow) without touching the user's mouse
+        // attention nudge: `morc patch <id> /__pulse true` plays the blue pulse on that card (the "look here" that costs less than opening something new)
+        if (m.data && '/__pulse' in m.data) { pulse(root); break; }
         if (m.data && '/__hover' in m.data) { stage.dispatchEvent(new PointerEvent(m.data['/__hover'] ? 'pointerenter' : 'pointerleave')); break; }
         r.patch(m); measureSoon(); break;
       case 'backdrop': adaptToBackdrop(stage, m.rgb); break;   // sampled just before the window appears
