@@ -40,22 +40,76 @@ fn gate(w: &worker::Worker, chore: bool, direct: bool) -> Result<Vec<u128>, &'st
     Ok(recent)
 }
 
+/// ONE agent for everything. If it is already working, a new wake is queued and handed to it (batched into one run) when it finishes:
+/// a burst of clicks never starts a burst of agents.
+struct Queue {
+    running: bool,
+    pending: Vec<String>,
+}
+static QUEUE: std::sync::Mutex<Queue> = std::sync::Mutex::new(Queue { running: false, pending: Vec::new() });
+
 fn spawn(w: &worker::Worker, prompt: &str, mut recent: Vec<u128>, chore: bool) -> &'static str {
     if std::env::var("MORC_WAKE_DRY").is_ok() {
         let _ = fs::write(paths::runtime_dir().join("wake.dry.txt"), prompt);
         return "dry-run";
     }
-    let exe = std::env::current_exe().map(|p| p.display().to_string()).unwrap_or_else(|_| "morc".into());
-    // the agent's system prompt: your copy in the data folder wins over the shipped one in the install folder
-    let persona = [paths::home_dir(), paths::app_dir()].iter().find_map(|d| fs::read_to_string(d.join(&w.persona)).ok()).unwrap_or_default();
+    {
+        let mut q = QUEUE.lock().unwrap();
+        if q.running {
+            q.pending.push(prompt.to_string());
+            return "queued";
+        }
+        q.running = true;
+    }
     recent.push(util::now_ms());
     let _ = fs::write(paths::wake_log_file(), recent.iter().map(|t| t.to_string()).collect::<Vec<_>>().join("\n"));
     if chore {
         worker::mark_chore();
     }
+    match launch(w, prompt) {
+        Ok(mut child) => {
+            let w = w.clone();
+            std::thread::spawn(move || {
+                let _ = child.wait();
+                // while it worked, more wakes may have arrived: run them as ONE follow-up, until the queue is empty
+                loop {
+                    let batch = {
+                        let mut q = QUEUE.lock().unwrap();
+                        if q.pending.is_empty() {
+                            q.running = false;
+                            return;
+                        }
+                        std::mem::take(&mut q.pending)
+                    };
+                    let prompt = format!("{} UI events arrived while you were busy. Handle them all in one go:\n\n{}", batch.len(), batch.join("\n\n---\n\n"));
+                    match launch(&w, &prompt) {
+                        Ok(mut c) => {
+                            let _ = c.wait();
+                        }
+                        Err(_) => {
+                            QUEUE.lock().unwrap().running = false;
+                            return;
+                        }
+                    }
+                }
+            });
+            "headless-spawned"
+        }
+        Err(_) => {
+            QUEUE.lock().unwrap().running = false;
+            "spawn-failed"
+        }
+    }
+}
+
+fn launch(w: &worker::Worker, prompt: &str) -> std::io::Result<std::process::Child> {
+    let exe = std::env::current_exe().map(|p| p.display().to_string()).unwrap_or_else(|_| "morc".into());
+    // the agent's system prompt: your copy in the data folder wins over the shipped one in the install folder
+    let persona = [paths::home_dir(), paths::app_dir()].iter().find_map(|d| fs::read_to_string(d.join(&w.persona)).ok()).unwrap_or_default();
     // The permission rule matches the command text, and a Windows path with backslashes never matched ("requires approval" for every
     // call, found in agent.log). So the agent calls plain `morc` (its exe folder is put on the child's PATH) and the rule says the same.
     let allow = "Bash(morc:*)".to_string();
+    let allow_ps = "PowerShell(morc:*)".to_string();   // the agent may reach for either shell; both are limited to the morc CLI
     let exe_dir = std::path::Path::new(&exe).parent().map(|p| p.display().to_string()).unwrap_or_default();
     let child_path = format!("{exe_dir};{}", std::env::var("PATH").unwrap_or_default());
     // max_turns 0 (the default) = no turn cap: the agent works until it is done. A positive number caps it.
@@ -64,7 +118,7 @@ fn spawn(w: &worker::Worker, prompt: &str, mut recent: Vec<u128>, chore: bool) -
     let log = fs::OpenOptions::new().create(true).append(true).open(paths::runtime_dir().join("agent.log"));
     let mut cmd = Command::new("claude");
     // Read/Write: it builds spec files to pass to `morc show --file` (inline JSON loses its quotes on Windows)
-    cmd.args(["-p", prompt, "--model", &w.model, "--allowedTools", &allow, "Read", "Write", "--append-system-prompt", &persona])
+    cmd.args(["-p", prompt, "--model", &w.model, "--allowedTools", &allow, &allow_ps, "Read", "Write", "--append-system-prompt", &persona])
         .current_dir(paths::home_dir())
         .env("PATH", child_path);
     if w.max_turns > 0 {
@@ -75,8 +129,7 @@ fn spawn(w: &worker::Worker, prompt: &str, mut recent: Vec<u128>, chore: bool) -
             cmd.stdout(f).stderr(f2);
         }
     }
-    let spawned = util::hidden(&mut cmd).spawn();
-    if spawned.is_ok() { "headless-spawned" } else { "spawn-failed" }
+    util::hidden(&mut cmd).spawn()
 }
 
 /// What the headless agent types to run the CLI: plain `morc` (spawn puts the exe's folder on its PATH).

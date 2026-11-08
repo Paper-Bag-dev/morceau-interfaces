@@ -67,6 +67,34 @@ pub fn run(surface: &str, topic: &str, action: &Value, proxy: &Proxy) -> Effect 
             });
             Effect::None
         }
+        "reveal" => {
+            // Open already-prepared cached components at once, no agent involved: {"do":"reveal","show":[{"name":"x","args":["--region","right"]}],
+            // "then":{"/state":"ready"}}. This is what a "show more" click does when the background agent got there first (prefetch).
+            let exe = std::env::current_exe().ok();
+            let shows: Vec<(String, Vec<String>)> = action["show"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|x| {
+                            let n = x["name"].as_str()?.to_string();
+                            let args = x["args"].as_array().map(|v| v.iter().filter_map(|s| s.as_str().map(String::from)).collect()).unwrap_or_default();
+                            Some((n, args))
+                        })
+                        .collect()
+                })
+                .unwrap_or_default();
+            if let Some(exe) = exe {
+                std::thread::spawn(move || {
+                    for (name, args) in shows {
+                        let _ = util::hidden(Command::new(&exe).arg("use").arg(&name).args(args)).output();
+                    }
+                });
+            }
+            if let Some((p, v)) = action["then"].as_object().and_then(|m| m.iter().next()) {
+                return Effect::Patch(p.clone(), v.clone());
+            }
+            Effect::None
+        }
         "emit" => {
             inbox::push(surface, topic, "emit", &action["payload"]);
             Effect::None

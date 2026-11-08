@@ -45,6 +45,9 @@ pub struct Opts {
     pub auto: bool,
     /// Ignore throttling and fullscreen deferral.
     pub force: bool,
+    /// A wake payload fired ONCE when this surface first appears: the background agent starts preparing what the card's "show more"
+    /// button will reveal, so the click is answered at once instead of after the agent has started. The host adds `surface` and `bg`.
+    pub prefetch: Option<Value>,
 }
 
 #[derive(Deserialize, Debug)]

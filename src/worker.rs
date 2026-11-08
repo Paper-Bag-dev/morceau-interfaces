@@ -2,7 +2,7 @@
 //! it is spawned only when the gates in wake.rs allow, does a few quick chores, and exits (= sleeps).
 //!
 //! prefs/worker.json (hot-reloaded, written with defaults on first use; edit it, nothing needs a rebuild):
-//!   enabled            false (the default) = never wake a headless agent; set true to opt in
+//!   enabled            true (the default) = the background agent can be woken; set false to opt out (it costs tokens)
 //!   model              the `claude --model` value for the chore agent
 //!   persona            file (relative to the morc folder) appended as its system prompt: docs/agent.md
 //!   idle_s             the PC counts as idle after this many seconds without keyboard/mouse input: the agent stays asleep
@@ -41,7 +41,7 @@ pub struct Worker {
 impl Default for Worker {
     fn default() -> Self {
         Worker {
-            enabled: false, // opt-in: a fresh install never spawns a headless agent (it costs the owner tokens). Set "enabled": true in prefs/worker.json.
+            enabled: true, // on by default: the background agent answers "show more" clicks. Gates (rate limit, one agent at a time) keep it cheap; set "enabled": false in prefs/worker.json to opt out.
             model: "claude-haiku-5-5".into(),
             persona: "docs/agent.md".into(),
             idle_s: 180,

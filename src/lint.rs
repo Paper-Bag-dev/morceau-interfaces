@@ -71,7 +71,7 @@ fn check_action(owner: &str, a: &Value, refs: &HashSet<String>, errs: &mut Vec<S
                 errs.push(format!("{owner}: run puts its output at {into} but nothing shows it. Add a text bound to {into}."));
             }
         }
-        "copy" | "open" | "close" | "emit" | "wake" => {}
+        "copy" | "open" | "close" | "emit" | "wake" | "reveal" => {}
         "" => errs.push(format!("{owner}: action has no `do`")),
         other => errs.push(format!("{owner}: unknown action '{other}'")),
     }

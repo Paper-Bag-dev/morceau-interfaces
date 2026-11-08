@@ -108,6 +108,7 @@ fn merge_opts(over: &Opts, base: &Opts) -> Opts {
         lint: over.lint.clone(),
         auto: over.auto,
         force: over.force,
+        prefetch: over.prefetch.clone().or_else(|| base.prefetch.clone()),
     }
 }
 
@@ -282,6 +283,15 @@ impl Host {
         if opts.urgent && may_beep {
             beep();
         }
+        // one step ahead: a card with a "show more" starts its background preparation the moment it appears
+        if let Some(mut p) = opts.prefetch.clone() {
+            if let Some(o) = p.as_object_mut() {
+                o.insert("surface".into(), Value::String(id.clone()));
+                o.insert("bg".into(), Value::Bool(true));
+                o.entry("prefetch").or_insert(Value::Bool(true));
+            }
+            util::log(&format!("prefetch for {id}: {}", wake::maybe_wake(&p)));
+        }
         json!({"ok": true, "status": "shown", "id": id})
     }
 
@@ -372,7 +382,7 @@ impl Host {
                     let r = wake::maybe_wake(&p);
                     util::log(&format!("wake: {r}"));
                     // a click that asked for background work but got nobody (agent off, rate limited): put the button back instead of leaving skeletons forever
-                    if p["bg"].as_bool().unwrap_or(false) && !matches!(r, "headless-spawned" | "dry-run") {
+                    if p["bg"].as_bool().unwrap_or(false) && !matches!(r, "headless-spawned" | "queued" | "dry-run") {
                         if let Some(s) = self.surfaces.get(&key) {
                             s.send(&json!({"t": "patch", "data": {"/state": "idle"}}));
                         }
