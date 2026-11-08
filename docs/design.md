@@ -17,3 +17,5 @@
 User-triggered motion (ripple, press-bounce, tick, hover lift, springs on arrival/exit) stays, because he asked for it and it shows what changed.
 **Drag glow:** components glow orange, strongest on the biggest block, weaker as they get smaller; no outer ring.
 **Tried and cut:** random/daily accent rotation (he wants one consistent coral); green/red yes-no (breaks the theme); shimmer on every primary button.
+
+**Fun to read:** a report or recap is a few big numbers and one-line captions, never a text list. Prefer hero numerals over sentences, at most 3-4 short items, biggest type that fits, a little personality in the wording. If it reads like notes, cut it down or turn it into numbers.
