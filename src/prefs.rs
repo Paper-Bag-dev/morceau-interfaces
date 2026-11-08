@@ -24,6 +24,7 @@ pub const PARAMS: &[(&str, f64, f64, f64, &str)] = &[
     ("boldness", 1.0, 0.3, 1.2, "color saturation of accents"),
     ("simplicity", 0.0, 0.0, 1.0, "above 0.7 unfamiliar chart kinds fall back to plain ones"),
     ("overlap", 0.6, 0.0, 1.0, "tolerance for covering non-active windows (0 = avoid everything)"),
+    ("crowd", 0.5, 0.15, 0.95, "how full the free space may get before crowd handling starts: the share of the room around the active window that our cards cover (learned: 'too crowded' lowers it, 'fine' raises it)"),
     ("dock", 0.7, 0.0, 1.0, "cohesion: snap flush to neighbouring windows and screen edges instead of floating (0 = float freely)"),
     ("morph", 0.6, 0.0, 1.0, "cohesion: reshape around neighbours - glanceable part docks beside the active window, the rest tucks below (L-shape / split)"),
     ("harmony", 0.6, 0.0, 1.0, "cohesion: line up with my own other surfaces (shared edges, tidy seams, same tone)"),

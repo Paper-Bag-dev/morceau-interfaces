@@ -31,8 +31,10 @@ one big blocker. Several small cards spread into the free space (`--region auto`
       any number of them in place: `morc push a b c d` (same id = refreshed where it stands, so cards shrink away and the active one takes the room).
    3. When the interaction is over, set the importances back with `morc card` and `morc push` the same list. A card nobody touches for too long expires by
       its `ttl`; close the rest with `morc close <id>`.
-   4. The host also does the shrink-and-restore by itself: once more than `crowd_max` cards are visible (5, in `prefs/placement.json`), hovering one shrinks the
-      others to `crowd_yield` (0.8, never below the zoom floor) and they come back when the pointer leaves. Change both numbers in that JSON.
+   4. The host also does the shrink-and-restore by itself when the screen is crowded. Crowded is NOT a card count: it is how much of the free room (the work area
+      minus the active window) our cards already cover, compared with the learned `crowd` limit in the annoyance vector (default 0.5). While you hover one card the
+      others shrink to `crowd_yield` (0.8 in `prefs/placement.json`, never below the zoom floor) and return when the pointer leaves. Teach it what you treat as
+      crowded: `morc annoy nudge crowd 0.8 --why "too crowded"` lowers the limit, `morc annoy nudge crowd 1.2 --why "fine"` raises it (per topic or global).
    Compact by default with the detail behind it ("show more" via prefetch + `reveal`) is how a card is made expandable.
 7. **Write, then push in small batches.** `morc card` for each, then `morc push` three or four at a time. Slowly: re-count after each batch.
 8. **Verify with numbers.** `morc status` rects: no overlap with the active window or another card. Look at the screen only when the user has asked.
