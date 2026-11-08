@@ -327,9 +327,11 @@ impl Host {
             }
             "layout" => self.layout(key, &m),
             "hover" => {
+                let on = m["v"].as_bool().unwrap_or(false);
                 if let Some(s) = self.surfaces.get_mut(&key) {
-                    s.life.on_hover(m["v"].as_bool().unwrap_or(false), now);
+                    s.life.on_hover(on, now);
                 }
+                self.crowd(key, on);
             }
             "pin" => {
                 if let Some(s) = self.surfaces.get_mut(&key) {
@@ -412,6 +414,31 @@ impl Host {
     }
 
     /// The page told us its content size and the shapes to keep clickable.
+    /// Crowded screen (more than `crowd_max` visible cards): while the pointer is on one card, every OTHER card shrinks to `crowd_yield` of its size
+    /// so the one in use has room (it grows itself on hover); when the pointer leaves, all go back. Thresholds are in prefs/placement.json.
+    fn crowd(&mut self, key: u64, on: bool) {
+        static YIELDED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+        use std::sync::atomic::Ordering::Relaxed;
+        let pol = policy::load();
+        let visible: Vec<u64> = self.surfaces.iter().filter(|(_, s)| s.phase == Phase::Visible).map(|(k, _)| *k).collect();
+        let crowded = pol.crowd_max > 0 && visible.len() > pol.crowd_max;
+        if on && !crowded {
+            return;
+        }
+        if !on && !YIELDED.load(Relaxed) {
+            return; // nothing was shrunk, nothing to restore
+        }
+        let prefs = prefs::load();
+        for k in visible {
+            if let Some(s) = self.surfaces.get(&k) {
+                let base = view_for(s, &s.opts, &prefs, &s.topic)["scale"].as_f64().unwrap_or(1.0);
+                let f = if on && k != key { pol.crowd_yield } else { 1.0 };
+                s.send(&json!({"t": "view", "view": {"scale": base * f}}));
+            }
+        }
+        YIELDED.store(on, Relaxed);
+    }
+
     fn layout(&mut self, key: u64, m: &Value) {
         let (kin, foreign) = self.estates(key);
         let Some(s) = self.surfaces.get_mut(&key) else { return };

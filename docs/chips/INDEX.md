@@ -25,12 +25,15 @@ one big blocker. Several small cards spread into the free space (`--region auto`
    sides of the active window, covering only background windows, never the active window and never one of our own cards; (f) hold the rest back: open
    fewer cards and say what is waiting (a "more" button) instead of overlapping.
    **Merge rule (once):** cards of the same kind are merged into one card whenever there is not room for them apart (charts into one window, numbers into one row).
-6b. **Make it interactive when space is short (Tier 1 or any time).** Show the compact card and put the detail behind the card: it expands on interaction
-   (hover or a "show more") to the detail view, the way `show more` already works with prefetch and `reveal`. While the user is interacting the card has
-   importance: it temporarily takes MORE space than the others, and the others move away or shrink toward their `min_importance` to give it room. When the
-   interaction ends, reset: it shrinks back and the others return. A card nobody has touched for too long disappears on its own (`ttl`); never leave a stale
-   card up. Keep the expanded view in the card's own JSON (a second layout or `show more` data), not in code. (Status: hover growth, prefetch and `reveal`
-   exist; making the other cards move aside and return is not built yet.)
+6b. **Crowded or short on space: update the cards you already have, with commands (no coding).**
+   1. `morc status` lists the cards on screen (id, rect, visible).
+   2. Make the one in use bigger and the rest smaller: `morc card <id> --importance X` for each (never below its `min_importance`), then ONE command re-pushes
+      any number of them in place: `morc push a b c d` (same id = refreshed where it stands, so cards shrink away and the active one takes the room).
+   3. When the interaction is over, set the importances back with `morc card` and `morc push` the same list. A card nobody touches for too long expires by
+      its `ttl`; close the rest with `morc close <id>`.
+   4. The host also does the shrink-and-restore by itself: once more than `crowd_max` cards are visible (5, in `prefs/placement.json`), hovering one shrinks the
+      others to `crowd_yield` (0.8, never below the zoom floor) and they come back when the pointer leaves. Change both numbers in that JSON.
+   Compact by default with the detail behind it ("show more" via prefetch + `reveal`) is how a card is made expandable.
 7. **Write, then push in small batches.** `morc card` for each, then `morc push` three or four at a time. Slowly: re-count after each batch.
 8. **Verify with numbers.** `morc status` rects: no overlap with the active window or another card. Look at the screen only when the user has asked.
 9. **Fix in JSON.** If something is off, change the card's file (chip, region, importance, dx/dy, data), re-push, and write down what worked.

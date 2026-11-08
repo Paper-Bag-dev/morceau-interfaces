@@ -95,6 +95,10 @@ pub struct Policy {
     pub step: i32,
     /// bottom-right zone where Windows toasts appear: [width, height] physical px
     pub toast_zone: [i32; 2],
+    /// More than this many cards on screen counts as crowded: while the user is on one card, the OTHERS shrink to `crowd_yield` of their size
+    /// (never below the page's zoom floor) and come back when the pointer leaves. 0 turns it off.
+    pub crowd_max: usize,
+    pub crowd_yield: f64,
     /// anchors that mean "I chose where": they override sibling pull and toast avoidance
     pub explicit_anchors: Vec<String>,
     pub anchors: BTreeMap<String, Anchor>,
@@ -124,6 +128,8 @@ impl Default for Policy {
             gap: 6,
             step: 20,
             toast_zone: [420, 380],
+            crowd_max: 5, // the overload test: past about five cards the screen reads as too much
+            crowd_yield: 0.8,
             explicit_anchors: ["right_bottom", "left_bottom", "bottom", "corner", "below"].iter().map(|s| s.to_string()).collect(),
             anchors: serde_json::from_str(DEFAULT_ANCHORS).unwrap_or_default(),
         }
