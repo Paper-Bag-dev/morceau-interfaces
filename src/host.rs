@@ -384,7 +384,10 @@ impl Host {
                     // a click that asked for background work but got nobody (agent off, rate limited): put the button back instead of leaving skeletons forever
                     if p["bg"].as_bool().unwrap_or(false) && !matches!(r, "headless-spawned" | "queued" | "dry-run") {
                         if let Some(s) = self.surfaces.get(&key) {
-                            s.send(&json!({"t": "patch", "data": {"/state": "idle"}}));
+                            // the spec says what "back to the button" means: payload.reset = {"/mode": "cold"}; default {"/state": "idle"}
+                            let reset = p["reset"].clone();
+                            let data = if reset.is_object() { reset } else { json!({"/state": "idle"}) };
+                            s.send(&json!({"t": "patch", "data": data}));
                         }
                     }
                 }
