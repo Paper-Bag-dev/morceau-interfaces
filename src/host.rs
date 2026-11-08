@@ -460,7 +460,12 @@ impl Host {
             let size = ((w * scale) as i32 - il - ir, (h * scale) as i32 - it - ib);   // the visible content
             let ow = 1.2 - prefs::get(&prefs::load(), &s.topic, "overlap");
             // A spot the user carried this topic to before wins, unless it would sit on top of the active window right now.
-            let remembered = placed::get(&s.topic).filter(|&(rx, ry)| !placement::covers_foreground(&placement::R { l: rx, t: ry, r: rx + size.0, b: ry + size.1 }));
+            // ...and never on top of one of my own cards: cards of one topic would otherwise all pile onto the same remembered spot.
+            let mine: Vec<placement::R> = kin.iter().chain(foreign.iter()).copied().collect();
+            let remembered = placed::get(&s.topic).filter(|&(rx, ry)| {
+                let r = placement::R { l: rx, t: ry, r: rx + size.0, b: ry + size.1 };
+                !placement::covers_foreground(&r) && !mine.iter().any(|w| r.l < w.r && w.l < r.r && r.t < w.b && w.t < r.b)
+            });
             let explicit = s.opts.at.map(|[ax, ay]| placement::clamp_inside(&placement::R { l: ax, t: ay, r: ax + size.0, b: ay + size.1 }));
             // Region placement (--region/--align/--dx/--dy, or anchor "auto"): the host divides the free space and puts the content in a region.
             let by_region = (s.opts.region.is_some() || s.opts.align.is_some() || s.opts.anchor.as_deref() == Some("auto"))

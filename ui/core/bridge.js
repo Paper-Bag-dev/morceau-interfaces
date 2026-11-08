@@ -33,7 +33,7 @@ export function setView(v) {
 }
 
 // ---------- hover-grow: a small 3D / chart / graph window gets a little bigger while the pointer is on it ----------
-let grownFrom = 0, growTimer = 0, shrinkTimer = 0;
+let grownFrom = 0, growTimer = 0, shrinkTimer = 0, lastShrinkAt = 0;   // lastShrinkAt: after a shrink, no re-grow for a while (the pointer can sit between the small and the grown edge and make the card flap)
 const GROW = 1.25, SMALL_W = 560;   // grows only when the window is narrower than SMALL_W (logical px); never past the screen cap
 stage.addEventListener('pointerenter', () => {
   clearTimeout(shrinkTimer);
@@ -41,7 +41,7 @@ stage.addEventListener('pointerenter', () => {
   clearTimeout(growTimer);
   growTimer = setTimeout(() => {
     const w = stage.getBoundingClientRect().width;   // logical px, includes zoom
-    if (grownFrom || w >= SMALL_W) return;
+    if (grownFrom || w >= SMALL_W || Date.now() - lastShrinkAt < 4000) return;
     const room = Math.min(view.maxw / w, view.maxh / stage.getBoundingClientRect().height);
     const k = Math.min(GROW, room);
     if (k < 1.06) return;                            // no room worth growing into
@@ -57,7 +57,7 @@ stage.addEventListener('pointerleave', () => {
   if (!grownFrom) return;
   clearTimeout(shrinkTimer);
   shrinkTimer = setTimeout(() => {                   // linger a moment so the edge does not flicker
-    const z = grownFrom; grownFrom = 0;
+    const z = grownFrom; grownFrom = 0; lastShrinkAt = Date.now();
     fits = 0;
     applyZoom(z);
     measure();

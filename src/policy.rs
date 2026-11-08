@@ -1,4 +1,4 @@
-//! Placement policy as DATA, not code: weights, thresholds and the shape of every anchor live in `prefs/placement.json`.
+﻿//! Placement policy as DATA, not code: weights, thresholds and the shape of every anchor live in `prefs/placement.json`.
 //! The host re-reads the file whenever it changes (mtime), so tuning placement, or inventing a new anchor, needs no rebuild:
 //! edit the JSON, push the next surface. A missing file is written out with the defaults below; a missing key uses its default.
 //!
@@ -62,7 +62,7 @@ pub struct Weights {
 
 impl Default for Weights {
     fn default() -> Self {
-        Weights { cover_normal: 400.0, cover_important: 4.0, toast: 6.0, toast_explicit: 0.3, dock_flush: 2000.0, harmony_flush: 1600.0, explicit_harmony: 0.15, mine_overlap: 30.0, foreign_sep: 1.5, anchor_soften: 0.55 }
+        Weights { cover_normal: 400.0, cover_important: 4.0, toast: 6.0, toast_explicit: 0.3, dock_flush: 2000.0, harmony_flush: 1600.0, explicit_harmony: 0.15, mine_overlap: 5000.0, foreign_sep: 1.5, anchor_soften: 0.55 }
     }
 }
 
