@@ -14,8 +14,6 @@ dragged, and then quietly fade away. The engine is a small Rust host; everything
                                             ui/ (components, charts, 3D) --clicks, drags--> inbox --> agent (via hooks)
 ```
 
-> Working name. A different project already uses the name A2UI; this one is `morceau` (CLI: `morc`). Package: `morceau` on npm.
-
 ## What you get
 - **A tiny CLI** (`morc use | show | compose | patch | close ...`) and a cache, so showing something you showed before costs one line.
 - **Components**: text, stat (hero numeral with a needle), button, progress, input, list, chart (line, area, bar, donut, radar, heatmap, clock, rings, treemap,
