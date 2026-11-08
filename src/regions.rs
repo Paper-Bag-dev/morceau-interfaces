@@ -224,10 +224,11 @@ pub fn place(size: (i32, i32), spec: &Spec, widgets: &[R]) -> Option<(i32, i32)>
 }
 
 /// The size (physical px) of the region a spec will aim at, BEFORE the content is measured, so the page can wrap and flow to fit it.
-/// `min` = the smallest the content can be (declared by the component): regions too small for it are skipped. Ignores my own widgets
-/// (they only shrink it later). None = no region qualifies, the page keeps its default sizing.
-pub fn size_for(region: Option<&str>, sacrifice: bool, min: Option<(i32, i32)>) -> Option<(i32, i32)> {
-    let (regs, _, _) = compute(&[]);
+/// `min` = the smallest the content can be (declared by the component): regions too small for it are skipped. `widgets` = my cards already on screen:
+/// the region is what is REALLY left after them (a third or a side), so the card is sized to that and shrinks to fit it. None = no region qualifies,
+/// the page keeps its default sizing.
+pub fn size_for(region: Option<&str>, sacrifice: bool, min: Option<(i32, i32)>, widgets: &[R]) -> Option<(i32, i32)> {
+    let (regs, _, _) = compute(widgets);
     let pol = policy::load();
     let (mw, mh) = min.unwrap_or((0, 0));
     let _ = sacrifice;

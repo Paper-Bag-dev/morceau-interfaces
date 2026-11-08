@@ -61,8 +61,16 @@ def main(argv):
             args += ["--dx", str(dx)]
         if c.get("dy") is not None:
             args += ["--dy", str(c["dy"])]
-        rc |= subprocess.run(args, stdout=subprocess.DEVNULL).returncode
-        print(("shown " if rc == 0 else "failed ") + n)
+        res = subprocess.run(args, capture_output=True, text=True)
+        try:
+            reply = json.loads(res.stdout)
+        except ValueError:
+            reply = {}
+        if reply.get("status") == "deferred":   # the host held it (a fullscreen app is active, quiet hours, ...): say so, do not pretend it is on screen
+            print("held " + n + ": " + str(reply.get("why", "")))
+            continue
+        rc |= res.returncode
+        print(("shown " if res.returncode == 0 else "failed ") + n)
     return rc
 
 

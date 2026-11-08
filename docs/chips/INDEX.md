@@ -19,8 +19,8 @@ one big blocker. Several small cards spread into the free space (`--region auto`
 
 ## THE LADDER (always follow it, in this order, every time you put cards on screen)
 1. **Need.** List the cards you want and their kind: text/numbers or a picture (chart). Rank them: what matters most goes first.
-2. **Look.** `morc free`: the active window (centre of the 3x3 grid) and the free regions around it, sides and corners, with their sizes.
-3. **Count BEFORE you push.** For each card take its size at `min_importance` (text at the floor). Add them up against the free regions. Never open more
+2. **Look.** `morc space` (or `morc free`): the `mode` and the free regions with their sizes. `mode` is `around-active` (the active window is the centre of the 3x3 grid and the free sides and corners are around it) or `screen-thirds` (a FULLSCREEN app is active: no window to dock beside, the screen is split into left, mid and right thirds). In `screen-thirds` the host HOLDS every push that is not urgent or `--force` (`morc push` prints `held <name>: ...`); report what is waiting and push when the fullscreen app is gone. Never push over a game or a video.
+3. **Count BEFORE you push.** (A card is sized to the room that is really left after the cards already on screen, a side or a third, and shrinks down to its floor to fit it.) For each card take its size at `min_importance` (text at the floor). Add them up against the free regions. Never open more
    than fits; never push first and look after.
 4. **Group by kind.** Text becomes one flex row (`stat-strip`) for a strip above/below; charts become one merged window (`chart-stack`) for a tall side.
 5. **Assign.** Always fill the FOUR MAIN SIDES first (left, right, above, below; resize and merge cards to fit them) and only then expand into the corners

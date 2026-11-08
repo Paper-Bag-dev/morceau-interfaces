@@ -28,6 +28,9 @@ Short, so an agent or contributor can read it before touching the UI or the wake
 ## Content that is too vague
 - Every metric gets a one-line plain-language caption (what is measured, over what, what good looks like). No internal names ("cold start").
 
+## Fullscreen apps and the thirds mode (11-08)
+When the active window is a fullscreen app (a game) the host reports `screen-thirds`: no window to dock beside, so my side/corner counting does not apply, and cards landed in the thirds over the game, at inconsistent sizes. Rules now: the host holds every non-urgent push while a fullscreen app is active (`show.rs`); a card is sized to the room really left after the cards already on screen (`size_for` takes the current widgets), so it shrinks to fit a narrow side or third; the ladder's look step reads `mode` first.
+
 ## The ladder (what the overload test taught)
 Pushing 12 full-size cards with no sums first piled them onto the terminal and into corners while a side still had room, and cards already placed moved when new ones arrived. So: count the room before you push, give things up in a fixed order (merge, trim data, shrink to the floor, remaining Tier 0, Tier 1 background windows only, hold back), push in small batches. Full ladder: docs/chips/INDEX.md. When space is short, merge same-kind cards and make the card expandable (compact by default, detail on interaction, others yield space, reset afterwards, expire when idle): rung 6b; only part of it is built (hover growth, prefetch, reveal).
 
