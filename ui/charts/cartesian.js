@@ -9,7 +9,7 @@ export function width(s) {
   if (s.kind !== 'bar' || !(s.labels && s.labels.length)) return 0;
   const longest = Math.max(0, ...s.labels.map((l) => measure(l, 9.5)));
   const n = Math.max(s.labels.length, (s.target || []).length);
-  return Math.max(180, Math.ceil(PAD * 2 + n * Math.max(48, longest + 14)));
+  return Math.max(180, Math.ceil(PAD * 2 + n * Math.max(40, longest + 8)));
 }
 
 function frame(s) {

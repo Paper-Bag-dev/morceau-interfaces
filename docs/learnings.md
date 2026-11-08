@@ -15,6 +15,16 @@ Short, so an agent or contributor can read it before touching the UI or the wake
   `morc patch <id> /__hover true` (and `false`).
 - **Also:** hover shadows must stay inside the 8 px window margin, or they clip on light cards.
 
+## Metrics are a dashboard, not a story
+- A vertical list of one thing after another is good for telling a story and bad for numbers the user wants to see at once. For metrics build a
+  **dashboard**: a row of big stat tiles, then a row with charts side by side, one short muted line of explanation, one Close. The card may be wide
+  (`max_frac` up to 0.85, `min` about [640,300]); rows wrap when the box is narrow.
+- Tile labels do the explaining ("Re-used from cache", "New today"), so the caption can stay one line.
+- **Type floors:** card text 15 px (small 14, large 18, hero 36), chart titles 15 px, chart text never below 13 px (`FLOOR` in `ui/charts/util.js`).
+  The global size bias is a learned preference (`morc annoy nudge size_bias`); he asked for bigger text and cards on 11-08.
+- **Two layout bugs that clipped charts:** `#surface` got a `max-width` from the wrap width and squeezed a rigid chart canvas, so it now has
+  `min-width: min-content` (min beats max); and a chart in a row could flex-shrink below its canvas, so `.c-chart` is `flex: none` and rows wrap.
+
 ## Content that is too vague
 - Every metric gets a one-line plain-language caption (what is measured, over what, what good looks like). No internal names ("cold start").
 

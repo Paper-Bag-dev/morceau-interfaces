@@ -32,8 +32,10 @@ export const fmt = (v, unit = '') => `${Math.round(v * 10) / 10}${unit}`;
 const BODY = '"Segoe UI Variable Text", "Segoe UI", sans-serif';
 const DISPLAY = '"Bahnschrift", "Segoe UI Variable Display", "Segoe UI", sans-serif';   // numerals: DIN-like, matches the stat component
 
+export const FLOOR = 13;   // smallest chart text in css px; bigger text is passed explicitly
+
 export function label(g, text, x, y, { align = 'center', size = 11, color, weight = 500, display = false } = {}) {
-  g.font = `${weight} ${size}px ${display ? DISPLAY : BODY}`;
+  g.font = `${weight} ${Math.max(FLOOR, size)}px ${display ? DISPLAY : BODY}`;   // type floor: chart text is never smaller than FLOOR
   g.fontVariantNumeric = 'tabular-nums';
   g.fillStyle = color || ink(0.85);
   g.textAlign = align;
@@ -45,6 +47,6 @@ export function label(g, text, x, y, { align = 'center', size = 11, color, weigh
 let mctx = null;
 export function measure(text, size = 11, weight = 500) {
   if (!mctx) mctx = document.createElement('canvas').getContext('2d');
-  mctx.font = `${weight} ${size}px ${BODY}`;
+  mctx.font = `${weight} ${Math.max(FLOOR, size)}px ${BODY}`;
   return mctx.measureText(String(text)).width;
 }
