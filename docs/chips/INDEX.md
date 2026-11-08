@@ -6,6 +6,21 @@ A **chip** is a ready-made card: a JSON file (the layout, already built) plus a 
 separate card (`donut-card`, `week-chart`). Never mix a picture and a text list in one card, never stack everything as one long vertical story, never
 one big blocker. Several small cards spread into the free space (`--region auto`), sized in between (about importance 1.0; text cards 0.85 to 1.0).
 
+**The loop (whenever you or the background agent push chips):**
+1. Decide every card you want to show, and write each card's data JSON first (fast, one file per card; a recipe like `cache/recipes/tokens-cards.json` lists them).
+2. Next turn pass them all to `morc use <chip> --data @file --region auto`. Do not pick positions yourself; the host does it with the Tier 0 rule below.
+3. To tweak a card later, edit its JSON and re-push. Do not edit scripts or code.
+
+**Tier 0 placement (how the host fills free space, in the 3x3 grid with the active window as the centre cell):**
+- Look for free space beside the active window (free of every other window and card). Active window on the right and the left free: fill the left, starting
+  at the edge **next to the active window** and working outward. Once that is full, take the next free cell and start again at its corner **closest to the
+  active window** (bottom-left free: its top-right corner; top-left: bottom-right; top-right: bottom-left; bottom-right: top-left). Active window below:
+  start from the top (top-left or top-right) and so on, for every free quadrant.
+- A big background window never blocks this: the free sides of the ACTIVE window count as free.
+- If Tier 0 cannot be followed, populate right (or the scored fallback). If a card can never fit any free space, start from the right.
+- Compromise on **size**, never on text: cards shrink to fit the free space, but text stays at or above the type floor (15 px card text, 13 px chart text).
+  If it would go below that, the card goes elsewhere instead of shrinking further.
+
 **To show something:**
 1. Find the chip below. Open its md (one screen) for the params and the size knobs.
 2. Change only its **data** (a small JSON file with the params) and, if needed, a size knob. The layout JSON stays untouched.

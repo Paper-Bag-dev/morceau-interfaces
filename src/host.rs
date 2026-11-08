@@ -753,7 +753,10 @@ fn view_for(s: &Surface, opts: &Opts, prefs: &prefs::Prefs, topic: &str) -> Valu
     let strip_h = reg.map(|(_, h)| h as f64).unwrap_or(placement::dock_below() as f64);
     let big = opts.max_frac.unwrap_or(0.5) > 0.5;
     let wrap = if prefs::get(prefs, topic, "morph") >= 0.3 && !is_important(opts) && !big {
-        if room >= 230.0 { (room - 14.0).clamp(230.0, 420.0) } else { 360.0 }   // no gap beside a neighbour: still wrap long text instead of forcing a slab
+        // leave the policy margin + gap too, or content that wraps to exactly the region is a hair too wide for it and falls back to scored placement
+        let pol = policy::load();
+        let slack = 14.0 + (pol.margin + pol.gap) as f64 / sf;
+        if room >= 230.0 { (room - slack).clamp(230.0, 420.0) } else { 360.0 }   // no gap beside a neighbour: still wrap long text instead of forcing a slab
     } else {
         0.0
     };

@@ -152,7 +152,7 @@ pub fn compute(widgets: &[R]) -> (Vec<Region>, &'static str, Option<R>) {
 fn default_align(name: &str) -> &'static str {
     match name {
         "right" | "right-col" | "bottom-right" => "left-top",
-        "left" | "left-col" | "bottom-left" => "left-top", // cards in the left free side sit at the left, toward the screen edge
+        "left" | "left-col" | "bottom-left" => "right-top", // hug the active window: a card in the left side sits at its right edge, next to the window
         "below" | "below-row" => "top-right",
         "above" | "above-row" => "bottom-right",
         "top-right" => "left-bottom",
@@ -215,7 +215,10 @@ pub fn place(size: (i32, i32), spec: &Spec, widgets: &[R]) -> Option<(i32, i32)>
     let pol = policy::load();
     let (m, gap) = (pol.margin, pol.gap);
     let wanted = spec.region.as_deref().filter(|r| *r != "auto");
-    let r = candidates(&regs, wanted, if spec.sacrifice { 2 } else { 1 }).into_iter().find(|r| r.rect.w() >= size.0 + m + gap && r.rect.h() >= size.1 + m + gap)?;
+    // Tier 0 (free of every window) first; when a big background window covers the whole screen tier 0 is empty, and then the free sides of the
+    // ACTIVE window (tier 1) are the free space: background windows never block a card. (`sacrifice` no longer gates this.)
+    let _ = spec.sacrifice;
+    let r = candidates(&regs, wanted, 2).into_iter().find(|r| r.rect.w() >= size.0 + m + gap && r.rect.h() >= size.1 + m + gap)?;
     Some(aligned(&r.rect, size, &spec.align, &r.name, spec.dx, spec.dy, m, gap))
 }
 
@@ -226,7 +229,8 @@ pub fn size_for(region: Option<&str>, sacrifice: bool, min: Option<(i32, i32)>) 
     let (regs, _, _) = compute(&[]);
     let pol = policy::load();
     let (mw, mh) = min.unwrap_or((0, 0));
-    candidates(&regs, region.filter(|r| *r != "auto"), if sacrifice { 2 } else { 1 })
+    let _ = sacrifice;
+    candidates(&regs, region.filter(|r| *r != "auto"), 2)
         .into_iter()
         .find(|r| r.rect.w() >= mw + pol.margin + pol.gap && r.rect.h() >= mh + pol.margin + pol.gap)
         .map(|r| (r.rect.w(), r.rect.h()))
