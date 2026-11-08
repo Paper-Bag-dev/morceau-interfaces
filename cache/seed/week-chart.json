@@ -1,14 +1,81 @@
 {
-  "t": "save",
-  "name": "week-chart",
-  "desc": "7-day bar/line chart with a title. Pass /title, /values (7 numbers), /labels (7 strings), /unit.",
-  "params": ["/title", "/values", "/labels", "/unit"],
-  "opts": { "min": [260,150], "ttl": 25, "topic": "charts.week" },
-  "components": [
-    { "id": "root", "type": "column", "gap": 6, "children": ["c", "ok"] },
-    { "id": "c", "type": "chart", "kind": "bar", "title": "{/title}", "data": { "bind": "/values" }, "labels": { "bind": "/labels" }, "height": 110, "unit": "m" },
-    { "id": "ok", "type": "row", "children": ["b"] },
-    { "id": "b", "type": "button", "label": "Close", "action": { "do": "close" } }
-  ],
-  "data": { "title": "Last 7 days", "values": [0, 0, 0, 0, 0, 0, 0], "labels": ["M", "T", "W", "T", "F", "S", "S"] }
+    "t":  "save",
+    "name":  "week-chart",
+    "desc":  "7-day bar/line chart with a title. Pass /title, /values (7 numbers), /labels (7 strings), /unit.",
+    "params":  [
+                   "/title",
+                   "/values",
+                   "/labels",
+                   "/unit"
+               ],
+    "opts":  {
+                 "min":  [
+                             260,
+                             150
+                         ],
+                 "ttl":  25,
+                 "topic":  "charts.week",
+                 "importance":  "0.7"
+             },
+    "components":  [
+                       {
+                           "id":  "root",
+                           "type":  "column",
+                           "gap":  6,
+                           "children":  [
+                                            "c",
+                                            "ok"
+                                        ]
+                       },
+                       {
+                           "id":  "c",
+                           "type":  "chart",
+                           "kind":  "bar",
+                           "title":  "{/title}",
+                           "data":  {
+                                        "bind":  "/values"
+                                    },
+                           "labels":  {
+                                          "bind":  "/labels"
+                                      },
+                           "height":  110,
+                           "unit":  "m"
+                       },
+                       {
+                           "id":  "ok",
+                           "type":  "row",
+                           "children":  [
+                                            "b"
+                                        ]
+                       },
+                       {
+                           "id":  "b",
+                           "type":  "button",
+                           "label":  "Close",
+                           "action":  {
+                                          "do":  "close"
+                                      }
+                       }
+                   ],
+    "data":  {
+                 "title":  "Last 7 days",
+                 "values":  [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                            ],
+                 "labels":  [
+                                "M",
+                                "T",
+                                "W",
+                                "T",
+                                "F",
+                                "S",
+                                "S"
+                            ]
+             }
 }
