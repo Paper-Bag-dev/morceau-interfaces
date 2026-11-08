@@ -2,6 +2,12 @@
 
 A **chip** is a ready-made card: a JSON file (the layout, already built) plus a short md next to this index. You do not write component code.
 
+**STRICT RULE: every component is modular and controlled by a JSON file.** Whenever you make or change any component or chip: its layout is one JSON
+in `cache/seed/`, and everything that can vary (data, `align` left/right, `importance`, `min_importance`, `region`, `ttl`, `chip`) is a field in the card's
+JSON (`cards/<name>.json`, written with `morc card`). Nothing about one component is hardcoded in Python or Rust. A new knob is a new field read
+generically for every card, never a branch for one chip. Fields not set fall back to defaults; you only write what differs. A new component is done only
+when it has: its layout JSON, a short md in `docs/chips/`, a line in this index, and works through `morc card` + `morc push`.
+
 **Group by kind (the user has said this many times):** numbers and text go together in ONE card (`stat-tiles`); pictures (charts) each go in their own
 separate card (`donut-card`, `week-chart`). Never mix a picture and a text list in one card, never stack everything as one long vertical story, never
 one big blocker. Several small cards spread into the free space (`--region auto`), sized in between (about importance 1.0; text cards 0.85 to 1.0).

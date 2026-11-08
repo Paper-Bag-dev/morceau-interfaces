@@ -240,7 +240,7 @@ impl Host {
         let may_beep = pv("sound") > 0.5;
 
         let mut payload = json!({"t": "init", "id": id, "components": components, "data": if data.is_null() { json!({}) } else { data },
-                             "opts": {"urgent": opts.urgent, "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme}, "literacy": literacy::snapshot()});
+                             "opts": {"urgent": opts.urgent, "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme, "align": opts.align}, "literacy": literacy::snapshot()});
         self.parked.retain(|p| p.id != id);
         sources::register(&id, &srcs);
         self.last_use = Instant::now();

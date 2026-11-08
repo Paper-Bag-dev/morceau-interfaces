@@ -35,6 +35,8 @@ def main(argv):
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="ascii") as f:
             json.dump(c.get("data", {}), f)
         args = [BIN, "use", c["chip"], "--id", n, "--data", "@" + f.name, "--importance", str(imp), "--ttl", str(c.get("ttl", 90)), "--region", c.get("region", "auto")]
+        if c.get("align"):
+            args += ["--align", c["align"]]
         rc |= subprocess.run(args, stdout=subprocess.DEVNULL).returncode
         print(("shown " if rc == 0 else "failed ") + n)
     return rc

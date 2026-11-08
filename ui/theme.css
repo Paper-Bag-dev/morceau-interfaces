@@ -249,5 +249,12 @@ body { color: hsl(var(--ink)); cursor: default; }
 .col.end > .c-text, .col.end > .row, .col.end > .stat { align-self: flex-end; }
 .col.end > .c-text { text-align: right; }
 .col.end > .row { justify-content: flex-end; }
+/* card-level "align": "right" (set in the card's JSON): everything in the card starts from the right edge, so titles, charts, stats and Close line up */
+#stage.align-right .col { --align: flex-end; align-items: flex-end; }
+#stage.align-right .col > .c-text, #stage.align-right .col > .stat, #stage.align-right .col > .c-chart, #stage.align-right .col > .row { align-self: flex-end; }
+#stage.align-right .col > .c-text { text-align: right; }
+#stage.align-right .row { justify-content: flex-end; }
+#stage.align-right .c-chart { display: flex; flex-direction: column; align-items: flex-end; }
+#stage.align-right .c-chart .ttl { align-self: flex-end; }
 .flow-left { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: 8px; }   /* first column at the right, the rest grow leftward */
 .flow-left > .col > .c-text { max-width: 250px; }

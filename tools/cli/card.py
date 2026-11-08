@@ -15,7 +15,17 @@ def value(text):
     try:
         return json.loads(text)
     except ValueError:
-        return text
+        pass
+    # Windows shells strip the quotes inside JSON, so a plain list is fine too: [a,b,c] or [1,2,3]
+    if text.startswith("[") and text.endswith("]"):
+        items = []
+        for t in (s.strip().strip("\"'") for s in text[1:-1].split(",") if s.strip()):
+            try:
+                items.append(json.loads(t))
+            except ValueError:
+                items.append(t)
+        return items
+    return text
 
 
 def set_path(d, path, v):
@@ -51,6 +61,8 @@ def main(argv):
             card[a[2:].replace("-", "_")] = float(nxt) if a != "--ttl" else int(nxt)
         elif a == "--region":
             card["region"] = nxt
+        elif a == "--align":  # left | right: where the card's contents start (titles, charts, Close all line up on that edge)
+            card["align"] = nxt
         else:
             print("unknown option " + a)
             return 2

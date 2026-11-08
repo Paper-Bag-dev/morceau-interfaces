@@ -48,6 +48,8 @@ window.morc = {
         }
         applyTheme(stage, pickTheme(m.opts && m.opts.topic, m.opts && m.opts.theme, m.view && m.view.theme_default));
         literacy.set(m.literacy);
+        // card-level alignment from the card's JSON ("align": "right"): titles, rows, text, charts and Close all start from the same edge
+        stage.classList.toggle('align-right', /right/.test((m.opts && m.opts.align) || ''));
         r.init(m);
         if (ready) root.classList.add('on');   // refresh of an on-screen surface: stay visible
         measureSoon();
