@@ -1,4 +1,4 @@
-//! The chore agent's settings and senses. It is a low-cost headless model (Haiku by default) that is NOT a daemon:
+﻿//! The chore agent's settings and senses. It is a low-cost headless model (Haiku by default) that is NOT a daemon:
 //! it is spawned only when the gates in wake.rs allow, does a few quick chores, and exits (= sleeps).
 //!
 //! prefs/worker.json (hot-reloaded, written with defaults on first use; edit it, nothing needs a rebuild):
@@ -49,7 +49,7 @@ impl Default for Worker {
             max_per_hour: 6,
             min_gap_s: 20,
             chore_cooldown_min: 30.0,
-            max_turns: 8,
+            max_turns: 24,
             track_titles: true,
             redact: ["password", "passcode", "otp", "bank", "login", "sign in", "private", "incognito"].iter().map(|s| s.to_string()).collect(),
         }
