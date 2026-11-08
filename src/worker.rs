@@ -31,6 +31,8 @@ pub struct Worker {
     pub persona: String,
     pub idle_s: u64,
     pub defer_to_session: bool,
+    /// Seconds the agent stays awake after its last interaction (a finished turn or a new message), waiting for more work, before it sleeps.
+    pub linger_s: u64,
     pub session_fresh_s: u64,
     pub max_per_hour: usize,
     pub min_gap_s: u64,
@@ -48,6 +50,7 @@ impl Default for Worker {
             persona: "docs/agent.md".into(),
             idle_s: 180,
             defer_to_session: false,
+            linger_s: 600, // awake for 10 minutes after the last interaction; every new one restarts the timer
             session_fresh_s: 600,
             max_per_hour: 6,
             min_gap_s: 20,

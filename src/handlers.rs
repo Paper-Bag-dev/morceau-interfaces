@@ -77,7 +77,13 @@ pub fn run(surface: &str, topic: &str, action: &Value, proxy: &Proxy) -> Effect 
                     a.iter()
                         .filter_map(|x| {
                             let n = x["name"].as_str()?.to_string();
-                            let args = x["args"].as_array().map(|v| v.iter().filter_map(|s| s.as_str().map(String::from)).collect()).unwrap_or_default();
+                            let mut args: Vec<String> = x["args"].as_array().map(|v| v.iter().filter_map(|s| s.as_str().map(String::from)).collect()).unwrap_or_default();
+                            // "id": show this component under another id, e.g. a skeleton placeholder under the id the real card will use,
+                            // so the card that is built later replaces it in place
+                            if let Some(id) = x["id"].as_str() {
+                                args.push("--id".into());
+                                args.push(id.to_string());
+                            }
                             Some((n, args))
                         })
                         .collect()

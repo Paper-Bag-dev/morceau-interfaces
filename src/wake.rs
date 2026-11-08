@@ -1,10 +1,11 @@
-﻿//! Waking a headless agent (the chore agent, Haiku by default), cheapest and most conservative first.
+//! Waking a headless agent (the chore agent, Haiku by default), cheapest and most conservative first.
 //! Every wake, whatever asked for it, passes the same gates in this order:
 //!   1. only if prefs/worker.json says defer_to_session: a live interactive session touched morc recently -> rest. By default the agent and the session work together
 //!   2. the PC is idle (no keyboard/mouse input for idle_s)      -> rest
 //!   3. hard rate limit (max_per_hour, min_gap_s)                -> rest
 //!   4. chores only: the chore cooldown has not passed           -> rest
-//! Passing them spawns a headless `claude -p` (model, persona, turn cap from prefs/worker.json). It exits when done: that is its sleep.
+//! Passing them starts ONE headless `claude -p` (model, persona, turn cap from prefs/worker.json) that reads its work from stdin. Later wakes are
+//! written to that same process and queue behind what it is doing. It stays awake `linger_s` after its last turn, then the host closes its input: its sleep.
 //! Two ways in: a user action on a widget (maybe_wake) and a chore (chore: from a trigger rule, an external tool, or `morc chore <reason>`).
 
 use crate::{inbox, paths, util, worker};
@@ -44,94 +45,139 @@ fn gate(w: &worker::Worker, chore: bool, direct: bool, click: bool) -> Result<Ve
     Ok(recent)
 }
 
-/// ONE agent for everything. If it is already working, a new wake is queued and handed to it (batched into one run) when it finishes:
-/// a burst of clicks never starts a burst of agents.
-struct Queue {
-    running: bool,
-    pending: Vec<String>,
+/// ONE agent for everything, and it stays awake for a while.
+/// The first wake starts a `claude -p` that reads its work from stdin (stream-json). Every later wake is written to that same process, so a
+/// burst of clicks never starts a burst of agents: they queue up in its input and it works through them one after another. When it has
+/// finished everything and nothing new came for `linger_s`, the host closes its input and it exits: that is its sleep.
+struct Agent {
+    alive: bool,
+    stdin: Option<std::process::ChildStdin>,
+    /// messages written whose turn has not finished yet
+    in_flight: usize,
+    last_done: std::time::Instant,
 }
-static QUEUE: std::sync::Mutex<Queue> = std::sync::Mutex::new(Queue { running: false, pending: Vec::new() });
+static AGENT: std::sync::Mutex<Option<Agent>> = std::sync::Mutex::new(None);
+
+fn user_line(prompt: &str) -> String {
+    let mut s = json!({"type": "user", "message": {"role": "user", "content": prompt}}).to_string();
+    s.push('\n');
+    s
+}
 
 fn spawn(w: &worker::Worker, prompt: &str, mut recent: Vec<u128>, chore: bool) -> &'static str {
+    use std::io::Write;
     if std::env::var("MORC_WAKE_DRY").is_ok() {
         let _ = fs::write(paths::runtime_dir().join("wake.dry.txt"), prompt);
         return "dry-run";
     }
+    // already awake: hand it the work, it queues behind what it is doing
     {
-        let mut q = QUEUE.lock().unwrap();
-        if q.running {
-            q.pending.push(prompt.to_string());
-            return "queued";
+        let mut g = AGENT.lock().unwrap();
+        if let Some(a) = g.as_mut() {
+            if a.alive {
+                if let Some(si) = a.stdin.as_mut() {
+                    if si.write_all(user_line(prompt).as_bytes()).and_then(|_| si.flush()).is_ok() {
+                        a.in_flight += 1;
+                        a.last_done = std::time::Instant::now(); // any new interaction restarts the awake timer
+                        return "queued";
+                    }
+                }
+                a.alive = false; // its input is gone: start a new one below
+            }
         }
-        q.running = true;
     }
     recent.push(util::now_ms());
     let _ = fs::write(paths::wake_log_file(), recent.iter().map(|t| t.to_string()).collect::<Vec<_>>().join("\n"));
     if chore {
         worker::mark_chore();
     }
-    match launch(w, prompt) {
-        Ok(mut child) => {
-            let w = w.clone();
-            std::thread::spawn(move || {
-                let _ = child.wait();
-                // while it worked, more wakes may have arrived: run them as ONE follow-up, until the queue is empty
-                loop {
-                    let batch = {
-                        let mut q = QUEUE.lock().unwrap();
-                        if q.pending.is_empty() {
-                            q.running = false;
-                            return;
-                        }
-                        std::mem::take(&mut q.pending)
-                    };
-                    let prompt = format!("{} UI events arrived while you were busy. Handle them all in one go:\n\n{}", batch.len(), batch.join("\n\n---\n\n"));
-                    match launch(&w, &prompt) {
-                        Ok(mut c) => {
-                            let _ = c.wait();
-                        }
-                        Err(_) => {
-                            QUEUE.lock().unwrap().running = false;
-                            return;
-                        }
+    let mut child = match launch(w) {
+        Ok(c) => c,
+        Err(_) => return "spawn-failed",
+    };
+    let Some(mut stdin) = child.stdin.take() else { return "spawn-failed" };
+    let stdout = child.stdout.take();
+    if stdin.write_all(user_line(prompt).as_bytes()).and_then(|_| stdin.flush()).is_err() {
+        let _ = child.kill();
+        return "spawn-failed";
+    }
+    *AGENT.lock().unwrap() = Some(Agent { alive: true, stdin: Some(stdin), in_flight: 1, last_done: std::time::Instant::now() });
+
+    // reader: copy what the agent says to agent.log, and notice when a turn finishes
+    if let Some(out) = stdout {
+        std::thread::spawn(move || {
+            use std::io::{BufRead, BufReader};
+            let mut log = fs::OpenOptions::new().create(true).append(true).open(paths::runtime_dir().join("agent.log")).ok();
+            for line in BufReader::new(out).lines().map_while(Result::ok) {
+                if line.contains("\"type\":\"result\"") {
+                    if let Some(a) = AGENT.lock().unwrap().as_mut() {
+                        a.in_flight = a.in_flight.saturating_sub(1);
+                        a.last_done = std::time::Instant::now();
+                    }
+                    if let (Some(f), Ok(v)) = (log.as_mut(), serde_json::from_str::<Value>(&line)) {
+                        let _ = writeln!(f, "{}", v["result"].as_str().unwrap_or("").trim());
+                    }
+                } else if line.contains("\"is_error\":true") {
+                    // a refused or failed tool call: keep one short line (what was refused), not the whole event
+                    if let (Some(f), Ok(v)) = (log.as_mut(), serde_json::from_str::<Value>(&line)) {
+                        let why = v["message"]["content"][0]["content"].as_str().unwrap_or("error");
+                        let _ = writeln!(f, "tool error: {}", why.chars().take(200).collect::<String>());
                     }
                 }
-            });
-            "headless-spawned"
-        }
-        Err(_) => {
-            QUEUE.lock().unwrap().running = false;
-            "spawn-failed"
-        }
+            }
+            if let Some(a) = AGENT.lock().unwrap().as_mut() {
+                a.alive = false; // the process ended (slept, crashed or was killed)
+            }
+        });
     }
+    // sleeper: once idle for linger_s with nothing in flight, close its input so it exits
+    let linger = std::time::Duration::from_secs(w.linger_s.max(5));
+    std::thread::spawn(move || {
+        loop {
+            std::thread::sleep(std::time::Duration::from_secs(1));
+            let mut g = AGENT.lock().unwrap();
+            let Some(a) = g.as_mut() else { break };
+            if !a.alive {
+                break;
+            }
+            if a.in_flight == 0 && a.last_done.elapsed() >= linger {
+                a.stdin = None; // dropping stdin closes it: the agent finishes and exits
+                a.alive = false;
+                break;
+            }
+        }
+        let _ = child.wait();
+    });
+    "headless-spawned"
 }
 
-fn launch(w: &worker::Worker, prompt: &str) -> std::io::Result<std::process::Child> {
+fn launch(w: &worker::Worker) -> std::io::Result<std::process::Child> {
     let exe = std::env::current_exe().map(|p| p.display().to_string()).unwrap_or_else(|_| "morc".into());
     // the agent's system prompt: your copy in the data folder wins over the shipped one in the install folder
     let persona = [paths::home_dir(), paths::app_dir()].iter().find_map(|d| fs::read_to_string(d.join(&w.persona)).ok()).unwrap_or_default();
     // The permission rule matches the command text, and a Windows path with backslashes never matched ("requires approval" for every
     // call, found in agent.log). So the agent calls plain `morc` (its exe folder is put on the child's PATH) and the rule says the same.
     let allow = "Bash(morc:*)".to_string();
-    let allow_ps = "PowerShell(morc:*)".to_string();   // the agent may reach for either shell; both are limited to the morc CLI
+    let allow_ps = "PowerShell(morc:*)".to_string(); // the agent may reach for either shell; both are limited to the morc CLI
     let exe_dir = std::path::Path::new(&exe).parent().map(|p| p.display().to_string()).unwrap_or_default();
     let child_path = format!("{exe_dir};{}", std::env::var("PATH").unwrap_or_default());
     // max_turns 0 (the default) = no turn cap: the agent works until it is done. A positive number caps it.
     let turns = w.max_turns.to_string();
-    // the agent's own words and errors go to <runtime>/agent.log, so a silent failure can be read afterwards
-    let log = fs::OpenOptions::new().create(true).append(true).open(paths::runtime_dir().join("agent.log"));
     let mut cmd = Command::new("claude");
     // Read/Write: it builds spec files to pass to `morc show --file` (inline JSON loses its quotes on Windows)
-    cmd.args(["-p", prompt, "--model", &w.model, "--allowedTools", &allow, &allow_ps, "Read", "Write", "--append-system-prompt", &persona])
-        .current_dir(paths::home_dir())
-        .env("PATH", child_path);
+    cmd.args(["-p", "--input-format", "stream-json", "--output-format", "stream-json", "--verbose", "--model", &w.model]);
+    // its own scratch folder: the temp spec files it writes never end up in the repo or your data folder
+    let work = paths::runtime_dir().join("agent");
+    let _ = fs::create_dir_all(&work);
+    cmd.args(["--allowedTools", &allow, &allow_ps, "Read", "Write", "--append-system-prompt", &persona])
+        .current_dir(&work)
+        .env("PATH", child_path)
+        .env("MORC_HEADLESS", "1") // so its own hooks do not steal the interactive session's unread events
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null());
     if w.max_turns > 0 {
         cmd.args(["--max-turns", &turns]);
-    }
-    if let Ok(f) = log {
-        if let Ok(f2) = f.try_clone() {
-            cmd.stdout(f).stderr(f2);
-        }
     }
     util::hidden(&mut cmd).spawn()
 }

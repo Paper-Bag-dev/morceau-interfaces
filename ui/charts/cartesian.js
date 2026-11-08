@@ -1,7 +1,16 @@
 ﻿// line / area / spark / bar: trends and comparisons over an ordered axis.
-import { base, easeOutBack, easeOutCubic, stagger, label, fmt, ink } from './util.js';
+import { base, easeOutBack, easeOutCubic, stagger, label, fmt, ink, measure } from './util.js';
 
 const PAD = 10;
+
+// A bar chart is exactly as wide as its bars and labels need (a slot per bar wide enough for its label, plus padding), never a default
+// width with an empty strip that the window can cut off. Few bars make a narrow chart, many bars a wider one. Other kinds keep the default.
+export function width(s) {
+  if (s.kind !== 'bar' || !(s.labels && s.labels.length)) return 0;
+  const longest = Math.max(0, ...s.labels.map((l) => measure(l, 9.5)));
+  const n = Math.max(s.labels.length, (s.target || []).length);
+  return Math.max(180, Math.ceil(PAD * 2 + n * Math.max(48, longest + 14)));
+}
 
 function frame(s) {
   const { W, H, values: v } = s;

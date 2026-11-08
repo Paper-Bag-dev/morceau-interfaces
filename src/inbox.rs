@@ -43,6 +43,10 @@ pub fn session_age_s() -> Option<u64> {
 
 /// Text for the Claude Code hook: what the user did on screen while Claude wasn't looking.
 pub fn hook_json(event_name: &str) -> String {
+    // the background agent runs with the same hooks: it must not count as a live session or take the interactive session's unread events
+    if std::env::var("MORC_HEADLESS").is_ok() {
+        return String::new();
+    }
     touch_session();
     let ev = unread(false);
     if ev.is_empty() {
