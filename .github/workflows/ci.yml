@@ -1,0 +1,33 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --release
+      - name: Test
+        run: cargo test --release
+      - name: Check the UI modules parse
+        shell: bash
+        run: |
+          fail=0
+          for f in $(git ls-files 'ui/**/*.js' | grep -v '^ui/vendor/'); do node --check "$f" || fail=1; done
+          exit $fail
+      - name: Check the CLI plugins parse
+        shell: bash
+        run: |
+          fail=0
+          for f in tools/cli/*.py tools/*.py; do python -c "import ast,sys;ast.parse(open('$f',encoding='utf-8').read())" || fail=1; done
+          exit $fail
+      - name: Guard against secrets and personal data in tracked files
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^|/)\.env$'; then echo "a .env is tracked"; exit 1; fi
+          if git grep -I -n -E 'SKETCHFAB_TOKEN=[A-Za-z0-9]{8,}'; then echo "a token is committed"; exit 1; fi

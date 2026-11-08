@@ -1,0 +1,197 @@
+# Morceau
+
+**Ephemeral, agent-driven UI for Windows.** An AI agent (or you) shows small, glanceable windows on your screen with one CLI command: a stat card, a chart,
+a form, a yes/no ask, a graph, a 3D model. They are borderless and transparent, sit next to what you are doing without covering it, can be clicked and
+dragged, and then quietly fade away. The engine is a small Rust host; everything it draws is plain web UI served from disk.
+
+```
+ agent / script / you
+        |  morc use stat-card-min --data ...        (one short CLI call, cached components, ~80 tokens)
+        v
+   morc CLI  --localhost, token-checked-->  Rust host (windows, placement, lifetime, linter)
+                                                  |  WebView2 windows, one per surface
+                                                  v
+                                            ui/ (components, charts, 3D) --clicks, drags--> inbox --> agent (via hooks)
+```
+
+> Working name. A different project already uses the name A2UI; this one is `morceau` (CLI: `morc`). Package: `morceau` on npm.
+
+## What you get
+- **A tiny CLI** (`morc use | show | compose | patch | close ...`) and a cache, so showing something you showed before costs one line.
+- **Components**: text, stat (hero numeral with a needle), button, progress, input, list, chart (line, area, bar, donut, radar, heatmap, clock, rings, treemap,
+  gauge, spark), graph (Cytoscape), 3D model viewer (three.js: procedural or glTF with animation or a bone-driven procedural idle), skeleton, spinner.
+- **Placement that does the geometry for you**: the host divides the free screen around the window you are working in into regions (right, below, left, above,
+  the four corners). You say `--region right --align top`; it fits, or falls back to the least-overlapping spot.
+- **Fragments and recipes**: small reusable sub-trees composed into widgets, cached by structure, parameterised with `{{params}}` and `--set` / `--data` flags.
+- **A linter** that refuses dead controls, questions that never resolve, icon-only buttons without a title, and numbers without units.
+- **A preference vector** ("annoyance vector") the agent edits when you complain (too big, too often, too flashy), per topic, with a log of why.
+- **Triggers** (zero tokens): JSON rules that watch a number in a file and show a cached widget, plus an optional gated **chore agent** (a headless low-cost model
+  that wakes only when you are at the PC and no interactive session is open, and sets its own next wake).
+- **Agent integration**: Claude Code hooks and a skill, `AGENTS.md` / `CLAUDE.md` for any coding agent, and a generic system prompt (`docs/agent.md`).
+
+## Requirements
+- Windows 10 or 11 (x64) with the **Microsoft Edge WebView2 Runtime** (preinstalled on Windows 11 and current Windows 10).
+- **Node 16+** only for the npm install path. **Python 3.8+ (`py` launcher)** for the extended commands (`compose`, `cache`, `init`, `place`, `wake`, ...).
+- To build from source: the Rust toolchain (https://rustup.rs) and the MSVC build tools.
+
+## Install
+**From npm (prebuilt, recommended)**
+```powershell
+npm i -g morceau          # adds `morc` (and `morceau`) to your PATH
+morc init                 # creates your data folder, caches the shipped components
+morc use ask-permission   # your first widget
+```
+or without installing: `npx morceau use ask-permission`.
+
+**From the git repository** (builds the engine for you; needs Rust)
+```powershell
+npm i -g github:Paper-Bag-dev/morceau-interfaces
+```
+
+**From source**
+```powershell
+git clone https://github.com/Paper-Bag-dev/morceau-interfaces.git
+cd morceau-interfaces
+cargo build --release                 # target\release\morc.exe
+.\target\release\morc.exe init
+```
+`build.cmd` builds and installs to `%LOCALAPPDATA%\morc\bin\morc.exe`. Put that folder on your PATH, or use the npm install.
+
+## Full setup, step by step
+1. **Install** as above, then run `morc status`. The first command starts the host (hidden, detached) in about 3 seconds. `morc stop` ends it.
+2. **`morc init`** creates your data folder (see below), copies `actions.json` from `examples/`, and caches the shipped seeds and recipes. It is safe to
+   repeat. `morc init --home D:\my-morceau-data` keeps your data somewhere of your choosing and remembers it (no environment variable needed).
+3. **See it work**: `morc use ask-permission`, `morc use bike-viewer`, `morc graph --root tools/ --langs python`. Click, drag (hold ~0.1 s), pin, dismiss (the x).
+4. **Make your own**: `morc commands` lists the tools; `docs/extending.md` shows components, fragments, recipes and CLI plugins; `docs/protocol.md` is the spec format.
+5. **Wire up your agent** (optional): see *Agents* below.
+6. **Triggers** (optional): copy an example from `examples/triggers/` into `<data folder>\triggers\` and point `source.file` at a JSON file you maintain.
+7. **Chore agent** (optional, off by default): set `"enabled": true` in `<data folder>\prefs\worker.json`, pick `model`, and read the gates below first.
+
+## Your data folder
+Everything that is yours lives outside the install, so upgrading never touches it. It is found by, in order: `MORC_HOME`, the path in
+`%LOCALAPPDATA%\morc\home.txt` (written by `morc init --home`), or the install folder itself (portable mode).
+
+| path | what |
+|---|---|
+| `prefs/annoyance.json`, `annoyance_log.md` | the preference vector and a log of who changed what and why |
+| `prefs/placement.json` | placement weights, thresholds and anchor shapes (hot-reloaded: edit with `morc place`) |
+| `prefs/worker.json` | the chore agent: enabled, model, idle seconds, rate limits, title tracking and redaction |
+| `triggers/*.json` | rules that show a widget (or wake the chore agent) when a number in a file crosses a threshold |
+| `actions.json` | the allowlist of host-side commands a widget may *name* (a spec can never carry a command) |
+| `cache/components/` | saved specs; `cache/recipes/`, `cache/fragments/` are yours too (they shadow the shipped ones) |
+| `tools/cli/` | your own CLI plugins (they shadow shipped ones of the same name) |
+| `docs/agent.md`, `chore-prompt.md` | optional overrides of the agent system prompt and the chore wake prompt |
+
+Per-machine runtime state (token, logs, usage counts, the installed exe) is under `%LOCALAPPDATA%\morc`. The install folder is `MORC_APP` or found from the exe.
+
+## Ten-minute tour
+```powershell
+morc use ask-permission --data @ask.json            # inline JSON loses its quotes in Windows shells: pass a file (@file.json)
+morc show spec.json                          # any spec: {id?, opts?, components, data?, sources?}
+morc save spec.json                          # cache it as a named component
+morc use my-card --data @card.json --region right --align top   # place by name, the host does the geometry
+morc patch my-card /n 43                     # change one value on screen
+morc compose --recipe cache\recipes\stat-card-min.json --data h.label=Focus --data h.value=42 --data h.unit=min --use -- --region auto
+morc free                                    # where is there room right now
+morc cache stats                             # LFU: what is used, what will fade
+```
+A spec is JSON: a flat list of `{id, type, ...props, children?}` plus a data model. Any prop can be a literal, `{"bind":"/path"}`, or a template string `"CPU {/cpu:0}%"`.
+
+## Concepts
+- **Surface**: one window with a lifetime (default ~15 s, hover pauses, interaction extends, pin holds, sticky skips the timer, urgent is ringed and parked if ignored).
+- **Component / fragment / recipe**: a spec you saved; a reusable sub-tree with `{{params}}`; a recipe that composes fragments, cached by structure.
+- **Region**: a free rectangle around the active window. `morc use X --region right|below|left|above|top-right|...|auto --align ... --dx --dy`.
+- **Context scope**: the topic prefix (`stats.minutes` -> `stats`). Surfaces of one scope line up; a different scope goes to the opposite side.
+- **Linter**: runs on every show/save/stream. `opts.lint:"off"` exists for demos only.
+- **Preference vector**: size, ttl, frequency, motion, sound, boldness, simplicity, overlap, dock, morph, harmony, quiet hours, muted apps and topics. Per topic too.
+
+## Architecture
+```
+ +-------------------+        +-----------------------------+        +----------------------------------+
+ | agent / script    |  CLI   | morc.exe  (CLI mode)        | TCP    | morc.exe  (host mode, detached)  |
+ | hooks, triggers   |------->| parse, ensure host, send    |------->| 127.0.0.1:47831, per-machine     |
+ +-------------------+        +-----------------------------+ token  | token; one event loop (tao)      |
+        ^                                                            +----------------+-----------------+
+        | inbox (clicks, drags, answers) via hooks / `morc inbox`                     |  Ev::{Cmd, Ipc, Foreground, Hotkey}
+        |                                                                             v
+ +------+---------------+     +-------------------+      +-----------------------------------------------+
+ | chore agent (opt-in) |<----| wake gates        |<-----| surfaces: one WebView2 window each + a warm   |
+ | claude -p, exits     |     | session / idle /  |      | spare; shaped by SetWindowRgn, no-activate    |
+ +----------------------+     | rate / cooldown   |      | page: ui/ (store -> renderer -> components)   |
+                              +-------------------+      +-----------------------------------------------+
+```
+**Processes.** The same exe is the CLI and the host. A CLI call connects to `127.0.0.1:47831` with the token in `%LOCALAPPDATA%\morc`, starting a hidden detached host
+first if none is up (its std handles are made non-inheritable so a caller capturing output never waits on it). Everything the host does happens on one event loop;
+helper threads (TCP server, data sources, triggers and wake flags, hotkeys, the foreground-window WinEvent hook) only post events to it.
+
+**A surface, end to end.** `use` loads a cached spec and merges `--data`; the **linter** checks it; the host claims the warm spare WebView, sends it `init`
+(spec + preference view); the page's **store** (JSON-pointer data model) and **renderer** build the DOM from the flat component list (`{bind}` and `{/path}` templates,
+`when` visibility), then report the content size and the clickable `[data-hit]` rects. The host sizes the window, clips it to the union of those rects, asks
+**regions** for a spot, shows it without stealing focus, and the page springs in. `patch` changes the store and the page animates the difference. Lifetime rules
+(`lifetime.rs`) expire it, park it if urgent, and log ignored, glanced or engaged to the engagement log.
+
+**Placement pipeline.** (1) `--at` wins; (2) `--region` / `--align` / `--dx` / `--dy` or `auto`: the active window is the centre of a 3x3 grid, each of the eight cells
+(and the four bands) minus every window and widget is a free rectangle (tier 0), then minus only the active window (tier 1, if the `overlap` preference allows);
+default alignment hugs the active window; (3) if nothing fits, scored placement over a candidate grid (overlap, toast zone, flush-to-neighbour, same-scope harmony,
+opposite-side-for-other-scopes) using weights from `prefs/placement.json`. Fullscreen or no active window splits the screen into right, middle and left thirds.
+
+**Data in, events out.** A spec's `sources` (file + JSON pointer) feed live values; `actions.json` is the only way a widget runs anything on the host (a spec names an
+entry, never carries a command); clicks that need the agent become inbox events that Claude Code hooks inject into the next prompt.
+
+**The cache.** Specs are cached by name; `compose` builds specs from fragments and caches them by structure hash; usage counts drive an LFU with one-week half-life and
+a daily expiry. The three folders (install, your data, runtime) keep shipped files, your files and machine state apart (`src/paths.rs`, `tools/cli/_home.py`).
+
+**Chore agent.** A trigger rule, a wake flag or a click asks for a wake; the gates run in order (interactive session open, PC idle, rate limit, chore cooldown); if they pass
+the host spawns `claude -p` with `docs/agent.md` as the system prompt and `docs/chore-prompt.md` filled with recent window titles. The agent does at most two chores,
+sets its next wake (`morc wake set`) and exits.
+
+| extension point | where | needs a rebuild? |
+|---|---|---|
+| new look, size, model, card | fragment `{{params}}`, recipe `vars`, `--set` / `--data` flags | no |
+| placement, taste, chore agent | `prefs/placement.json`, `annoyance.json`, `worker.json` (hot-reloaded) | no |
+| new component or chart kind | a file in `ui/plugins/`, `ui/components/`, `ui/charts/` | no |
+| new command | a script in `tools/cli/` (`# morc <name>: description` on the first lines) | no |
+| a new engine capability (protocol message, platform layer) | `src/` | yes |
+
+## Themes and design rules
+One accent (coral by default; `morc annoy theme <name|auto>` or `opts.theme`), rounded pill shapes, small buttons, text on a frosted plate, colours that flip
+against the page behind (backdrop-aware), no window chrome. Type floors 11.5 / 12.5 / 15 / 22 / 32 px, icons at least 14 px, charts at least 96 px tall. Sentence
+case; no all-caps labels, eyebrows, monospace data labels or arrow glyphs. Motion only when the user triggers it or for an urgent ask. Tokens and the reasoning
+are in `docs/design.md`; the CSS variables are in `ui/theme.css` and `ui/core/theme.js`.
+
+## Agents
+- **Claude Code**: merge `integrations/claude-code/settings.example.json` into `~/.claude/settings.json` (two hooks that inject your clicks and drags into the
+  session as `[morc] N UI interaction(s) ...`), and copy `integrations/claude-code/skills/morc-screen` to `~/.claude/skills/`. `CLAUDE.md` imports `AGENTS.md`.
+- **Any other agent**: point it at `AGENTS.md` (how to work on the repo) and `docs/agent.md` (how to drive it). The CLI is the whole interface.
+- **Chore agent (headless, opt-in)**: the host can spawn `claude -p --model <model>` with `docs/agent.md` as its system prompt. Gates, in order: an interactive
+  session was active recently (rest), the PC has had no input for `idle_s` (rest), the hourly rate limit, the chore cooldown. It exits when done, and sets its next
+  wake with `morc wake set`. It never runs unless `prefs/worker.json` says `"enabled": true`.
+
+## Security and privacy
+- The command port is `127.0.0.1` only and needs the per-machine token in `%LOCALAPPDATA%\morc`.
+- Specs can only use registered components and named actions; commands run only from the `actions.json` allowlist, with fixed arguments.
+- The host never captures screen content. Window-title tracking (for the chore agent) is on only if `track_titles` is true; titles containing any `redact` word are
+  never stored; the log stays local, but the chore prompt sends recent titles to the model you configured, so keep that in mind.
+- Downloaded 3D models are not part of this repository; each keeps its author's licence (`THIRD-PARTY.md`).
+
+## Troubleshooting
+- Logs: `%LOCALAPPDATA%\morc\host.log`; `MORC_DEBUG=1` adds placement and layout lines.
+- Nothing appears: `morc status`; if the host is up, `morc dismiss-all` then `morc use ask-permission`. A stale host serves stale UI files: `morc stop`, then retry.
+- WebGL context lost / black canvas: software GL (SwiftShader) is already the default; `MORC_WV_ARGS=gpu` opts into hardware GL.
+- A model looks heavy: 3D defaults to `quality: lite` at a capped fps; measure CPU before leaving an animated model running.
+- First start after installing a new build can pause while Windows scans the new binary.
+
+## Layout of this repository
+`src/` Rust engine - `ui/` page runtime and components - `tools/cli/` CLI plugins - `cache/` shipped seeds, fragments and recipes - `docs/` specs and prompts -
+`examples/` triggers, actions, sample data - `integrations/` Claude Code hooks and skill - `bin/` npm launcher - `scripts/` build and publish checks.
+See `docs/README.md` for the full map and `BACKLOG.md` for what is next (macOS is on it).
+
+## Contributing
+Read `AGENTS.md`. Keep the engine generic: no personal data, no machine paths. Changes to behaviour go through data (prefs, fragments, recipes) before code.
+`cargo test --release`, `node --check` on UI files, and the CI workflow must pass.
+
+## Licence
+MIT, see `LICENSE`. Third-party notices: `THIRD-PARTY.md`.
+
+---
+Made with love by Claude + paper_bag_dev ❤️

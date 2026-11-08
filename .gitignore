@@ -1,0 +1,25 @@
+# Secrets: never commit
+.env
+*.key
+*token*
+
+# Build and Python noise
+target/
+*.log
+__pycache__/
+*.pyc
+
+# Saved specs are re-created from cache/seed, cache/recipes and the host
+cache/components/
+# Rewritten by the host on every start
+cache/registry.md
+cache/.compose-*.json
+cache/.sk-*.json
+# The chore agent's own runtime flags
+prefs/wake_flags.json
+# Downloaded Sketchfab models (large, licensed): re-create with `morc sketchfab get <uid>`
+ui/models/assets/
+# Build artefacts (the npm package ships bin/morc.exe built from this source)
+bin/morc.exe
+node_modules/
+*.tgz
