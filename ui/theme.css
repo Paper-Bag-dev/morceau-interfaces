@@ -1,4 +1,4 @@
-﻿/* shadcn/ui "zinc" tokens (same variable names, so shadcn recipes copy over) + backdrop-aware schemes.
+/* shadcn/ui "zinc" tokens (same variable names, so shadcn recipes copy over) + backdrop-aware schemes.
    Two groups of text color on purpose:
      --ink*        floating text with no card behind it (reads against the page behind the window)
      --foreground  text on filled surfaces (cards, buttons, inputs)
@@ -109,7 +109,7 @@ body { color: hsl(var(--ink)); cursor: default; }
 .c-list .item.act { cursor: pointer; } .c-list .item.act:hover { transform: translateX(3px); background: hsl(var(--secondary)); }
 .c-list .sub { color: hsl(var(--muted-foreground)); font-size: 12px; }
 
-.c-chart { min-width: 260px; flex: none; }   /* a chart never shrinks below its canvas inside a row: rows wrap instead */
+.c-chart { min-width: 200px; flex: none; }   /* a chart never shrinks below its canvas inside a row: rows wrap instead */
 .c-chart .ttl { color: hsl(var(--ink-muted)); font-size: 15px; margin-bottom: 3px; }
 .c-chart canvas { display: block; border-radius: 22px; background: hsl(var(--card) / .86); }
 
@@ -179,6 +179,7 @@ body { color: hsl(var(--ink)); cursor: default; }
         --plate: linear-gradient(rgb(52 47 44 / .80), rgb(33 29 27 / .86)); }
 .c-text, .c-kv, .stat, .c-prog, .c-chart .ttl, .plate { background: var(--grain), var(--plate); background-blend-mode: soft-light, normal; backdrop-filter: blur(10px) saturate(1.1);
   border: 1px solid rgb(255 255 255 / .08); border-radius: 14px; padding: 5px 11px; box-shadow: 0 5px 16px rgb(0 0 0 / .30); width: fit-content; align-self: flex-start; -webkit-text-stroke: 0; }
+.c-text { border-radius: 10px; }   /* a one-line text plate is short: the stat tiles' 14px reads as a pill on it, so text plates are squarer to match the tiles' look */
 .c-text, .c-kv, .stat, .c-prog, .c-chart .ttl, .plate { color: hsl(0 0% 97%); text-shadow: 0 1px 1px rgb(0 0 0 / .4); }
 .c-text.hero, .stat { padding: 7px 14px 8px; }
 .c-prog { padding: 7px 11px 8px; }

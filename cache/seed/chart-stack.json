@@ -1,18 +1,105 @@
 {
-  "t": "save",
-  "name": "chart-stack",
-  "desc": "Two charts in ONE window, a donut over a bar chart, with Close: for a tall free side. Pass /pie {title, values, labels} and /bars {title, values, labels}; values are in millions (M).",
-  "params": ["/pie/title", "/pie/values", "/pie/labels", "/bars/title", "/bars/values", "/bars/labels"],
-  "opts": { "min": [260, 300], "ttl": 90, "topic": "charts.stack", "importance": "0.7" },
-  "components": [
-    { "id": "root", "type": "column", "gap": 8, "children": ["pie", "bars", "ok"] },
-    { "id": "pie", "type": "chart", "kind": "donut", "title": "{/pie/title}", "data": { "bind": "/pie/values" }, "labels": { "bind": "/pie/labels" }, "unit": "M", "height": 120 },
-    { "id": "bars", "type": "chart", "kind": "bar", "title": "{/bars/title}", "data": { "bind": "/bars/values" }, "labels": { "bind": "/bars/labels" }, "unit": "M", "height": 110 },
-    { "id": "ok", "type": "row", "children": ["b"] },
-    { "id": "b", "type": "button", "label": "Close", "action": { "do": "close" } }
-  ],
-  "data": {
-    "pie": { "title": "Share", "values": [1], "labels": ["all"] },
-    "bars": { "title": "Per day", "values": [0, 0, 0, 0, 0], "labels": ["a", "b", "c", "d", "e"] }
-  }
+    "t":  "save",
+    "name":  "chart-stack",
+    "desc":  "Two charts in ONE window, a donut over a bar chart, with Close: for a tall free side. Pass /pie {title, values, labels} and /bars {title, values, labels}; values are in millions (M).",
+    "params":  [
+                   "/pie/title",
+                   "/pie/values",
+                   "/pie/labels",
+                   "/bars/title",
+                   "/bars/values",
+                   "/bars/labels"
+               ],
+    "opts":  {
+                 "min":  [
+                             240,
+                             300
+                         ],
+                 "ttl":  90,
+                 "topic":  "charts.stack",
+                 "importance":  "0.7"
+             },
+    "components":  [
+                       {
+                           "id":  "root",
+                           "type":  "column",
+                           "gap":  8,
+                           "children":  [
+                                            "pie",
+                                            "bars",
+                                            "ok"
+                                        ]
+                       },
+                       {
+                           "id":  "pie",
+                           "type":  "chart",
+                           "kind":  "donut",
+                           "title":  "{/pie/title}",
+                           "data":  {
+                                        "bind":  "/pie/values"
+                                    },
+                           "labels":  {
+                                          "bind":  "/pie/labels"
+                                      },
+                           "unit":  "M",
+                           "height":  100
+                       },
+                       {
+                           "id":  "bars",
+                           "type":  "chart",
+                           "kind":  "bar",
+                           "title":  "{/bars/title}",
+                           "data":  {
+                                        "bind":  "/bars/values"
+                                    },
+                           "labels":  {
+                                          "bind":  "/bars/labels"
+                                      },
+                           "unit":  "M",
+                           "height":  110
+                       },
+                       {
+                           "id":  "ok",
+                           "type":  "row",
+                           "children":  [
+                                            "b"
+                                        ]
+                       },
+                       {
+                           "id":  "b",
+                           "type":  "button",
+                           "label":  "Close",
+                           "action":  {
+                                          "do":  "close"
+                                      }
+                       }
+                   ],
+    "data":  {
+                 "pie":  {
+                             "title":  "Share",
+                             "values":  [
+                                            1
+                                        ],
+                             "labels":  [
+                                            "all"
+                                        ]
+                         },
+                 "bars":  {
+                              "title":  "Per day",
+                              "values":  [
+                                             0,
+                                             0,
+                                             0,
+                                             0,
+                                             0
+                                         ],
+                              "labels":  [
+                                             "a",
+                                             "b",
+                                             "c",
+                                             "d",
+                                             "e"
+                                         ]
+                          }
+             }
 }

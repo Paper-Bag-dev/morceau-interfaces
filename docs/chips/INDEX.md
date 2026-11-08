@@ -22,6 +22,7 @@ one big blocker. Several small cards spread into the free space (`--region auto`
    or mixed quadrants. Never start in a corner. Fill every side before reaching for a corner (a free top row must be used before anything goes elsewhere).
    Before opening a new card ask: can it be merged into a card already on screen (a donut into the older chart window, a fact into an existing row)? Merge first.
    Biggest free side first (corners only after the sides are used). Each card starts at the very edge of its quadrant next to the
+   **Why cards leak to corners:** a chip whose min size (times the display scale, plus margin and gap) is wider than the side it is aimed at does not fit that side, so the host falls back to scored placement and the card lands in a corner. Keep each chip's min and its charts narrow enough for the narrowest side (about 320 px of room on a 344 px side), and keep chart minimum widths small. Text facts are SEPARATE small cards: in the top strip they flex from the left while the numbers row flexes from the right.
    active window (`dx`/`dy`), then fills outward. Tier 0 = free of every window and card.
 6. **Not enough room? Give up things in THIS order:** (a) merge cards of the same kind; (b) trim data (5 bars, not 7); (c) shrink the card down to its
    `min_importance` (never the text floor, never icon or component minimums); (d) use the remaining Tier 0 spaces, corners included; (e) Tier 1: the free
