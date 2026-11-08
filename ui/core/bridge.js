@@ -3,6 +3,7 @@
 const HOLD_MS = 100;      // hold the left button this long (without moving) and the window picks up: 0.1 s on empty areas and text
 const HOLD_MS_CONTROL = 220; // buttons, rows, canvases: a normal click lasts ~100 ms, so these arm a little later and still click
 const MOVE_SLOP = 7;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;   // no hover morph for people who asked for less motion
 const MIN_ZOOM = 0.85;      // never shrink content below this: text, icons and charts stay readable; the window wraps/scrolls instead
 
 export const send = (m) => window.ipc && window.ipc.postMessage(JSON.stringify(m));
@@ -47,8 +48,10 @@ stage.addEventListener('pointerenter', () => {
     if (k < 1.06) return;                            // no room worth growing into
     grownFrom = zoom;
     fits = 0;
-    applyZoom(Math.min(2.2, zoom * k));
-    measure();   // tell the host NOW, not next frame: the window grows with the card instead of clipping it for a frame
+    const z1 = zoom, z2 = Math.min(2.2, zoom * k);
+    applyZoom(z2);
+    measure();   // tell the host NOW: the window is already full size, then the card eases up to it from its old size
+    morph(z1 / z2, 1);
     measureSoon();
   }, 220);                                           // a pass-over does not trigger it
 });
@@ -59,11 +62,17 @@ stage.addEventListener('pointerleave', () => {
   shrinkTimer = setTimeout(() => {                   // linger a moment so the edge does not flicker
     const z = grownFrom; grownFrom = 0; lastShrinkAt = Date.now();
     fits = 0;
-    applyZoom(z);
-    measure();
-    measureSoon();
+    // ease the card down inside the still-large window, then shrink the window and drop the transform
+    morph(1, z / zoom, () => { applyZoom(z); measure(); measureSoon(); });
   }, 450);
 });
+
+// Smooth grow/shrink: scale the whole surface from one factor to another (top-left origin) so hover growth is an animation, not a jump.
+function morph(from, to, done) {
+  const surf = document.getElementById('surface');
+  if (!surf || reduced) { if (done) done(); return; }\n  const a = surf.animate([{ transformOrigin: '0 0', transform: `scale(${from})` }, { transformOrigin: '0 0', transform: `scale(${to})` }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
+  a.onfinish = () => { a.cancel(); if (done) done(); };
+}
 
 function measure() {
   queued = false;

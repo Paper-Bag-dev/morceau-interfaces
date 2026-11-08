@@ -1,4 +1,4 @@
-// Shared chart helpers: accent-derived palette and easing.
+﻿// Shared chart helpers: accent-derived palette and easing.
 
 export function accent() {
   const v = getComputedStyle(document.getElementById('stage')).getPropertyValue('--accent').trim() || '217 91% 66%';
@@ -39,4 +39,12 @@ export function label(g, text, x, y, { align = 'center', size = 11, color, weigh
   g.textAlign = align;
   g.textBaseline = 'middle';
   g.fillText(text, x, y);
+}
+
+// Width in css px of a text at a size and weight, in the chart body font: charts size themselves from their labels instead of clipping them.
+let mctx = null;
+export function measure(text, size = 11, weight = 500) {
+  if (!mctx) mctx = document.createElement('canvas').getContext('2d');
+  mctx.font = ` px `;
+  return mctx.measureText(String(text)).width;
 }

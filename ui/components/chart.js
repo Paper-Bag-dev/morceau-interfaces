@@ -1,4 +1,4 @@
-import { register } from '../core/registry.js';
+﻿import { register } from '../core/registry.js';
 import { reduced } from '../core/motion.js';
 import * as literacy from '../core/literacy.js';
 import { working } from '../core/working.js';
@@ -37,7 +37,13 @@ register('chart', (c, ctx) => {
   // Fixed pixel width: a %-width canvas inside a shrink-wrapped surface feeds back on itself and grows every repaint.
   s.W = c.width || 280;
   cv.style.width = s.W + 'px';
-  const sizeH = () => { s.H = c.height || HEIGHT[kind] || 90; cv.style.height = s.H + 'px'; };
+  const sizeH = () => { s.H = c.height || HEIGHT[kind] || 90; cv.style.height = s.H + 'px'; fitW(); };
+  // the chart sizes itself from its labels (a module may export width(s)): the canvas never clips its own legend, and the window follows
+  function fitW() {
+    const need = MODS[kind] && MODS[kind].width ? MODS[kind].width(s) : 0;
+    const w = Math.max(c.width || 280, need);
+    if (w !== s.W) { s.W = w; cv.style.width = w + 'px'; }
+  }
   sizeH();
 
   // ---- teaching caption for unfamiliar kinds ----
@@ -111,7 +117,7 @@ register('chart', (c, ctx) => {
   }
 
   ctx.bind(c.data, setData);
-  if (c.labels) ctx.bind(c.labels, (v) => { s.labels = Array.isArray(v) ? v : []; kick(); });
+  if (c.labels) ctx.bind(c.labels, (v) => { s.labels = Array.isArray(v) ? v : []; fitW(); kick(); });
   cv.addEventListener('pointermove', (e) => {
     const z = window.__zoom || 1, r = cv.getBoundingClientRect(), h = MODS[kind].hit(s, (e.clientX - r.left) / z, (e.clientY - r.top) / z);
     if (h !== s.hover) { s.hover = h; if (!raf) paint(); }

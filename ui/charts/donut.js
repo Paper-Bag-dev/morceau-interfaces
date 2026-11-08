@@ -1,14 +1,24 @@
-﻿// donut: share of a whole (where did the time go). Slices sweep in clockwise; the hovered slice pushes outward.
-import { palette, easeOutCubic, clamp01, label, fmt, ink } from './util.js';
+// donut: share of a whole (where did the time go). Slices sweep in clockwise; the hovered slice pushes outward.
+// Layout is padding + flow, never fixed fractions: [pad][ring][gap][swatch + label column][pad]. width() tells the chart how wide it needs to be.
+import { palette, easeOutCubic, clamp01, label, fmt, ink, measure } from './util.js';
+
+const PAD = 14, GAP = 22, ROW = 17, SW = 10, SWGAP = 6, MAXROWS = 7;
 
 function geo(s) {
-  const cx = s.W * 0.34, cy = s.H / 2, R = Math.min(s.W * 0.34, s.H / 2) - 6;
-  return { cx, cy, R, r: R * 0.62 };
+  const R = Math.max(20, s.H / 2 - PAD);
+  return { cx: PAD + R, cy: s.H / 2, R, r: R * 0.62, lx: PAD + R * 2 + GAP };
 }
 
-// labels longer than the legend column are cut with an ellipsis, never clipped by the canvas edge\nconst cut = (t, n) => (t.length > n ? t.slice(0, n - 1) + '\u2026' : t);\n\nexport function draw(g, s) {
+// the width this chart needs so every legend label fits inside it, with padding all round
+export function width(s) {
+  const { lx } = geo(s);
+  const longest = Math.max(0, ...(s.labels || []).slice(0, MAXROWS).map((t) => measure(t, 10.5, 700)));
+  return Math.ceil(lx + SW + SWGAP + longest + PAD);
+}
+
+export function draw(g, s) {
   const v = s.values.map((x) => Math.max(0, x)), total = v.reduce((a, b) => a + b, 0) || 1, n = v.length;
-  const { cx, cy, R, r } = geo(s);
+  const { cx, cy, R, r, lx } = geo(s);
   const sweep = easeOutCubic(clamp01(s.t)) * Math.PI * 2;
   let a = -Math.PI / 2;
   v.forEach((val, i) => {
@@ -24,12 +34,14 @@ function geo(s) {
   });
   const hv = s.hover >= 0 ? s.hover : -1;
   label(g, hv >= 0 ? fmt(v[hv], s.unit) : fmt(total, s.unit), cx, cy - 4, { size: 19, weight: 600, color: ink(1), display: true });
-  label(g, hv >= 0 ? cut(String(s.labels[hv] || ''), 14) : 'total', cx, cy + 13, { size: 10.5, color: ink(.6) });
-  // legend on the right
-  const maxc = Math.max(6, Math.floor((s.W - s.W * 0.7 - 20) / 5.6));   // characters that fit beside the swatch\n  v.slice(0, 7).forEach((val, i) => {
-    const y = 14 + i * 17;
-    g.fillStyle = palette(i, n, 1, 110); g.beginPath(); g.roundRect(s.W * 0.7, y - 5, 10, 10, 3); g.fill();
-    label(g, cut(`${s.labels[i] || i + 1}`, maxc), s.W * 0.7 + 16, y, { align: 'left', size: 10.5, color: i === s.hover ? ink(1) : ink(.7), weight: i === s.hover ? 700 : 500 });
+  const inner = r * 2 - 8, name = hv >= 0 ? String(s.labels[hv] || '') : 'total';
+  label(g, measure(name, 10.5) > inner ? name.slice(0, Math.max(3, Math.floor(name.length * inner / measure(name, 10.5)) - 1)) + '\u2026' : name, cx, cy + 13, { size: 10.5, color: ink(.6) });
+  // legend: a column vertically centred beside the ring
+  const rows = Math.min(n, MAXROWS), top = cy - (rows * ROW) / 2 + ROW / 2;
+  v.slice(0, MAXROWS).forEach((val, i) => {
+    const y = top + i * ROW;
+    g.fillStyle = palette(i, n, 1, 110); g.beginPath(); g.roundRect(lx, y - SW / 2, SW, SW, 3); g.fill();
+    label(g, `${s.labels[i] || i + 1}`, lx + SW + SWGAP, y, { align: 'left', size: 10.5, color: i === s.hover ? ink(1) : ink(.7), weight: i === s.hover ? 700 : 500 });
   });
 }
 
@@ -44,4 +56,3 @@ export function hit(s, x, y) {
   for (let i = 0; i < v.length; i++) { acc += (Math.max(0, v[i]) / total) * Math.PI * 2; if (ang <= acc) return i; }
   return -1;
 }
-

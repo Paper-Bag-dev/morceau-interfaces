@@ -1,4 +1,4 @@
-# AGENTS.md: working on Morceau (for any coding agent)
+﻿# AGENTS.md: working on Morceau (for any coding agent)
 
 Morceau is a Windows-only host that shows borderless, transparent, self-expiring UI windows ("surfaces") driven by an AI agent through a CLI (`morc`).
 Rust engine (tao + wry/WebView2 + the `windows` crate) + an ES-module web UI served from disk + CLI plugins (Python). Read `README.md` first.
@@ -36,7 +36,8 @@ runtime state (`%LOCALAPPDATA%\morc`). Never put user data in the install; never
 5. **Design tokens are law** (`docs/design.md`): one accent, rounded, small, sentence case, no all-caps/eyebrows/mono labels/arrow glyphs, type floors.
 6. **Keep personal data out of this repo.** No tokens, paths from your machine, names, stats files. Examples use `myapp`/`stats.json`. The `main` branch is
    the shareable engine; personal setups live on a separate branch or in the data folder.
-7. **Cheap by default.** Animated 3D defaults to `quality: lite` and a capped fps; software GL is the default backend. Measure CPU before leaving anything animated running.
+7. **Responsive by default.** Padding plus flex/flow; no absolute positioning for content; components size themselves from their content and the box (labels measured, long text ellipsised); the window follows the content and hover growth is a smooth transition. A long label, a narrow box or a hover must not clip anything.
+8. **Cheap by default.** Animated 3D defaults to `quality: lite` and a capped fps; software GL is the default backend. Measure CPU before leaving anything animated running.
 
 ## Pitfalls we already hit
 - PowerShell: `R`, `rp`, `diff`, `sc`, `sleep` and friends are aliases; never name a helper function with a short alias-like name. `@(@(a,b))` with one pair

@@ -25,7 +25,8 @@ pub fn save(name: &str, desc: &str, params: &[String], opts: &Opts, components: 
 }
 
 pub fn load(name: &str) -> Option<Value> {
-    serde_json::from_str(&fs::read_to_string(file_for(name)).ok()?).ok()
+    // PowerShell writes a BOM; a cached spec edited by hand or by an agent must still load
+    serde_json::from_str(fs::read_to_string(file_for(name)).ok()?.trim_start_matches('\u{feff}')).ok()
 }
 
 pub fn all() -> Vec<Value> {
@@ -33,7 +34,7 @@ pub fn all() -> Vec<Value> {
     let mut v: Vec<Value> = rd
         .filter_map(|e| e.ok())
         .filter_map(|e| fs::read_to_string(e.path()).ok())
-        .filter_map(|s| serde_json::from_str(&s).ok())
+        .filter_map(|s| serde_json::from_str(s.trim_start_matches('\u{feff}')).ok())
         .collect();
     v.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
     v
