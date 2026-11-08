@@ -1,0 +1,2 @@
+{"name":"line-trend","required":["title","values","labels"],"desc":"A line that draws itself left to right: how one measure changed over time. Data: /@/title /@/values /@/labels (unit minutes)","root":"c","components":[
+ {"id":"c","type":"chart","kind":"line","title":"{/@/title}","data":{"bind":"/@/values"},"labels":{"bind":"/@/labels"},"unit":"m","height":96}]}

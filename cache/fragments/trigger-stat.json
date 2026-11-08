@@ -1,0 +1,2 @@
+{"name":"trigger-stat","required":["label","unit"],"desc":"A hero number that shows the value that tripped a trigger rule ({/_trigger}). Data: /@/label /@/unit","root":"s","components":[
+ {"id":"s","type":"stat","label":"{/@/label}","value":"{/_trigger}","unit":"{/@/unit}"}]}

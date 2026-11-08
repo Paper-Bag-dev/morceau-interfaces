@@ -1,0 +1,2 @@
+{"name":"week-bars","required":["title","values","labels"],"desc":"Seven-day bar chart. Data: /@/title /@/values (7 numbers) /@/labels (7 strings)","root":"c","components":[
+ {"id":"c","type":"chart","kind":"bar","title":"{/@/title}","data":{"bind":"/@/values"},"labels":{"bind":"/@/labels"},"height":110,"unit":"m"}]}

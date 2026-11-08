@@ -1,0 +1,15 @@
+{
+  "t": "save",
+  "name": "graph-view",
+  "desc": "Any node-link graph (code, goals, dependencies, flows) on Cytoscape: draggable nodes, labelled layers, an optional animated route. Pass /graph in the schema of docs/graphs.md and /title. `morc graph ...` fills it from the code graph or a JSON file.",
+  "params": ["/title", "/graph"],
+  "opts": { "min": [640,380], "ttl": 120, "topic": "viz.graph" },
+  "components": [
+    { "id": "root", "type": "column", "gap": 8, "children": ["t", "g", "row"] },
+    { "id": "t", "type": "text", "size": "lg", "text": "{/title}" },
+    { "id": "g", "type": "graph", "data": { "bind": "/graph" }, "width": 880, "height": 500 },
+    { "id": "row", "type": "row", "children": ["x"] },
+    { "id": "x", "type": "button", "icon": "x", "title": "Close", "action": { "do": "close" } }
+  ],
+  "data": { "title": "Graph", "graph": {} }
+}

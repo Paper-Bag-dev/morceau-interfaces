@@ -1,0 +1,2 @@
+{"name":"donut-split","required":["title","values","labels"],"desc":"Share of a whole as a donut. Data: /@/title /@/values /@/labels (all non-overlapping parts, unit minutes)","root":"c","components":[
+ {"id":"c","type":"chart","kind":"donut","title":"{/@/title}","data":{"bind":"/@/values"},"labels":{"bind":"/@/labels"},"unit":"m","height":124}]}

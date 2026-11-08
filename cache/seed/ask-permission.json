@@ -1,0 +1,15 @@
+{
+  "t": "save", "name": "ask-permission",
+  "desc": "Urgent yes/no ask routed back to Claude (wake). Check/x icon buttons (label dropped once the user has learned the icons). Sticky, ringed, parked if ignored; `morc summon` brings it back.",
+  "params": ["/title", "/body", "/yes", "/no", "/ctx"],
+  "opts": { "min": [260,130], "urgent": true, "topic": "agent.ask", "anchor": "near_focus" },
+  "components": [
+    { "id": "root", "type": "column", "gap": 8, "children": ["t", "b", "row"] },
+    { "id": "t", "type": "text", "size": "lg", "bold": true, "text": "{/title}" },
+    { "id": "b", "type": "text", "tone": "muted", "text": "{/body}" },
+    { "id": "row", "type": "row", "children": ["y", "n"] },
+    { "id": "y", "type": "button", "variant": "good", "icon": "check", "label": "{/yes}", "action": [{ "do": "wake", "payload": { "ctx": "{/ctx}", "answer": "yes" } }, { "do": "close" }] },
+    { "id": "n", "type": "button", "variant": "bad", "icon": "x", "label": "{/no}", "action": [{ "do": "wake", "payload": { "ctx": "{/ctx}", "answer": "no" } }, { "do": "close" }] }
+  ],
+  "data": { "title": "Need your OK", "body": "", "yes": "Yes", "no": "No", "ctx": "" }
+}

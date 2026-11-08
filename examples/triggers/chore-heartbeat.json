@@ -1,0 +1,11 @@
+{
+  "name": "chore-heartbeat",
+  "_note": "Copy to <data folder>/triggers/. Every 5 min during waking hours the host asks for a chore wake of the background agent. The host's gates decide whether it really wakes: a live agent session open, the PC idle, the hourly rate limit, the chore cooldown (prefs/worker.json). Remove it to run the agent only on clicks and wake flags.",
+  "every": 300,
+  "source": { "file": "%LOCALAPPDATA%/myapp/stats.json", "pointer": "/today/minutes" },
+  "when": { "gte": 0 },
+  "window": ["09:00", "23:00"],
+  "chore": "heartbeat",
+  "topic": "chore",
+  "cooldown_min": 45
+}

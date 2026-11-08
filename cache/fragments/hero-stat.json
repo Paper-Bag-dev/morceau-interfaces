@@ -1,0 +1,2 @@
+{"name":"hero-stat","required":["label","value","unit"],"desc":"One big number with a label and unit. Data: /@/label /@/value /@/unit","root":"s","components":[
+ {"id":"s","type":"stat","label":"{/@/label}","value":"{/@/value}","unit":"{/@/unit}"}]}

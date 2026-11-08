@@ -1,0 +1,11 @@
+{
+  "_comment": "Merge the \"hooks\" block into ~/.claude/settings.json (all projects) or <project>/.claude/settings.json. `morc` must be on PATH (npm i -g morceau). Each hook prints the user's unread clicks and drags from their screen as context, only when there is something unread, so it costs nothing when idle.",
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "morc", "args": ["hook", "SessionStart"], "timeout": 20 } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "morc", "args": ["hook", "UserPromptSubmit"], "timeout": 20 } ] }
+    ]
+  }
+}

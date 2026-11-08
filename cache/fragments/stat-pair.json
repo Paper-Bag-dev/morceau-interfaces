@@ -1,0 +1,4 @@
+{"name":"stat-pair","required":["l1","v1","u1","l2","v2","u2"],"desc":"Two hero numbers stacked. Data: /@/l1 /@/v1 /@/u1 /@/l2 /@/v2 /@/u2","root":"c","components":[
+ {"id":"c","type":"column","gap":6,"children":["a","b"]},
+ {"id":"a","type":"stat","label":"{/@/l1}","value":"{/@/v1}","unit":"{/@/u1}"},
+ {"id":"b","type":"stat","label":"{/@/l2}","value":"{/@/v2}","unit":"{/@/u2}"}]}

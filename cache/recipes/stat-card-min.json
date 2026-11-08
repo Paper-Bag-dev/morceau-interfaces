@@ -1,0 +1,2 @@
+{"name":"stat-card-min","desc":"A compact stat card: one hero number with label and unit, no buttons (the corner x closes it). Give it data per push: --data h.label=... --data h.value=N --data h.unit=min","topic":"cards","opts":{"min":[200,110],"ttl":120},
+ "parts":[{"id":"h","frag":"hero-stat"}],"data":{"h":{"label":"","value":"","unit":"min"}}}

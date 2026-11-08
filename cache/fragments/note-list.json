@@ -1,0 +1,4 @@
+{"name":"note-list","required":["title","items"],"desc":"A title and a list of rows of any length (the structure never changes, only the data). Data: /@/title and /@/items = [{text, sub?, badge?}]. Long lists stay one tall column.","root":"c","components":[
+ {"id":"c","type":"column","gap":6,"align":"flex-end","children":["t","l"]},
+ {"id":"t","type":"text","size":"lg","text":"{/@/title}"},
+ {"id":"l","type":"list","max":12,"items":{"bind":"/@/items"}}]}

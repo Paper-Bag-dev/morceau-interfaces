@@ -1,0 +1,5 @@
+{
+  "_comment": "Host-side allowlist for {do:'run', id:'...'} actions. A spec can only NAME an entry; it can never carry a command. Keep entries read-only and harmless. Copy to your data folder as actions.json (`morc init` does this).",
+  "today": { "argv": ["powershell", "-NoProfile", "-Command", "Get-Date -Format yyyy-MM-dd"] },
+  "disk-free-gb": { "argv": ["powershell", "-NoProfile", "-Command", "[math]::Round((Get-PSDrive C).Free/1GB,1)"] }
+}

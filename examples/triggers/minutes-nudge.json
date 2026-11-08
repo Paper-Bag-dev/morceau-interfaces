@@ -1,0 +1,13 @@
+{
+  "name": "minutes-nudge",
+  "_note": "Copy to <data folder>/triggers/. Every 10 min: if /today/minutes in the stats file reaches 120 between 09:00 and 22:00, show the cached `nudge-card` with the number that tripped the rule. Zero tokens: the host does it. The cooldown stretches by itself for topics you ignore.",
+  "every": 600,
+  "source": { "file": "%LOCALAPPDATA%/myapp/stats.json", "pointer": "/today/minutes" },
+  "when": { "gte": 120 },
+  "window": ["09:00", "22:00"],
+  "use": "nudge-card",
+  "data": { "t": { "label": "Screen time today", "unit": "min" } },
+  "topic": "nudges.minutes",
+  "cooldown_min": 120,
+  "opts": { "ttl": 14, "min": [200, 150] }
+}

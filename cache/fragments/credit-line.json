@@ -1,0 +1,2 @@
+{"name":"credit-line","desc":"A small muted line, used for licence credits. Param: credit.","root":"c","components":[
+ {"id":"c","type":"text","size":"sm","tone":"muted","text":"{{credit}}"}]}

@@ -1,0 +1,12 @@
+# Belt and braces next to package.json "files": nothing personal or downloaded may ever be packed.
+.env
+.env.*
+!.env.example
+prefs/
+triggers/
+actions.json
+cache/components/
+ui/models/assets/
+target/
+*.log
+*.tgz

@@ -1,0 +1,10 @@
+{
+  "_comment": "Named routes for graph_export.py --flow NAME. Paths are relative to --root. Trace them with `code-graph-mcp callgraph <symbol> --file ...`, then list the files in the order the data travels.",
+  "report": [
+    "ui/components/button.js", "ui/core/render.js", "ui/core/bridge.js", "src/host.rs", "src/handlers.rs",
+    "src/ev.rs", "src/surface.rs", "ui/core/main.js", "ui/core/store.js", "ui/components/chart.js", "ui/components/list.js"
+  ],
+  "drag": [
+    "ui/core/bridge.js", "src/host.rs", "src/winstyle.rs", "src/placed.rs", "src/inbox.rs", "src/surface.rs", "ui/core/main.js"
+  ]
+}
