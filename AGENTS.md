@@ -36,7 +36,7 @@ runtime state (`%LOCALAPPDATA%\morc`). Never put user data in the install; never
 5. **Design tokens are law** (`docs/design.md`): one accent, rounded, small, sentence case, no all-caps/eyebrows/mono labels/arrow glyphs, type floors.
 6. **Keep personal data out of this repo.** No tokens, paths from your machine, names, stats files. Examples use `myapp`/`stats.json`. The `main` branch is
    the shareable engine; personal setups live on a separate branch or in the data folder.
-7. **Responsive by default.** Padding plus flex/flow; no absolute positioning for content; components size themselves from their content and the box (labels measured, long text ellipsised); the window follows the content and hover growth is a smooth transition. A long label, a narrow box or a hover must not clip anything.
+7. **Responsive by default.** Padding plus flex/flow; no absolute positioning for content; components size themselves from their content and the box (labels measured, long text ellipsised); the window follows the content and hover growth is a smooth transition. A long label, a narrow box or a hover must not clip anything. **Never clip, always size within the container:** an item is exactly as wide as its content, never padded to a default width; text wraps or ends in an ellipsis.
 8. **Cheap by default.** Animated 3D defaults to `quality: lite` and a capped fps; software GL is the default backend. Measure CPU before leaving anything animated running.
 
 ## Pitfalls we already hit
@@ -46,3 +46,4 @@ runtime state (`%LOCALAPPDATA%\morc`). Never put user data in the install; never
 - Files written by PowerShell carry a BOM: every JSON reader here tolerates it (`utf-8-sig`, `trim_start_matches('\u{feff}')`).
 - WebGL hardware contexts get reset on some machines: SwiftShader is the default (`MORC_WV_ARGS=gpu` opts out). `backdrop-filter` on a WebGL surface is a risk.
 - The window shape is the union of `[data-hit]` rects; a stray full-size container with `data-hit` makes a rectangle.
+- **Never write a literal `\n` into a file.** Scripted edits (PowerShell string replace, here-strings with escapes) have slipped `\n` into JS, Rust and docs and broken builds. Do multi-line edits with the editor tool (Edit/Write), not a replace script. If you must script one, use a here-string or real newlines, then check `git diff -U0 | Select-String '^\+.*\\n'` before committing and run `node --check` / `cargo build`.

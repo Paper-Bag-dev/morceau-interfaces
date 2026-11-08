@@ -1,6 +1,6 @@
-//! Waking a headless agent (the chore agent, Haiku by default), cheapest and most conservative first.
+﻿//! Waking a headless agent (the chore agent, Haiku by default), cheapest and most conservative first.
 //! Every wake, whatever asked for it, passes the same gates in this order:
-//!   1. a live interactive Claude session touched morc recently -> rest (a hook / Monitor delivers the event to that session)
+//!   1. only if prefs/worker.json says defer_to_session: a live interactive session touched morc recently -> rest. By default the agent and the session work together
 //!   2. the PC is idle (no keyboard/mouse input for idle_s)      -> rest
 //!   3. hard rate limit (max_per_hour, min_gap_s)                -> rest
 //!   4. chores only: the chore cooldown has not passed           -> rest
@@ -19,9 +19,11 @@ fn gate(w: &worker::Worker, chore: bool, direct: bool) -> Result<Vec<u128>, &'st
         return Err("disabled");
     }
     if !direct {
-        if let Some(age) = inbox::session_age_s() {
-            if age < w.session_fresh_s {
-                return Err("session-live");
+        if w.defer_to_session {
+            if let Some(age) = inbox::session_age_s() {
+                if age < w.session_fresh_s {
+                    return Err("session-live");
+                }
             }
         }
         if worker::idle_seconds() > w.idle_s {

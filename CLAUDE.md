@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 @AGENTS.md
 
@@ -15,3 +15,5 @@
   never click or move the cursor for them.
 - **Cost discipline.** Prefer `morc use` of a cached component, then `morc compose`, then a new spec (see the ladder in `docs/agent.md`). One-line replies.
 - **Do not commit** `.env`, `prefs/` state or downloaded models. The CI and `.gitignore` assume a clean engine tree.
+- **UI writing standard:** never clip, always size within the container. Padding plus flex flow, nothing absolute, items exactly as wide as their content, long text wraps or ends in an ellipsis, hover growth is a smooth transition and the window follows. Check a long label, a narrow box and a hover. Explain every metric in one plain line. Own cards are never covered (see docs/agent.md).
+- **Concurrency:** the background agent and your interactive session can work at the same time (`defer_to_session` is false by default). Clicks marked `bg:true` belong to the background agent; do not redo them unless it failed.

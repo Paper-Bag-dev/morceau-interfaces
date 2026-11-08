@@ -1,4 +1,4 @@
-//! The agent inbox: UI interactions meant for Claude (wake / emit actions, form submits).
+﻿//! The agent inbox: UI interactions meant for Claude (wake / emit actions, form submits).
 //! Append-only JSONL plus a byte cursor, so every reader (hook, Monitor, headless wake) sees each event once.
 //! Behavioural stats do NOT go here; see engagement.rs.
 
@@ -52,8 +52,13 @@ pub fn hook_json(event_name: &str) -> String {
         "[morc] {} UI interaction(s) from the user's screen while you were away. Act on them as the screen agent (docs: morc/docs/agent.md):",
         ev.len()
     )];
-    for e in ev.iter().take(20) {
+    // a click marked bg:true is already being handled by the background agent: tell the session, do not hand it over as work
+    let (bg, mine): (Vec<&Value>, Vec<&Value>) = ev.iter().partition(|e| e["payload"]["bg"].as_bool().unwrap_or(false));
+    for e in mine.iter().take(20) {
         lines.push(format!("- {}", e));
+    }
+    if !bg.is_empty() {
+        lines.push(format!("- {} click(s) went to the background agent (bg:true); it is handling them. Act on them only if it reports a failure or the user asks.", bg.len()));
     }
     json!({"hookSpecificOutput": {"hookEventName": event_name, "additionalContext": lines.join("\n")}}).to_string()
 }

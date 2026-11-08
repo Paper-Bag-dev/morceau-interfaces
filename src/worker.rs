@@ -6,7 +6,8 @@
 //!   model              the `claude --model` value for the chore agent
 //!   persona            file (relative to the morc folder) appended as its system prompt: docs/agent.md
 //!   idle_s             the PC counts as idle after this many seconds without keyboard/mouse input: the agent stays asleep
-//!   session_fresh_s    a live interactive Claude session touched morc this recently: the agent stays asleep (the session does the work)
+//!   defer_to_session   false (the default): the background agent and a live interactive Claude session work at the same time; true = the agent stays asleep while a session touched morc within session_fresh_s
+//!   session_fresh_s    how recent counts as live when defer_to_session is true
 //!   max_per_hour, min_gap_s     hard rate limit on any headless wake
 //!   chore_cooldown_min          at least this long between chore wakes (stats accumulate in between)
 //!   max_turns          cap on the agent's turns per wake
@@ -29,6 +30,7 @@ pub struct Worker {
     pub model: String,
     pub persona: String,
     pub idle_s: u64,
+    pub defer_to_session: bool,
     pub session_fresh_s: u64,
     pub max_per_hour: usize,
     pub min_gap_s: u64,
@@ -45,6 +47,7 @@ impl Default for Worker {
             model: "claude-haiku-5-5".into(),
             persona: "docs/agent.md".into(),
             idle_s: 180,
+            defer_to_session: false,
             session_fresh_s: 600,
             max_per_hour: 6,
             min_gap_s: 20,
