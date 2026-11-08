@@ -49,7 +49,7 @@ impl Default for Worker {
             max_per_hour: 6,
             min_gap_s: 20,
             chore_cooldown_min: 30.0,
-            max_turns: 24,
+            max_turns: 0,
             track_titles: true,
             redact: ["password", "passcode", "otp", "bank", "login", "sign in", "private", "incognito"].iter().map(|s| s.to_string()).collect(),
         }
