@@ -3,8 +3,8 @@
 ## Next
 - [ ] **macOS build, published as one version with Windows** (to use it at work). Scope, honestly:
   - The UI (`ui/`), the CLI plugins (`tools/cli`), the protocol and the cache are platform-neutral. The Windows-specific part is the Rust platform layer:
-    window shaping (`SetWindowRgn`), no-activate/tool-window styles and DWM (`winstyle.rs`), the active-window watcher (`fgwatch.rs`, `placement.rs`),
-    global hotkeys (`hotkeys.rs`), backdrop sampling (`backdrop.rs`), input-idle and window titles (`worker.rs`), cursor swapping, the `windows` crate.
+    window shaping (`SetWindowRgn`), no-activate/tool-window styles and DWM (`platform/window_style.rs`), the active-window watcher (`platform/foreground_watch.rs`, `placement/desktop.rs`),
+    global hotkeys (`platform/hotkeys.rs`), backdrop sampling (`platform/backdrop.rs`), input-idle and window titles (`agent/worker.rs`), cursor swapping, the `windows` crate.
   - Plan: put those behind a small `platform` trait (`windows.rs` today, `macos.rs` new, using `objc2` / Cocoa: `NSWindow` level + click-through via
     `ignoresMouseEvents` regions, `NSWorkspace` for the active app, `CGEventSource` idle time, `CGWindowListCopyWindowInfo` for window rectangles).
     `tao` and `wry` already support macOS (WKWebView instead of WebView2). The transparent, shaped window needs a per-pixel hit test instead of a region.
@@ -14,7 +14,12 @@
     `py` launcher becomes `python3`, and Gatekeeper needs a signed and notarised binary for a smooth install.
   - Check on a work machine first: does the employer allow a local helper that draws overlay windows and reads window titles? Window-title logging is off
     unless `track_titles` is on, and titles matching the `redact` list are never stored.
-- [ ] Move the prebuilt `morc.exe` out of the npm tarball into GitHub Release assets built by CI (provenance), with the npm `postinstall` downloading and
+- [ ] **Keep both platforms, and let `npx morceau` offer the choice.** Windows and macOS are both maintained (the Windows-only code already sits in
+  `src/platform/`; a macOS `platform/` sits beside it). The installer asks which one you want (windows or mac, with the machine's own as the default) and
+  downloads ONLY that build, in isolation, from the GitHub repo's release assets (built by CI, with SHA-256), into its own folder
+  (`%LOCALAPPDATA%\morc\bin\<platform>` / `~/Library/Application Support/morc/bin/<platform>`). `npx morceau` itself stays a tiny launcher: no binary inside the
+  npm tarball, so the package is small and each platform's download is isolated and verifiable. Ties in with the release-assets item below and with the
+  `platform/` folder split already done.- [ ] Move the prebuilt `morc.exe` out of the npm tarball into GitHub Release assets built by CI (provenance), with the npm `postinstall` downloading and
   verifying it.
 - [ ] Optional GitHub release workflow: tag -> build -> attach the exe and its hash.
 
