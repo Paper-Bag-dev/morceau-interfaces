@@ -1,0 +1,12 @@
+/* chart: a canvas card with a title plate, an optional "how to read this" caption. Sizes: ui/tokens/chart.json (--chart-min-w, --chart-title-size, --chart-canvas-radius). */
+.c-chart { min-width: var(--chart-min-w, 200px); flex: none; }   /* a chart never shrinks below its canvas inside a row: rows wrap instead */
+.c-chart .ttl { font-size: var(--chart-title-size, 15px); margin-bottom: 5px; padding: 3px 10px; }
+.c-chart canvas { display: block; border-radius: var(--chart-canvas-radius, 22px); background: hsl(var(--card) / .86); min-height: 96px; }   /* never squashed into an unreadable strip */
+
+/* "how to read this" caption under unfamiliar charts */
+.explain { margin-top: 6px; padding: 7px 9px; border-radius: 18px; background: hsl(var(--card) / .94); border: 1px solid hsl(var(--accent, var(--border)) / .5); max-width: 300px; }
+.explain .txt { font-size: 11.5px; line-height: 1.4; color: hsl(var(--foreground)); }
+.explain .chips { display: flex; gap: 6px; margin-top: 6px; }
+.mini { font: inherit; font-size: 11.5px; font-weight: 600; padding: 2px 9px; border-radius: 99px; cursor: pointer; color: hsl(var(--secondary-foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); transition: transform .2s var(--spring), background .15s; }
+.mini:hover { transform: scale(1.06); background: hsl(var(--accent, var(--ring)) / .35); }
+.mini:active { transform: scale(.94); }

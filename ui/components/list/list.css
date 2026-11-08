@@ -1,0 +1,5 @@
+/* list: rows of text, optionally clickable. */
+.c-list { display: flex; flex-direction: column; gap: 4px; min-width: 240px; }
+.c-list .item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 11px; font-size: 11.5px; border-radius: 18px; color: hsl(var(--foreground)); background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border) / .8); transition: transform .2s var(--spring), background .15s; font-variant-numeric: tabular-nums; }
+.c-list .item.act { position: relative; overflow: hidden; cursor: pointer; } .c-list .item.act:hover { transform: translateX(3px); background: hsl(var(--secondary)); }
+.c-list .sub { color: hsl(var(--muted-foreground)); font-size: 12px; }

@@ -1,4 +1,4 @@
-import { register } from '../core/registry.js';
+import { register } from '../../core/registry.js';
 
 const box = (cls) => (c, ctx) => {
   const el = document.createElement('div');

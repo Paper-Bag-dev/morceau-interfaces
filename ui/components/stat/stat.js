@@ -1,5 +1,5 @@
-import { register } from '../core/registry.js';
-import { reduced } from '../core/motion.js';
+import { register } from '../../core/registry.js';
+import { reduced } from '../../core/motion.js';
 
 // {type:"stat", label:"Video time today", value:{bind:"/video"}, unit:"min", max:135, warnAt:.8, dangerAt:1, decimals:0}
 // A hero numeral that counts to its value, plus (with `max`) a hairline needle that glides to where it sits against the limit.

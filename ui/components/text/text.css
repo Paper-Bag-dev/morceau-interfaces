@@ -1,0 +1,17 @@
+/* text, kv, badge. Sizes: ui/tokens/text.json (--text-size, --text-size-lg, --text-size-xl, --text-radius). The plate look comes from the `plate` component. */
+.c-text { line-height: 1.35; max-width: 420px; font-size: var(--text-size, 15px); border-radius: var(--text-radius, 10px); }   /* a one-line plate is short: squarer than the 14px tiles so it does not read as a pill */
+.c-text.xs { font-size: 13px } .c-text.sm { font-size: 14px }
+.c-text.lg { font-size: var(--text-size-lg, 18px); font-weight: 600; } .c-text.xl { font-size: var(--text-size-xl, 26px); font-weight: 600; letter-spacing: -.01em }
+.c-text.hero { font-size: 36px; font-weight: 600; line-height: 1.05; padding: 7px 14px 8px; }
+.c-text.b { font-weight: 600 }
+.c-text.lg, .c-text.xl, .c-text.hero { font-family: var(--font-display); font-variation-settings: "wdth" 92; letter-spacing: -.005em; }
+.tone-good { color: hsl(var(--good)); } .tone-warn { color: hsl(var(--warn)); } .tone-bad { color: hsl(var(--bad)); }
+
+.c-kv { display: flex; justify-content: space-between; gap: 18px; min-width: 190px; width: auto; align-self: stretch; }
+
+.badge { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: hsl(var(--foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--accent, var(--border)) / .45); }
+.badge.tone-good { background: hsl(var(--good) / .18); border-color: hsl(var(--good) / .5); color: hsl(var(--good)); }
+.badge.tone-warn { background: hsl(var(--warn) / .18); border-color: hsl(var(--warn) / .5); color: hsl(var(--warn)); }
+.badge.tone-bad  { background: hsl(var(--bad) / .18);  border-color: hsl(var(--bad) / .5);  color: hsl(var(--bad)); }
+/* figures that can change never jitter */
+.c-kv .v, .badge, .c-text { font-variant-numeric: tabular-nums; }

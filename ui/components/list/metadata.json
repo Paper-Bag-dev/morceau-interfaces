@@ -1,0 +1,15 @@
+{
+    "name":  "list",
+    "description":  "Rows of text, optionally clickable.",
+    "types":  [
+                  "list"
+              ],
+    "js":  "list.js",
+    "css":  "list.css",
+    "deps":  [
+
+             ],
+    "tokens":  [
+
+               ]
+}

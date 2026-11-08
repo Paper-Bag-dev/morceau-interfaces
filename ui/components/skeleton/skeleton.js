@@ -1,4 +1,4 @@
-import { register } from '../core/registry.js';
+import { register } from '../../core/registry.js';
 
 // {type:"skeleton", w:300, h:110, variant:"chart|stat|bar|list|btn|text"}
 // A placeholder card the size of the component that will replace it, so the layout does not jump when the real thing arrives.

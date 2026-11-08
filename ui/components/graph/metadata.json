@@ -1,0 +1,15 @@
+{
+    "name":  "graph",
+    "description":  "A node-link graph on Cytoscape.",
+    "types":  [
+                  "graph"
+              ],
+    "js":  "graph.js",
+    "css":  "graph.css",
+    "deps":  [
+                 "plate"
+             ],
+    "tokens":  [
+
+               ]
+}

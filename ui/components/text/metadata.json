@@ -1,0 +1,20 @@
+{
+    "name":  "text",
+    "description":  "Text, key-value rows and badges.",
+    "types":  [
+                  "text",
+                  "badge",
+                  "kv"
+              ],
+    "js":  "text.js",
+    "css":  "text.css",
+    "deps":  [
+                 "plate"
+             ],
+    "tokens":  [
+                   "text-size",
+                   "text-size-lg",
+                   "text-size-xl",
+                   "text-radius"
+               ]
+}

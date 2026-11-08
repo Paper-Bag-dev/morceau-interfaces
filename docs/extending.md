@@ -5,8 +5,8 @@ Everything below is "drop a file in a folder"; no rebuild unless you touch Rust.
 | you want | do this | picked up |
 |---|---|---|
 | a new CLI command | `tools/cli/<name>.py` (or `.ps1` / `.cmd`) with a line `# morc: what it does` near the top | instantly: `morc <name> ...`, listed by `morc commands` |
-| a new UI component | `ui/plugins/<name>.js` that calls `register("type", (spec, ctx) => element)` | next surface (the host lists `plugins/index.json`; main.js imports each before saying ready) |
-| a new chart kind | `ui/charts/<kind>.js` exporting `draw(g, s)` + `hit(s, x, y)`; add it to `MODS` in `components/chart.js` (+ `charts/explain.js` if unfamiliar) | next surface |
+| a new UI component | `morc ui new <name> --deps plate --types <type>`: a folder `ui/components/<name>/` with its code, styles and `metadata.json`; edit it, run `morc ui build` (index: `ui/COMPONENTS.md`) | next surface (the host lists `plugins/index.json`; main.js imports each before saying ready) |
+| a new chart kind | `ui/charts/<kind>.js` exporting `draw(g, s)` + `hit(s, x, y)`; add it to `MODS` in `components/chart/chart.js` (+ `charts/explain.js` if unfamiliar) | next surface |
 | a 3D model | `ui/models/<name>.js` exporting `build(THREE, opts)` (see `bike.js`); show with `{type:"model3d", model:"<name>"}` | next surface |
 | a program a button may run | add a named entry to `actions.json` (argv + cwd), then `{do:"run", id:"...", into:"/path", then:{...}, fail:{...}}` | immediately (read per click) |
 | live numbers on a surface | `sources: {"/x": {file, pointer, every}}` (JSON file + pointer, polled by the host) | on show |

@@ -1,9 +1,9 @@
-import { register } from '../core/registry.js';
-import { reduced } from '../core/motion.js';
-import { accent } from '../charts/util.js';
-import * as literacy from '../core/literacy.js';
-import { working } from '../core/working.js';
-import { EXPLAIN } from '../charts/explain.js';
+import { register } from '../../core/registry.js';
+import { reduced } from '../../core/motion.js';
+import { accent } from '../../charts/util.js';
+import * as literacy from '../../core/literacy.js';
+import { working } from '../../core/working.js';
+import { EXPLAIN } from '../../charts/explain.js';
 
 // {type:"graph", data:{bind:"/graph"}, width:460, height:320}
 // A node-link diagram on Cytoscape.js (vendored in ui/vendor, loaded only when a graph is shown). Schema: docs/graphs.md:

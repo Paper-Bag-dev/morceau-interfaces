@@ -1,16 +1,16 @@
-﻿import { register } from '../core/registry.js';
-import { reduced } from '../core/motion.js';
-import * as literacy from '../core/literacy.js';
-import { working } from '../core/working.js';
-import { EXPLAIN, FANCY } from '../charts/explain.js';
-import * as cartesian from '../charts/cartesian.js';
-import * as radar from '../charts/radar.js';
-import * as donut from '../charts/donut.js';
-import * as gauge from '../charts/gauge.js';
-import * as heatmap from '../charts/heatmap.js';
-import * as clock from '../charts/clock.js';
-import * as rings from '../charts/rings.js';
-import * as treemap from '../charts/treemap.js';
+import { register } from '../../core/registry.js';
+import { reduced } from '../../core/motion.js';
+import * as literacy from '../../core/literacy.js';
+import { working } from '../../core/working.js';
+import { EXPLAIN, FANCY } from '../../charts/explain.js';
+import * as cartesian from '../../charts/cartesian.js';
+import * as radar from '../../charts/radar.js';
+import * as donut from '../../charts/donut.js';
+import * as gauge from '../../charts/gauge.js';
+import * as heatmap from '../../charts/heatmap.js';
+import * as clock from '../../charts/clock.js';
+import * as rings from '../../charts/rings.js';
+import * as treemap from '../../charts/treemap.js';
 
 // {type:"chart", kind:"line|area|spark|bar|radar|donut|gauge|heatmap|clock|rings|treemap",
 //  title, data:{bind}, labels:{bind}, unit, max, targets:[...], cols (heatmap), height}

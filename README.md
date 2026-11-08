@@ -82,6 +82,34 @@ Everything that is yours lives outside the install, so upgrading never touches i
 
 Per-machine runtime state (token, logs, usage counts, the installed exe) is under `%LOCALAPPDATA%\morc`. The install folder is `MORC_APP` or found from the exe.
 
+## Shortcuts
+**Keyboard**
+| keys | what it does |
+|---|---|
+| `Ctrl+Alt+X` | dismiss every floating card at once |
+| `Ctrl+Alt+Space` | bring back anything that needed you (parked urgent asks), next to the active window |
+
+**On a card (mouse)**
+| gesture | what it does |
+|---|---|
+| hold ~0.1 s on empty space or text (0.2 s on buttons), then drag | pick the card up and move it; the spot is remembered for that topic |
+| hover | pauses the lifetime; a small chart or 3D card grows a little and eases back |
+| pin (top right, shows on hover) | keep the card open; long-press it to pick the card up |
+| x (under the pin) | dismiss this card |
+| click anything | extends the lifetime and teaches the annoyance vector what you engage with |
+
+**Command line (the ones used every day)**
+```powershell
+morc card NAME --chip CHIP --set key=value ...   # write or change one card's data file (remembered in cards/)
+morc push NAME [NAME ...]                        # show cards; the host places them in free space (or --all --prefix p-)
+morc status                                      # the cards on screen: id, rect, visible
+morc space   |  morc free                        # the free regions around the active window
+morc patch ID /path value                        # change one value live; /__pulse true plays the blue look-here pulse
+morc ui build | list | show NAME | new NAME      # the UI component tree (folders: code + styles + metadata)
+morc annoy nudge crowd 0.8 --why "too crowded"   # teach the host what you treat as crowded or too big
+morc commands                                    # every CLI plugin with one line each
+morc dismiss-all   |  morc summon                # the hotkeys, as commands
+```
 ## Ten-minute tour
 ```powershell
 morc use ask-permission --data @ask.json            # inline JSON loses its quotes in Windows shells: pass a file (@file.json)

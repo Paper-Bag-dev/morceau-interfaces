@@ -1,0 +1,15 @@
+{
+    "name":  "skeleton",
+    "description":  "Shimmering placeholder shapes.",
+    "types":  [
+                  "skeleton"
+              ],
+    "js":  "skeleton.js",
+    "css":  "skeleton.css",
+    "deps":  [
+
+             ],
+    "tokens":  [
+
+               ]
+}

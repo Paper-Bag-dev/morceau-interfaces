@@ -23,5 +23,5 @@ Props: `title`, `data` (bind), `labels` (bind), `unit`, `max`, `targets`, `cols`
   prefer a simpler kind for that user until they ask for it. Edit the wording in `explain.js` if a phrasing keeps failing.
 - State: `%LOCALAPPDATA%\morc\literacy.json` (`{kind: {seen, got, confused}}`).
 
-Adding a kind = one file in `ui/charts/` exporting `draw(g, s)` and `hit(s, x, y)`, one line in `ui/components/chart.js` (MODS), and
+Adding a kind = one file in `ui/charts/` exporting `draw(g, s)` and `hit(s, x, y)`, one line in `ui/components/chart/chart.js` (MODS), and
 an entry in `explain.js` if it needs teaching. Planned fancy ones: streamgraph, sankey (where time flows), bullet, slope, calendar streaks.

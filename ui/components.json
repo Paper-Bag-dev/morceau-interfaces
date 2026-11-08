@@ -1,0 +1,178 @@
+{
+ "order": [
+  "button",
+  "plate",
+  "chart",
+  "graph",
+  "input",
+  "layout",
+  "list",
+  "progress",
+  "skeleton",
+  "spinner",
+  "stat",
+  "text"
+ ],
+ "components": {
+  "button": {
+   "path": "components/button",
+   "js": "button.js",
+   "css": "button.css",
+   "types": [
+    "button"
+   ],
+   "deps": [],
+   "tokens": [],
+   "description": "Buttons: primary, ghost, icon-only, yes/no, swatches, toggles, ripple and shine."
+  },
+  "plate": {
+   "path": "components/plate",
+   "js": null,
+   "css": "plate.css",
+   "types": [],
+   "deps": [],
+   "tokens": [
+    "plate-radius",
+    "plate-padding"
+   ],
+   "description": "The shared frosted-glass material (grain + dark gradient + blur) that text, stat, progress, kv and chart titles sit on. Style only."
+  },
+  "chart": {
+   "path": "components/chart",
+   "js": "chart.js",
+   "css": "chart.css",
+   "types": [
+    "chart"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "chart-min-w",
+    "chart-title-size",
+    "chart-canvas-radius",
+    "chart-text-floor"
+   ],
+   "description": "Charts on a canvas (bar, line, donut, gauge, heatmap, ...). Drawing code lives in ui/charts/."
+  },
+  "graph": {
+   "path": "components/graph",
+   "js": "graph.js",
+   "css": "graph.css",
+   "types": [
+    "graph"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [],
+   "description": "A node-link graph on Cytoscape."
+  },
+  "input": {
+   "path": "components/input",
+   "js": "input.js",
+   "css": "input.css",
+   "types": [
+    "input"
+   ],
+   "deps": [],
+   "tokens": [],
+   "description": "A text field."
+  },
+  "layout": {
+   "path": "components/layout",
+   "js": "layout.js",
+   "css": "layout.css",
+   "types": [
+    "column",
+    "row",
+    "panel",
+    "spacer",
+    "divider",
+    "wing"
+   ],
+   "deps": [],
+   "tokens": [],
+   "description": "Flex layout: columns, rows, panels, spacer, divider, wing; right-aligned cards and the leftward flow."
+  },
+  "list": {
+   "path": "components/list",
+   "js": "list.js",
+   "css": "list.css",
+   "types": [
+    "list"
+   ],
+   "deps": [],
+   "tokens": [],
+   "description": "Rows of text, optionally clickable."
+  },
+  "progress": {
+   "path": "components/progress",
+   "js": "progress.js",
+   "css": "progress.css",
+   "types": [
+    "progress"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [],
+   "description": "A labelled progress bar (percent)."
+  },
+  "skeleton": {
+   "path": "components/skeleton",
+   "js": "skeleton.js",
+   "css": "skeleton.css",
+   "types": [
+    "skeleton"
+   ],
+   "deps": [],
+   "tokens": [],
+   "description": "Shimmering placeholder shapes."
+  },
+  "spinner": {
+   "path": "components/spinner",
+   "js": "spinner.js",
+   "css": "spinner.css",
+   "types": [
+    "spinner"
+   ],
+   "deps": [],
+   "tokens": [],
+   "description": "The building indicator (system blue)."
+  },
+  "stat": {
+   "path": "components/stat",
+   "js": "stat.js",
+   "css": "stat.css",
+   "types": [
+    "stat"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [],
+   "description": "One hero numeral with a label, unit and optional needle."
+  },
+  "text": {
+   "path": "components/text",
+   "js": "text.js",
+   "css": "text.css",
+   "types": [
+    "text",
+    "badge",
+    "kv"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "text-size",
+    "text-size-lg",
+    "text-size-xl",
+    "text-radius"
+   ],
+   "description": "Text, key-value rows and badges."
+  }
+ }
+}

@@ -1,0 +1,4 @@
+/* spinner: the "building" indicator is the system working, so blue (--sys). */
+.spinner { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; padding: 7px 14px; }
+.spinner .ring { width: 15px; height: 15px; border-radius: 50%; border: 2.5px solid rgb(255 255 255 / .22); border-top-color: hsl(var(--sys)); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

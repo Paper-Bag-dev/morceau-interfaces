@@ -1,4 +1,4 @@
-import { register } from '../core/registry.js';
+import { register } from '../../core/registry.js';
 
 // {type:"spinner", label:"Reading your last 7 days"}: shown while something is being built; pair it with `when` on a stage value
 // so it disappears the moment the result arrives. The ring is the only always-moving thing on screen, so it means "working".

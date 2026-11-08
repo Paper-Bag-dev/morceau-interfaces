@@ -16,17 +16,27 @@ function applyUi(ui) {
   window.dispatchEvent(new Event('morc-zoom'));   // charts repaint with the new tokens (text floor, colors)
 }
 import * as literacy from './literacy.js';
-import '../components/layout.js';
-import '../components/text.js';
-import '../components/button.js';
-import '../components/progress.js';
-import '../components/stat.js';
-import '../components/spinner.js';
-import '../components/skeleton.js';
-import '../components/input.js';
-import '../components/list.js';
-import '../components/chart.js';
-import '../components/graph.js';
+// The component tree. Every component is a folder (ui/components/<name>/: code, styles, metadata.json). `morc ui build` writes ui/components.json, the list of
+// those folders in dependency order; here each one's styles and code are loaded in that order, so a component always loads after what it depends on.
+async function loadComponents() {
+  try {
+    const manifest = await (await fetch('components.json')).json();
+    for (const name of manifest.order) {
+      const c = manifest.components[name];
+      if (c.css) {
+        await new Promise((done) => {
+          const l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = `${c.path}/${c.css}`;
+          l.onload = l.onerror = done;
+          document.head.appendChild(l);
+        });
+      }
+      if (c.js) await import(`../${c.path}/${c.js}`).catch((e) => send({ t: 'log', msg: `component ${name}: ${e.message}` }));
+    }
+  } catch (e) { send({ t: 'log', msg: 'components: ' + e.message }); }
+}
+await loadComponents();
 
 const stage = document.getElementById('stage');
 const root = document.getElementById('surface');

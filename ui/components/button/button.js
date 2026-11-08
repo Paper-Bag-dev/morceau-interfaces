@@ -1,8 +1,8 @@
-import { register } from '../core/registry.js';
-import { reduced } from '../core/motion.js';
-import { rippleAt } from '../core/ripple.js';
-import { icon } from '../core/icons.js';
-import * as literacy from '../core/literacy.js';
+import { register } from '../../core/registry.js';
+import { reduced } from '../../core/motion.js';
+import { rippleAt } from '../../core/ripple.js';
+import { icon } from '../../core/icons.js';
+import * as literacy from '../../core/literacy.js';
 
 // {type:"button", label?, icon?, variant:"primary|secondary|ghost|good|bad|destructive", shape?:"soft|circle", title?, action}
 //

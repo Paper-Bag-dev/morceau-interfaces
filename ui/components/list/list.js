@@ -1,6 +1,6 @@
-import { register } from '../core/registry.js';
-import { enter, reduced } from '../core/motion.js';
-import { rippleAt } from '../core/ripple.js';
+import { register } from '../../core/registry.js';
+import { enter, reduced } from '../../core/motion.js';
+import { rippleAt } from '../../core/ripple.js';
 
 // {type:"list", items:{bind:"/todos"}, max:6}   item: {text, sub?, badge?, action?}
 register('list', (c, ctx) => {

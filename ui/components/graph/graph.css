@@ -1,0 +1,6 @@
+/* graph (Cytoscape): a rounded card the diagram sits on, so it reads over any page; the read-out under it is a plate like all raw text. */
+.c-graph { display: flex; flex-direction: column; gap: 6px; width: max-content; align-self: flex-start; }   /* its box must be as wide as the canvas, or the window shape stops short */
+.c-graph .gframe { position: relative; overflow: hidden; border-radius: 22px; background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border)); box-shadow: 0 8px 24px rgb(0 0 0 / .35); }
+.c-graph .gcanvas { position: absolute; left: 0; top: 0; }
+.c-graph .ginfo { font-size: 12px; min-height: 22px; }
+#stage.dragging .c-graph .gframe { animation: glowin .22s ease-out both; box-shadow: 0 0 26px 3px hsl(var(--accent, var(--ring)) / .6), inset 0 0 22px hsl(var(--accent, var(--ring)) / .22); }

@@ -1,0 +1,15 @@
+{
+    "name":  "input",
+    "description":  "A text field.",
+    "types":  [
+                  "input"
+              ],
+    "js":  "input.js",
+    "css":  "input.css",
+    "deps":  [
+
+             ],
+    "tokens":  [
+
+               ]
+}

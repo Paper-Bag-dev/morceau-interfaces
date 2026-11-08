@@ -67,7 +67,7 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
   room: rearrange (merge) the cards so they fit the side properly. Corners come only after the sides are used.
 - **Group by kind, then fit the shape of the space.** Text/numbers go as ONE flex row in a long strip above or below the window (`stat-strip`). Pictures (charts)
   may be merged into ONE window on a tall side (`chart-stack`), even when they are different charts. A tall side takes a column, a strip takes a row.
-- **Start at the very edge of the quadrant,** next to the active window (hug it), then fill outward. Use the card's `dx`/`dy` to sit flush with the edge.
+- **Start at the very edge of the quadrant,** next to the active window (hug it), then fill outward. `morc push` makes a card with `align: left|right` sit flush with that edge on its own (dx = minus or plus the margin from `prefs/placement.json`); an explicit `dx` in the card file wins.
 - **Size is what you compromise, never text.** Shrink a card down to its `min_importance` (text stays at the floor) before moving it to a worse place;
   trim data (5 bars instead of 7) before shrinking text.
 - **Check after pushing:** `morc status` rects and a look at the screen: nothing overlaps the active window or another card. If it does, change the card JSON

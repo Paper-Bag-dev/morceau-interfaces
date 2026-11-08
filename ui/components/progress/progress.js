@@ -1,4 +1,4 @@
-import { register } from '../core/registry.js';
+import { register } from '../../core/registry.js';
 
 // {type:"progress", label:"Video today", value:{bind:"/video"}, max:135, unit:"m", warnAt:.8, dangerAt:1}
 register('progress', (c, ctx) => {

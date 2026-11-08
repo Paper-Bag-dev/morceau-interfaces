@@ -1,0 +1,27 @@
+/* button: real backgrounds for interactive bits, icon-only and yes/no semantics (read the answer by shape and color), swatches and pressed toggles, ripple + shine. */
+.btn { position: relative; overflow: hidden; font: inherit; font-weight: 600; font-size: 11.5px; color: hsl(var(--secondary-foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); border-radius: 999px; padding: 4px 12px; cursor: pointer;
+  transition: transform .22s var(--spring), background .15s, box-shadow .2s; box-shadow: 0 2px 8px rgb(0 0 0 / .3);
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+.btn:hover { transform: translateY(-1px) scale(1.035); box-shadow: 0 2px 6px hsl(var(--accent, var(--ring)) / .4), 0 1px 4px rgb(0 0 0 / .3); filter: brightness(1.06); }   /* shadows stay inside the 8px window margin, or they clip on light cards */
+.btn:active { transform: scale(.95); transition-duration: .08s; }
+.btn.primary { background: hsl(var(--accent, var(--primary))); color: hsl(var(--on-accent, var(--primary-foreground))); border-color: transparent; }
+.btn.destructive { background: hsl(var(--destructive)); color: white; border-color: transparent; }
+.btn.ghost { background: hsl(var(--card) / .8); color: hsl(var(--foreground)); }
+.btn.soft { border-radius: 13px; }
+.btn.circle { width: 26px; height: 26px; padding: 0; border-radius: 50%; display: inline-grid; place-items: center; font-size: 13px; }
+.btn:focus-visible, input:focus-visible { outline: 2px solid hsl(var(--ring) / .8); outline-offset: 1px; }
+.btn svg { flex: none; min-width: 14px; min-height: 14px; }
+.btn.icon-only { padding: 0; width: 28px; height: 28px; border-radius: 50%; }
+.btn.good { background: hsl(var(--accent, var(--primary))); color: hsl(var(--on-accent, var(--primary-foreground))); border-color: transparent; }
+.btn.bad { background: hsl(var(--card) / .97); color: hsl(var(--foreground)); border: 1.5px solid hsl(var(--accent, var(--ring))); }
+.btn .tick { color: inherit; margin-left: 2px; }
+
+/* ripple + shine (core/ripple.js): tinted with the surface accent */
+.ripple { position: absolute; border-radius: 50%; background: hsl(var(--accent, var(--ring)) / .55); pointer-events: none; }
+.shine { position: absolute; top: 0; bottom: 0; left: 0; width: 45%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .55), transparent); transform: translateX(-120%) skewX(-18deg); pointer-events: none; }
+
+/* swatches + pressed toggles */
+.btn.swatch { width: 24px; height: 24px; padding: 0; border-radius: 50%; background: var(--sw); border: 2px solid rgb(255 255 255 / .7); }
+.btn.swatch:hover { filter: brightness(1.12); }
+.btn.on { background: hsl(var(--accent, var(--ring)) / .26); box-shadow: inset 0 0 0 1.5px hsl(var(--accent, var(--ring))); }
+.btn.swatch.on { box-shadow: 0 0 0 2px hsl(var(--card)), 0 0 0 4px hsl(var(--accent, var(--ring))); background: var(--sw); }

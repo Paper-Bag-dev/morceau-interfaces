@@ -1,0 +1,20 @@
+{
+    "name":  "layout",
+    "description":  "Flex layout: columns, rows, panels, spacer, divider, wing; right-aligned cards and the leftward flow.",
+    "types":  [
+                  "column",
+                  "row",
+                  "panel",
+                  "spacer",
+                  "divider",
+                  "wing"
+              ],
+    "js":  "layout.js",
+    "css":  "layout.css",
+    "deps":  [
+
+             ],
+    "tokens":  [
+
+               ]
+}

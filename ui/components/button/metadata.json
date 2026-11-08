@@ -1,0 +1,15 @@
+{
+    "name":  "button",
+    "description":  "Buttons: primary, ghost, icon-only, yes/no, swatches, toggles, ripple and shine.",
+    "types":  [
+                  "button"
+              ],
+    "js":  "button.js",
+    "css":  "button.css",
+    "deps":  [
+
+             ],
+    "tokens":  [
+
+               ]
+}

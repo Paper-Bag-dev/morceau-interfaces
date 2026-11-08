@@ -1,0 +1,15 @@
+{
+    "name":  "stat",
+    "description":  "One hero numeral with a label, unit and optional needle.",
+    "types":  [
+                  "stat"
+              ],
+    "js":  "stat.js",
+    "css":  "stat.css",
+    "deps":  [
+                 "plate"
+             ],
+    "tokens":  [
+
+               ]
+}

@@ -1,4 +1,4 @@
-﻿# Learnings (things we hit, and the rule each one became)
+# Learnings (things we hit, and the rule each one became)
 
 Short, so an agent or contributor can read it before touching the UI or the wake path.
 
@@ -7,7 +7,7 @@ Short, so an agent or contributor can read it before touching the UI or the wake
 - **Cause:** the canvas was a fixed default width (280 px) with content drawn at fractions of it. Labels longer than the slot ran past the edge, and
   a canvas wider than its content left an empty strip that the window could cut off.
 - **Rule:** a chart is exactly as wide as its content needs. Each chart module may export `width(s)` (donut: ring + legend column + padding; bar: a slot
-  per bar wide enough for its label). `ui/components/chart.js` calls it whenever the labels or the kind change, and the canvas takes that width. A kind
+  per bar wide enough for its label). `ui/components/chart/chart.js` calls it whenever the labels or the kind change, and the canvas takes that width. A kind
   without `width()` keeps the default. New chart kinds must export `width()` if their content can be wider than the default.
 - **Never:** absolute positions for content, fractions of a fixed width for text, a default width that pads a card out.
 - **Hover:** growth is a smooth scale from the old size to the new one, and the window is resized to the final size first, so nothing is cut off mid-way.

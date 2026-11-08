@@ -9,10 +9,25 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _home import BIN, HOME  # noqa: E402
+from _home import APP, BIN, HOME  # noqa: E402
 
 CARDS = os.path.join(HOME, "cards")
 DEFAULT_MIN = 0.85  # text stays readable: no card goes below this size unless its own file says otherwise
+
+
+def margin():
+    """The host's margin from every edge (prefs/placement.json, in your data folder, else the shipped default 14), so flush alignment is data too."""
+    for root in (HOME, APP):
+        p = os.path.join(root, "prefs", "placement.json")
+        if os.path.exists(p):
+            try:
+                return int(json.load(open(p, encoding="utf-8-sig")).get("margin", 14))
+            except (ValueError, OSError):
+                break
+    return 14
+
+
+MARGIN = margin()
 
 
 def main(argv):
@@ -37,9 +52,15 @@ def main(argv):
         args = [BIN, "use", c["chip"], "--id", n, "--data", "@" + f.name, "--importance", str(imp), "--ttl", str(c.get("ttl", 90)), "--region", c.get("region", "auto")]
         if c.get("align"):
             args += ["--align", c["align"]]
-        for k in ("dx", "dy"):
-            if c.get(k) is not None:
-                args += ["--" + k, str(c[k])]
+        # Alignment is automatic: a card aligned left or right sits FLUSH with that edge of its quadrant. The host keeps a margin from every edge
+        # (prefs/placement.json), so the card's own dx cancels it: -margin for left, +margin for right. An explicit dx in the card file wins.
+        dx = c.get("dx")
+        if dx is None and c.get("align") in ("left", "right"):
+            dx = -MARGIN if c["align"] == "left" else MARGIN
+        if dx is not None:
+            args += ["--dx", str(dx)]
+        if c.get("dy") is not None:
+            args += ["--dy", str(c["dy"])]
         rc |= subprocess.run(args, stdout=subprocess.DEVNULL).returncode
         print(("shown " if rc == 0 else "failed ") + n)
     return rc

@@ -1,0 +1,15 @@
+{
+    "name":  "spinner",
+    "description":  "The building indicator (system blue).",
+    "types":  [
+                  "spinner"
+              ],
+    "js":  "spinner.js",
+    "css":  "spinner.css",
+    "deps":  [
+
+             ],
+    "tokens":  [
+
+               ]
+}

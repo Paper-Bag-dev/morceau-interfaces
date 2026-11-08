@@ -1,0 +1,18 @@
+{
+    "name":  "chart",
+    "description":  "Charts on a canvas (bar, line, donut, gauge, heatmap, ...). Drawing code lives in ui/charts/.",
+    "types":  [
+                  "chart"
+              ],
+    "js":  "chart.js",
+    "css":  "chart.css",
+    "deps":  [
+                 "plate"
+             ],
+    "tokens":  [
+                   "chart-min-w",
+                   "chart-title-size",
+                   "chart-canvas-radius",
+                   "chart-text-floor"
+               ]
+}

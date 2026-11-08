@@ -1,4 +1,4 @@
-import { register } from '../core/registry.js';
+import { register } from '../../core/registry.js';
 
 // {type:"input", placeholder:"Why do you need it?", bind:"/draft", submit:{do:"wake", payload:{answer:"{/draft}"}}}
 // Focusing a field asks the host for real keyboard focus (windows are otherwise no-activate); blur gives it back.

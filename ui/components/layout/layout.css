@@ -1,0 +1,18 @@
+/* layout: column, row, panel, spacer, divider, wing; the scroll box; right-aligned cards (a card's "align": "right") and the leftward flow. Pure flex + padding, nothing absolute. */
+.col { display: flex; flex-direction: column; gap: var(--gap, 8px); align-items: var(--align, stretch); }
+.row { display: flex; flex-direction: row; gap: var(--gap, 8px); align-items: var(--align, center); flex-wrap: wrap; }
+.divider { height: 1px; background: hsl(var(--ink) / .3); margin: 2px 0; }
+.scroll { overflow-y: auto; overscroll-behavior: contain; padding-right: 6px; scrollbar-width: thin; scrollbar-color: hsl(var(--accent, var(--ring)) / .7) transparent; }
+
+.col.end > .c-text, .col.end > .row, .col.end > .stat { align-self: flex-end; }
+.col.end > .c-text { text-align: right; }
+.col.end > .row { justify-content: flex-end; }
+/* card-level "align": "right" (set in the card's JSON): everything in the card starts from the right edge, so titles, charts, stats and Close line up */
+#stage.align-right .col { --align: flex-end; align-items: flex-end; }
+#stage.align-right .col > * { align-self: flex-end; }   /* every direct child, whatever component it is (text, stat, chart, progress, list, row ...), so nothing is left behind on the other edge */
+#stage.align-right .col > .c-text { text-align: right; }
+#stage.align-right .row { justify-content: flex-end; }
+#stage.align-right .c-chart { display: flex; flex-direction: column; align-items: flex-end; }
+#stage.align-right .c-chart .ttl { align-self: flex-end; }
+.flow-left { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: 8px; }   /* first column at the right, the rest grow leftward */
+.flow-left > .col > .c-text { max-width: 250px; }

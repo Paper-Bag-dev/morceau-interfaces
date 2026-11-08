@@ -1,0 +1,16 @@
+{
+    "name":  "plate",
+    "description":  "The shared frosted-glass material (grain + dark gradient + blur) that text, stat, progress, kv and chart titles sit on. Style only.",
+    "types":  [
+
+              ],
+    "js":  null,
+    "css":  "plate.css",
+    "deps":  [
+
+             ],
+    "tokens":  [
+                   "plate-radius",
+                   "plate-padding"
+               ]
+}
