@@ -53,14 +53,19 @@ fn spawn(w: &worker::Worker, prompt: &str, mut recent: Vec<u128>, chore: bool) -
     if chore {
         worker::mark_chore();
     }
-    let allow = format!("Bash({exe}:*)");
+    // The permission rule matches the command text, and a Windows path with backslashes never matched ("requires approval" for every
+    // call, found in agent.log). So the agent calls plain `morc` (its exe folder is put on the child's PATH) and the rule says the same.
+    let allow = "Bash(morc:*)".to_string();
+    let exe_dir = std::path::Path::new(&exe).parent().map(|p| p.display().to_string()).unwrap_or_default();
+    let child_path = format!("{exe_dir};{}", std::env::var("PATH").unwrap_or_default());
     let turns = w.max_turns.to_string();
     // the agent's own words and errors go to <runtime>/agent.log, so a silent failure can be read afterwards
     let log = fs::OpenOptions::new().create(true).append(true).open(paths::runtime_dir().join("agent.log"));
     let mut cmd = Command::new("claude");
     // Read/Write: it builds spec files to pass to `morc show --file` (inline JSON loses its quotes on Windows)
     cmd.args(["-p", prompt, "--model", &w.model, "--max-turns", &turns, "--allowedTools", &allow, "Read", "Write", "--append-system-prompt", &persona])
-        .current_dir(paths::home_dir());
+        .current_dir(paths::home_dir())
+        .env("PATH", child_path);
     if let Ok(f) = log {
         if let Ok(f2) = f.try_clone() {
             cmd.stdout(f).stderr(f2);
@@ -70,8 +75,9 @@ fn spawn(w: &worker::Worker, prompt: &str, mut recent: Vec<u128>, chore: bool) -
     if spawned.is_ok() { "headless-spawned" } else { "spawn-failed" }
 }
 
+/// What the headless agent types to run the CLI: plain `morc` (spawn puts the exe's folder on its PATH).
 fn exe_path() -> String {
-    std::env::current_exe().map(|p| p.display().to_string()).unwrap_or_else(|_| "morc".into())
+    "morc".to_string()
 }
 
 /// The user acted on a widget that needs the agent.

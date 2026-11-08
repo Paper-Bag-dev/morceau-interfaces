@@ -12,12 +12,15 @@ register('stat', (c, ctx) => {
   const num = el.querySelector('.num'), lbl = el.querySelector('.lbl'), fill = el.querySelector('.fill'), dot = el.querySelector('.dot');
   const unit = el.querySelector('.unit');
   ctx.bind(c.unit, (v) => { unit.textContent = v ?? ''; });   // the unit may be bound or templated, like label and value
-  const dec = c.decimals ?? 0, show = (n) => (dec ? n.toFixed(dec) : String(Math.round(n)));
+  // decimals: as given, else as many as the value itself carries (2.5 stays 2.5, never rounds to 3), up to 2
+  let dec = c.decimals ?? 0;
+  const show = (n) => (dec ? n.toFixed(dec) : String(Math.round(n)));
   ctx.bind(c.label, (v) => { lbl.textContent = v ?? ''; });
 
   let shown = 0, raf = 0;
   ctx.bind(c.value, (v) => {
     const to = Number(v) || 0, from = shown, t0 = performance.now();
+    if (c.decimals === undefined) dec = Math.min(2, (String(v).split('.')[1] || '').replace(/\D.*$/, '').length);
     cancelAnimationFrame(raf);
     const step = (now) => {                                  // count to the value: it answers a change, not decoration
       const p = Math.min(1, (now - t0) / 650), e = 1 - Math.pow(1 - p, 3);
