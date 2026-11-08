@@ -70,7 +70,8 @@ stage.addEventListener('pointerleave', () => {
 // Smooth grow/shrink: scale the whole surface from one factor to another (top-left origin) so hover growth is an animation, not a jump.
 function morph(from, to, done) {
   const surf = document.getElementById('surface');
-  if (!surf || reduced) { if (done) done(); return; }\n  const a = surf.animate([{ transformOrigin: '0 0', transform: `scale(${from})` }, { transformOrigin: '0 0', transform: `scale(${to})` }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
+  if (!surf || reduced) { if (done) done(); return; }
+  const a = surf.animate([{ transformOrigin: '0 0', transform: `scale(${from})` }, { transformOrigin: '0 0', transform: `scale(${to})` }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
   a.onfinish = () => { a.cancel(); if (done) done(); };
 }
 

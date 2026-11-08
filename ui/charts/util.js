@@ -45,6 +45,6 @@ export function label(g, text, x, y, { align = 'center', size = 11, color, weigh
 let mctx = null;
 export function measure(text, size = 11, weight = 500) {
   if (!mctx) mctx = document.createElement('canvas').getContext('2d');
-  mctx.font = ` px `;
+  mctx.font = `${weight} ${size}px ${BODY}`;
   return mctx.measureText(String(text)).width;
 }
