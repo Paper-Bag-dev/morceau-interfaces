@@ -1,0 +1,253 @@
+/* shadcn/ui "zinc" tokens (same variable names, so shadcn recipes copy over) + backdrop-aware schemes.
+   Two groups of text color on purpose:
+     --ink*        floating text with no card behind it (reads against the page behind the window)
+     --foreground  text on filled surfaces (cards, buttons, inputs)
+   data-bd on #stage is set from the sampled backdrop (core/theme.js): "dark" -> light surfaces (anti-color),
+   "light" -> dark ink over dark surfaces, "mid" -> default. */
+:root {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 20 9% 9%;
+  --muted: 20 6% 16%;
+  --muted-foreground: 20 6% 72%;
+  --border: 20 6% 22%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 20 12% 9%;
+  --secondary: 20 6% 17%;
+  --secondary-foreground: 0 0% 98%;
+  --destructive: 0 72% 51%;
+  --good: 142 60% 50%;
+  --warn: 38 92% 55%;
+  --bad: 0 80% 62%;
+  --ring: 217 91% 65%;
+  --sys: 212 92% 62%;      /* blue = the system is working; coral stays "yours" */
+  --ink: 0 0% 98%;
+  --ink-muted: 20 8% 82%;
+  --ink-shadow: 0 0 0;
+  --radius: 22px;
+  --font-display: "Bahnschrift", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;   /* numerals + titles: DIN-like, variable width */
+  --font-body: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --spring: cubic-bezier(.34, 1.56, .64, 1);   /* overshoot: the cheap spring for hover/press */
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  font-family: var(--font-body);
+  font-size: 12px;
+  color-scheme: dark;
+}
+
+/* dark page behind (video sites, terminals): flip to light surfaces */
+#stage[data-bd="dark"] {
+  --card: 30 14% 96%; --foreground: 20 12% 9%; --muted-foreground: 20 6% 34%;
+  --secondary: 30 10% 90%; --secondary-foreground: 20 12% 9%; --border: 30 8% 74%;
+  --primary: 20 12% 10%; --primary-foreground: 0 0% 98%;
+  --good: 142 70% 30%; --warn: 32 92% 38%; --bad: 0 75% 44%;
+}
+/* light page behind: floating text stays LIGHT with a heavier dark outline (subtitle style). Dark text with a light halo did not read. */
+#stage[data-bd="light"] { --ink-stroke: 3.4px; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: transparent; overflow: hidden; user-select: none; -webkit-user-select: none; }
+body { color: hsl(var(--ink)); cursor: default; }
+
+/* The stage shrink-wraps its content no matter how big the (transparent) window currently is.
+   Generous padding leaves room for glows, shadows and spring overshoot inside the window shape. */
+#stage { position: absolute; left: 0; top: 0; width: max-content; max-width: 3000px; padding: 36px 44px 24px 24px; }   /* long lines are limited per component (.c-text 420px); big working surfaces (graphs) set their own size */
+#surface { display: block; opacity: 0; }
+#surface.on { opacity: 1; }
+
+/* Floating text has no card behind it, so it carries its own legibility. */
+/* Backdrops can be split (white page next to a dark video), so an average can't pick one ink: an outline reads on anything. */
+.c-text, .c-kv, .c-prog .top, .c-chart .ttl, .stat { color: hsl(var(--ink)); -webkit-text-stroke: var(--ink-stroke, 2.6px) rgb(var(--ink-shadow) / .62); paint-order: stroke fill; text-shadow: 0 1px 3px rgb(var(--ink-shadow) / .7), 0 0 12px rgb(var(--ink-shadow) / .45); }
+
+.col { display: flex; flex-direction: column; gap: var(--gap, 8px); align-items: var(--align, stretch); }
+.row { display: flex; flex-direction: row; gap: var(--gap, 8px); align-items: var(--align, center); flex-wrap: wrap; }
+.divider { height: 1px; background: hsl(var(--ink) / .3); margin: 2px 0; }
+
+.panel { color: hsl(var(--foreground)); background: hsl(var(--card) / .94); border: 1px solid hsl(var(--border)); border-radius: var(--radius); padding: 10px 12px; box-shadow: 0 8px 24px rgb(0 0 0 / .4); }
+
+.c-text { line-height: 1.35; max-width: 420px; }
+.c-text.xs { font-size: 11.5px } .c-text.sm { font-size: 12.5px } .c-text.lg { font-size: 14px } .c-text.xl { font-size: 19px; letter-spacing: -.01em }
+.c-text.b { font-weight: 600 }
+.tone-muted { color: hsl(var(--ink-muted)); } .tone-good { color: hsl(var(--good)); } .tone-warn { color: hsl(var(--warn)); } .tone-bad { color: hsl(var(--bad)); }
+
+.c-kv { display: flex; justify-content: space-between; gap: 18px; min-width: 190px; }
+.c-kv .k { color: hsl(var(--ink-muted)); }
+
+.badge { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: hsl(var(--foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--accent, var(--border)) / .45); }
+.badge.tone-good { background: hsl(var(--good) / .18); border-color: hsl(var(--good) / .5); color: hsl(var(--good)); }
+.badge.tone-warn { background: hsl(var(--warn) / .18); border-color: hsl(var(--warn) / .5); color: hsl(var(--warn)); }
+.badge.tone-bad  { background: hsl(var(--bad) / .18);  border-color: hsl(var(--bad) / .5);  color: hsl(var(--bad)); }
+
+/* Interactive bits get real backgrounds. */
+.btn { position: relative; overflow: hidden; font: inherit; font-weight: 600; font-size: 11.5px; color: hsl(var(--secondary-foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); border-radius: 999px; padding: 4px 12px; cursor: pointer;
+  transition: transform .22s var(--spring), background .15s, box-shadow .2s; box-shadow: 0 2px 8px rgb(0 0 0 / .3); }
+.btn:hover { transform: translateY(-1px) scale(1.035); box-shadow: 0 4px 16px hsl(var(--accent, var(--ring)) / .4), 0 2px 8px rgb(0 0 0 / .3); filter: brightness(1.06); }
+.btn:active { transform: scale(.95); transition-duration: .08s; }
+.btn.primary { background: hsl(var(--accent, var(--primary))); color: hsl(var(--on-accent, var(--primary-foreground))); border-color: transparent; }
+.btn.destructive { background: hsl(var(--destructive)); color: white; border-color: transparent; }
+.btn.ghost { background: hsl(var(--card) / .8); color: hsl(var(--foreground)); }
+.btn.soft { border-radius: 13px; }
+.btn.circle { width: 26px; height: 26px; padding: 0; border-radius: 50%; display: inline-grid; place-items: center; font-size: 13px; }
+.btn:focus-visible, input:focus-visible { outline: 2px solid hsl(var(--ring) / .8); outline-offset: 1px; }
+
+/* ripple + shine (components/button.js, core/ripple.js): tinted with the surface accent */
+.c-list .item.act { position: relative; overflow: hidden; }
+.ripple { position: absolute; border-radius: 50%; background: hsl(var(--accent, var(--ring)) / .55); pointer-events: none; }
+.shine { position: absolute; top: 0; bottom: 0; left: 0; width: 45%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .55), transparent); transform: translateX(-120%) skewX(-18deg); pointer-events: none; }
+
+.c-prog { min-width: 220px; }
+.c-prog .top { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; }
+.c-prog .lbl { color: hsl(var(--ink-muted)); }
+.c-prog .track { height: 8px; border-radius: 99px; background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border)); overflow: hidden; }
+.c-prog .fill { height: 100%; width: 100%; transform-origin: left center; transform: scaleX(0); background: hsl(var(--accent, var(--primary))); border-radius: 99px; transition: transform .7s var(--spring), background .3s; }
+.c-prog.warn .fill { background: hsl(var(--warn)); } .c-prog.bad .fill { background: hsl(var(--bad)); } .c-prog.good .fill { background: hsl(var(--good)); }
+
+.field { font: inherit; color: hsl(var(--foreground)); background: hsl(var(--card) / .96); border: 1px solid hsl(var(--border)); border-radius: 999px; padding: 5px 12px; font-size: 11.5px; min-width: 220px; user-select: text; -webkit-user-select: text; cursor: text; transition: border-color .15s, box-shadow .2s; }
+.field:focus { border-color: hsl(var(--ring)); box-shadow: 0 0 0 3px hsl(var(--ring) / .25); outline: none; }
+
+.c-list { display: flex; flex-direction: column; gap: 4px; min-width: 240px; }
+.c-list .item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 11px; font-size: 11.5px; border-radius: 18px; color: hsl(var(--foreground)); background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border) / .8); transition: transform .2s var(--spring), background .15s; }
+.c-list .item.act { cursor: pointer; } .c-list .item.act:hover { transform: translateX(3px); background: hsl(var(--secondary)); }
+.c-list .sub { color: hsl(var(--muted-foreground)); font-size: 12px; }
+
+.c-chart { min-width: 260px; }
+.c-chart .ttl { color: hsl(var(--ink-muted)); font-size: 12px; margin-bottom: 3px; }
+.c-chart canvas { display: block; border-radius: 22px; background: hsl(var(--card) / .86); }
+
+/* "how to read this" caption under unfamiliar charts */
+.explain { margin-top: 6px; padding: 7px 9px; border-radius: 18px; background: hsl(var(--card) / .94); border: 1px solid hsl(var(--accent, var(--border)) / .5); max-width: 300px; }
+.explain .txt { font-size: 11.5px; line-height: 1.4; color: hsl(var(--foreground)); }
+.explain .chips { display: flex; gap: 6px; margin-top: 6px; }
+.mini { font: inherit; font-size: 11.5px; font-weight: 600; padding: 2px 9px; border-radius: 99px; cursor: pointer; color: hsl(var(--secondary-foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); transition: transform .2s var(--spring), background .15s; }
+.mini:hover { transform: scale(1.06); background: hsl(var(--accent, var(--ring)) / .35); }
+.mini:active { transform: scale(.94); }
+
+/* pin: far right, quiet, only on hover. Tilted 45deg so the point faces bottom-left; pinned = pushed straight in. */
+#pin { position: absolute; top: 5px; right: 44px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+  color: hsl(var(--accent, var(--ring))); background: hsl(var(--ink-shadow) / .0); opacity: 0; pointer-events: none; transition: opacity .2s, color .15s, transform .3s var(--spring), background .25s ease, box-shadow .25s ease; }
+#pin svg { width: 19px; height: 19px; transform: rotate(45deg); transition: transform .35s var(--spring), fill .2s; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
+#stage:hover #pin { opacity: .8; pointer-events: auto; }
+#pin:hover { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 2px 10px rgb(0 0 0 / .3); }
+#pin:hover svg { transform: rotate(35deg); }
+#stage.pinned #pin { opacity: .95; color: hsl(var(--accent, var(--ring))); pointer-events: auto; }
+#stage.pinned #pin svg { transform: rotate(0deg); fill: hsl(var(--accent, var(--ring)) / .4); }
+
+/* urgent: the whole shape gets a slow ring */
+#stage.urgent::before { content: ""; position: absolute; inset: 6px; border-radius: 28px; box-shadow: 0 0 0 1.5px hsl(var(--ring) / .7), 0 0 22px hsl(var(--ring) / .25); animation: ring 1.8s ease-in-out infinite; pointer-events: none; }
+@keyframes ring { 50% { box-shadow: 0 0 0 2.5px hsl(var(--ring) / 1), 0 0 30px hsl(var(--ring) / .45); } }
+#stage.dragging { cursor: grabbing; }
+#stage.dragging .btn { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+
+
+
+
+/* icon buttons + yes/no semantics: read the answer by shape and color, not by words */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+.btn svg { flex: none; min-width: 14px; min-height: 14px; }
+.btn.icon-only { padding: 0; width: 28px; height: 28px; border-radius: 50%; }
+.btn.good { background: hsl(var(--accent, var(--primary))); color: hsl(var(--on-accent, var(--primary-foreground))); border-color: transparent; }
+.btn.bad { background: hsl(var(--card) / .97); color: hsl(var(--foreground)); border: 1.5px solid hsl(var(--accent, var(--ring))); }
+.btn .tick { color: inherit; margin-left: 2px; }
+/* dismiss (x) sits under the pin: same quiet look, hover only. Long-press the pin to pick the whole window up. */
+#dismiss { position: absolute; top: 36px; right: 8px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+  color: hsl(var(--accent, var(--ring))); background: transparent; opacity: 0; pointer-events: none; transition: opacity .2s, transform .3s var(--spring), background .25s ease, box-shadow .25s ease; }
+#dismiss svg { width: 16px; height: 16px; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
+#stage:hover #dismiss { opacity: .7; pointer-events: auto; }
+#dismiss:hover { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 2px 10px rgb(0 0 0 / .3); }
+#pin.holding { transform: scale(1.25); opacity: 1 !important; background: hsl(var(--accent, var(--ring)) / .35); }
+/* Type: Bahnschrift carries numerals and titles (width axis tightened a touch), Segoe UI Variable Text carries everything else.
+   Scale 10.5 / 12 / 15 / 22 / 32. Any figure that can change is tabular so it never jitters. */
+.c-text.lg, .c-text.xl, .c-text.hero, .stat .num { font-family: var(--font-display); font-variation-settings: "wdth" 92; letter-spacing: -.005em; }
+.c-text.lg { font-size: 15px; font-weight: 600; } .c-text.xl { font-size: 22px; font-weight: 600; }
+.c-text.hero { font-size: 32px; font-weight: 600; line-height: 1.05; }
+.c-kv .v, .c-prog .val, .badge, .c-list .item, .stat .num, .c-text { font-variant-numeric: tabular-nums; }
+
+/* stat: one hero numeral with a hairline needle showing where it sits against its limit (the surface's one memorable thing) */
+.stat { display: flex; flex-direction: column; gap: 2px; min-width: 170px; }
+.stat .row1 { display: flex; align-items: baseline; gap: 5px; }
+.stat .num { font-size: 32px; font-weight: 600; line-height: 1; }
+.stat .unit { font-size: 13px; color: hsl(var(--ink-muted)); }
+.stat .lbl { font-size: 12.5px; color: hsl(var(--ink-muted)); }
+.stat .needle { position: relative; height: 12px; margin-top: 5px; }
+.stat .rail { position: absolute; left: 0; right: 0; top: 5px; height: 1.5px; border-radius: 2px; background: hsl(var(--ink) / .4); }
+.stat .fill { position: absolute; left: 0; top: 4.5px; height: 2.5px; width: 100%; border-radius: 2px; transform-origin: left center; transform: scaleX(0); background: hsl(var(--accent, var(--ring))); transition: transform .8s var(--spring), background .3s; }
+.stat .dot { position: absolute; top: 1px; left: 0; width: 10px; height: 10px; border-radius: 50%; transform: translateX(-50%); background: hsl(var(--accent, var(--ring))); box-shadow: 0 0 0 2px rgb(var(--ink-shadow) / .55); transition: left .8s var(--spring), background .3s; }
+.stat.warn .fill, .stat.warn .dot { background: hsl(var(--warn)); } .stat.bad .fill, .stat.bad .dot { background: hsl(var(--bad)); }
+/* Plates: every piece of raw text sits on a grainy frosted gray plate (dark in every scheme) so busy pages never bleed through.
+   The grain is an SVG noise tile; the blur is subtle and only softens what is inside the page. */
+:root { --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .11 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+        --plate: linear-gradient(rgb(52 47 44 / .80), rgb(33 29 27 / .86)); }
+.c-text, .c-kv, .stat, .c-prog, .c-chart .ttl, .plate { background: var(--grain), var(--plate); background-blend-mode: soft-light, normal; backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid rgb(255 255 255 / .08); border-radius: 14px; padding: 5px 11px; box-shadow: 0 5px 16px rgb(0 0 0 / .30); width: fit-content; align-self: flex-start; -webkit-text-stroke: 0; }
+.c-text, .c-kv, .stat, .c-prog, .c-chart .ttl, .plate { color: hsl(0 0% 97%); text-shadow: 0 1px 1px rgb(0 0 0 / .4); }
+.c-text.hero, .stat { padding: 7px 14px 8px; }
+.c-prog { padding: 7px 11px 8px; }
+.c-chart .ttl { margin-bottom: 5px; padding: 3px 10px; }
+.stat .unit, .stat .lbl, .c-kv .k, .c-prog .lbl, .tone-muted { color: rgb(255 255 255 / .68); }
+.c-kv { width: auto; align-self: stretch; }
+
+.spinner { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; padding: 7px 14px; }
+.spinner .ring { width: 15px; height: 15px; border-radius: 50%; border: 2.5px solid rgb(255 255 255 / .22); border-top-color: hsl(var(--sys)); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.scroll { overflow-y: auto; overscroll-behavior: contain; padding-right: 6px; scrollbar-width: thin; scrollbar-color: hsl(var(--accent, var(--ring)) / .7) transparent; }
+/* graph (Cytoscape): a rounded card the diagram sits on, so it reads over any page; the read-out under it is a plate like all raw text */
+.c-graph { display: flex; flex-direction: column; gap: 6px; width: max-content; align-self: flex-start; }   /* its box must be as wide as the canvas, or the window shape stops short */
+.c-graph .gframe { position: relative; overflow: hidden; border-radius: 22px; background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border)); box-shadow: 0 8px 24px rgb(0 0 0 / .35); }
+.c-graph .gcanvas { position: absolute; left: 0; top: 0; }
+.c-graph .ginfo { font-size: 12px; min-height: 22px; }
+#stage.dragging .c-graph .gframe { animation: glowin .22s ease-out both; box-shadow: 0 0 26px 3px hsl(var(--accent, var(--ring)) / .6), inset 0 0 22px hsl(var(--accent, var(--ring)) / .22); }
+/* 3D model (plugins/model3d.js): just the model and its shadow on a transparent canvas; the read-out is a plate like all raw text */
+.c-model { display: flex; flex-direction: column; gap: 6px; width: max-content; align-self: flex-start; }
+.c-model .mframe { position: relative; }
+.c-model .mcanvas { position: absolute; left: 0; top: 0; }
+.c-model canvas { display: block; cursor: grab; touch-action: none; }
+.c-model .ginfo { font-size: 12px; min-height: 22px; max-width: 520px; }
+#stage.dragging .c-model .mframe { filter: drop-shadow(0 0 16px hsl(var(--accent, var(--ring)) / .7)); }
+
+/* swatches + pressed toggles */
+.btn.swatch { width: 24px; height: 24px; padding: 0; border-radius: 50%; background: var(--sw); border: 2px solid rgb(255 255 255 / .7); }
+.btn.swatch:hover { filter: brightness(1.12); }
+.btn.on { background: hsl(var(--accent, var(--ring)) / .26); box-shadow: inset 0 0 0 1.5px hsl(var(--accent, var(--ring))); }
+.btn.swatch.on { box-shadow: 0 0 0 2px hsl(var(--card)), 0 0 0 4px hsl(var(--accent, var(--ring))); background: var(--sw); }
+/* working / ready (core/working.js): a soft blue pulse while a heavy component loads, then one radial ring */
+.working { position: relative; }
+.working::before { content: ""; position: absolute; inset: -4px; border-radius: 26px; pointer-events: none; animation: syspulse 1.7s ease-out 1 both;   /* once, then it rests invisible until the ready ring */
+  box-shadow: 0 0 0 1.5px hsl(var(--sys) / .6), 0 0 22px 3px hsl(var(--sys) / .38); }
+@keyframes syspulse { 0% { opacity: 0; } 35% { opacity: .95; } 100% { opacity: 0; } }
+.burst { position: absolute; inset: 0; border-radius: 26px; pointer-events: none; border: 2px solid hsl(var(--sys) / .85); box-shadow: 0 0 28px hsl(var(--sys) / .55), inset 0 0 20px hsl(var(--sys) / .25); }
+.spinner .ring { border-top-color: hsl(var(--sys)); }   /* the "Building" indicator is the system working, so blue */
+/* skeleton cards: grainy gray shapes with a slow sweep, the same material as the plates so they read as "text/figure goes here" */
+.sk { position: relative; overflow: hidden; border-radius: 18px; background: var(--grain), linear-gradient(rgb(60 55 52 / .55), rgb(40 36 34 / .6)); background-blend-mode: soft-light, normal; border: 1px solid rgb(255 255 255 / .06); flex: none; }
+.sk.stat, .sk.bar, .sk.text { border-radius: 14px; }
+.sk.btn { border-radius: 999px; }
+.sk.chart::after { content: ""; position: absolute; inset: 14px 16px; border-radius: 10px; opacity: .55;
+  background: repeating-linear-gradient(90deg, rgb(255 255 255 / .16) 0 14%, transparent 14% 24%); mask-image: linear-gradient(to top, #000 0 55%, transparent 55% 100%); }
+.sk.list { background-image: var(--grain), repeating-linear-gradient(rgb(255 255 255 / .09) 0 28px, transparent 28px 34px); background-blend-mode: soft-light, normal; }
+.sk-shine { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / .12) 50%, transparent 70%); transform: translateX(-100%); animation: skshine 1.6s ease-in-out infinite; }
+@keyframes skshine { to { transform: translateX(100%); } }
+/* Carrying the window: the components themselves glow orange, strongest on the biggest block and weaker as they get smaller
+   (chart/panel > rows, tracks, inputs > buttons, badges > text). No outer ring: the glow belongs to the content. */
+@keyframes glowin { from { box-shadow: 0 0 0 0 transparent; } }
+#stage.dragging .c-chart canvas, #stage.dragging .panel {
+  animation: glowin .22s ease-out both;
+  box-shadow: 0 0 26px 3px hsl(var(--accent, var(--ring)) / .6), inset 0 0 22px hsl(var(--accent, var(--ring)) / .22); }
+#stage.dragging .explain, #stage.dragging .c-list .item, #stage.dragging .c-prog .track, #stage.dragging .field {
+  animation: glowin .22s ease-out both;
+  box-shadow: 0 0 16px 1px hsl(var(--accent, var(--ring)) / .42), inset 0 0 10px hsl(var(--accent, var(--ring)) / .14); }
+#stage.dragging .btn, #stage.dragging .badge, #stage.dragging .mini {
+  animation: glowin .22s ease-out both;
+  box-shadow: 0 0 9px hsl(var(--accent, var(--ring)) / .34); }
+#stage.dragging .c-text, #stage.dragging .c-kv, #stage.dragging .c-chart .ttl, #stage.dragging .c-prog .top {
+  text-shadow: 0 1px 3px rgb(var(--ink-shadow) / .7), 0 0 10px hsl(var(--accent, var(--ring)) / .55), 0 0 22px hsl(var(--accent, var(--ring)) / .25); }
+/* inside the page, too: carrying shows the move cursor */
+#stage.dragging, #stage.dragging * { cursor: move !important; }
+
+/* A WebGL canvas plus backdrop-filter blur on a transparent window is a GPU-process reset waiting to happen; surfaces with a 3D model use plain plates. */
+#stage:has(.c-model) .plate, #stage:has(.c-model) .c-text, #stage:has(.c-model) .c-kv, #stage:has(.c-model) .stat, #stage:has(.c-model) .c-prog, #stage:has(.c-model) .c-chart .ttl { backdrop-filter: none; }
+.c-chart canvas { min-height: 96px; }   /* a chart never gets squashed into an unreadable strip: the window wraps around it instead */
+.col.end > .c-text, .col.end > .row, .col.end > .stat { align-self: flex-end; }
+.col.end > .c-text { text-align: right; }
+.col.end > .row { justify-content: flex-end; }
+.flow-left { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: 8px; }   /* first column at the right, the rest grow leftward */
+.flow-left > .col > .c-text { max-width: 250px; }

@@ -1,0 +1,63 @@
+// Motion defaults: everything arrives with a dampened spring and leaves quickly.
+// Springs are simulated once into Web Animations keyframes, so the browser animates them off the main thread.
+
+/** Simulate a damped spring 0 -> 1. Returns {values: number[], ms}. */
+export function simulate({ stiffness = 320, damping = 24, mass = 1 } = {}) {
+  const dt = 1 / 60;
+  let x = 0, v = 0, t = 0;
+  const values = [0];
+  while (t < 1.2) {
+    const a = (-stiffness * (x - 1) - damping * v) / mass;
+    v += a * dt;
+    x += v * dt;
+    t += dt;
+    values.push(x);
+    if (Math.abs(x - 1) < 0.0015 && Math.abs(v) < 0.01) break;
+  }
+  values[values.length - 1] = 1;
+  return { values, ms: Math.round(t * 1000) };
+}
+
+const SPRING = simulate();
+
+/** Pop in: slide up a little, scale from .92, fade. `delay` staggers siblings. */
+export function enter(el, delay = 0) {
+  const kf = SPRING.values.map((p) => ({
+    opacity: Math.min(1, p * 2.2),
+    transform: `translateY(${(1 - p) * 14}px) scale(${0.92 + 0.08 * p})`,
+  }));
+  return el.animate(kf, { duration: SPRING.ms, delay, easing: 'linear', fill: 'backwards' });
+}
+
+/** Quick exit: no bounce, so it never feels like it is arguing with you. */
+export function leave(el) {
+  return el.animate(
+    [{ opacity: 1, transform: 'translateY(0) scale(1)' }, { opacity: 0, transform: 'translateY(6px) scale(.96)' }],
+    { duration: 170, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' },
+  );
+}
+
+/** Attention pulse for summoned/urgent surfaces. */
+export function pulse(el) {
+  return el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.045)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+}
+
+/** Ease a number toward a target each frame (critically damped feel). Returns stop(). */
+export function glide(get, set, target, rate = 14) {
+  let raf, last = performance.now();
+  const step = (now) => {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    const cur = get();
+    const next = cur + (target() - cur) * (1 - Math.exp(-rate * dt));
+    set(Math.abs(next - target()) < 0.002 ? target() : next);
+    if (next !== target()) raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+  return () => cancelAnimationFrame(raf);
+}
+
+// Live binding: importers see changes. Reduced when the OS asks, or when the annoyance vector's `motion` is low.
+const OS_REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+export let reduced = OS_REDUCED;
+export function setReduced(v) { reduced = OS_REDUCED || !!v; }
