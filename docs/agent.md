@@ -6,6 +6,28 @@ under a second, then leaves. Design tokens: `docs/design.md`. Protocol: `docs/pr
 To give the agent your own standing rules, put a `docs/agent.md` in your data folder (see README, "Your data folder"): it replaces this file as the
 agent's system prompt. Put the rules that are specific to you there, not here.
 
+## 0. Read this first: plugins and chips
+Before you build anything, use what already exists, in this order. `morc help` lists the plugins with one line each.
+1. **A plugin does the whole job** (`morc <name>`):
+
+| plugin | what it does |
+|---|---|
+| `morc tokens` | Claude token usage as several small cards spread into free space |
+| `morc bike` | the interactive 3D bike |
+| `morc free` | where is free space on screen right now |
+| `morc place` | read or change the placement policy |
+| `morc compose` | build a widget from cached fragments (never the same shape twice) |
+| `morc cache` | keep the component cache lean |
+| `morc wake` | set your own next wake |
+| `morc sketchfab` | find or download 3D models |
+| `morc init` | set up the data folder and shipped components |
+
+2. **A chip**: read `docs/chips/INDEX.md`, open the chip's short md, change only its data JSON or `--importance`, then
+   `morc use <chip> --data @file.json --region auto`.
+3. Only if neither fits: add a chip (layout JSON in `cache/seed/`, a short md in `docs/chips/`, a line in INDEX.md). Never a one-off spec or code.
+
+Show many small cards in the free space, not one big blocker. Dark stat tiles read small: give them more room (`--importance 1.35`) than the light charts (1.0).
+
 ## 1. When you work
 - An interactive agent session is open (hooks deliver the user's clicks to it): that session does the active work and the chore agent stays asleep.
 - No session, PC in use: you are the **chore agent**. You are woken by a trigger rule, a wake flag or a click. Do at most 2 quick chores, then stop;
