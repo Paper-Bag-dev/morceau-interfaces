@@ -152,7 +152,7 @@ pub fn compute(widgets: &[R]) -> (Vec<Region>, &'static str, Option<R>) {
 fn default_align(name: &str) -> &'static str {
     match name {
         "right" | "right-col" | "bottom-right" => "left-top",
-        "left" | "left-col" | "bottom-left" => "right-top",
+        "left" | "left-col" | "bottom-left" => "left-top", // cards in the left free side sit at the left, toward the screen edge
         "below" | "below-row" => "top-right",
         "above" | "above-row" => "bottom-right",
         "top-right" => "left-bottom",
@@ -198,10 +198,13 @@ fn candidates<'a>(regs: &'a [Region], wanted: Option<&str>, tiers: u8) -> Vec<&'
         order.extend(regs.iter().filter(|r| r.name == name && r.tier < tiers));
     }
     for tier in 0..tiers {
-        for n in ORDER {
-            order.extend(regs.iter().filter(|r| r.tier == tier && r.name == n));
-        }
+        // "auto" = go where the room is: the biggest free region first (the active window is on one side, the free side is the other),
+        // not a fixed right-first order that puts cards over a busy side while the other side is empty
+        let mut here: Vec<&Region> = regs.iter().filter(|r| r.tier == tier).collect();
+        here.sort_by_key(|r| std::cmp::Reverse(r.rect.w() as i64 * r.rect.h() as i64));
+        order.extend(here);
     }
+    let _ = ORDER;
     order
 }
 
