@@ -37,6 +37,9 @@ def main(argv):
         args = [BIN, "use", c["chip"], "--id", n, "--data", "@" + f.name, "--importance", str(imp), "--ttl", str(c.get("ttl", 90)), "--region", c.get("region", "auto")]
         if c.get("align"):
             args += ["--align", c["align"]]
+        for k in ("dx", "dy"):
+            if c.get(k) is not None:
+                args += ["--" + k, str(c[k])]
         rc |= subprocess.run(args, stdout=subprocess.DEVNULL).returncode
         print(("shown " if rc == 0 else "failed ") + n)
     return rc

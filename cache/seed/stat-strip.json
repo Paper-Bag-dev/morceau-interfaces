@@ -1,0 +1,92 @@
+{
+    "t":  "save",
+    "name":  "stat-strip",
+    "desc":  "Four big numbers in ONE flex row, no buttons (the corner x closes it): a long, low card for the strip above or below the active window. Pass /a /b /c /d, each {label, value, unit}.",
+    "params":  [
+                   "/a/label",
+                   "/a/value",
+                   "/a/unit",
+                   "/b/label",
+                   "/b/value",
+                   "/b/unit",
+                   "/c/label",
+                   "/c/value",
+                   "/c/unit",
+                   "/d/label",
+                   "/d/value",
+                   "/d/unit"
+               ],
+    "opts":  {
+                 "min":  [
+                             520,
+                             90
+                         ],
+                 "ttl":  90,
+                 "topic":  "stats.strip",
+                 "importance":  "0.8",
+                 "max_frac":  0.9
+             },
+    "components":  [
+                       {
+                           "id":  "root",
+                           "type":  "row",
+                           "gap":  8,
+                           "children":  [
+                                            "a",
+                                            "b",
+                                            "c",
+                                            "d"
+                                        ]
+                       },
+                       {
+                           "id":  "a",
+                           "type":  "stat",
+                           "label":  "{/a/label}",
+                           "value":  "{/a/value}",
+                           "unit":  "{/a/unit}"
+                       },
+                       {
+                           "id":  "b",
+                           "type":  "stat",
+                           "label":  "{/b/label}",
+                           "value":  "{/b/value}",
+                           "unit":  "{/b/unit}"
+                       },
+                       {
+                           "id":  "c",
+                           "type":  "stat",
+                           "label":  "{/c/label}",
+                           "value":  "{/c/value}",
+                           "unit":  "{/c/unit}"
+                       },
+                       {
+                           "id":  "d",
+                           "type":  "stat",
+                           "label":  "{/d/label}",
+                           "value":  "{/d/value}",
+                           "unit":  "{/d/unit}"
+                       }
+                   ],
+    "data":  {
+                 "a":  {
+                           "label":  "A",
+                           "value":  0,
+                           "unit":  ""
+                       },
+                 "b":  {
+                           "label":  "B",
+                           "value":  0,
+                           "unit":  ""
+                       },
+                 "c":  {
+                           "label":  "C",
+                           "value":  0,
+                           "unit":  ""
+                       },
+                 "d":  {
+                           "label":  "D",
+                           "value":  0,
+                           "unit":  ""
+                       }
+             }
+}

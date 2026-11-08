@@ -59,6 +59,8 @@ def main(argv):
             card["data"].update(src)
         elif a in ("--importance", "--min-importance", "--ttl"):
             card[a[2:].replace("-", "_")] = float(nxt) if a != "--ttl" else int(nxt)
+        elif a in ("--dx", "--dy"):  # nudge from the aligned spot in physical px (e.g. flush with the quadrant edge)
+            card[a[2:]] = int(nxt)
         elif a == "--region":
             card["region"] = nxt
         elif a == "--align":  # left | right: where the card's contents start (titles, charts, Close all line up on that edge)
