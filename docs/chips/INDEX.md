@@ -2,6 +2,10 @@
 
 A **chip** is a ready-made card: a JSON file (the layout, already built) plus a short md next to this index. You do not write component code.
 
+**Group by kind (the user has said this many times):** numbers and text go together in ONE card (`stat-tiles`); pictures (charts) each go in their own
+separate card (`donut-card`, `week-chart`). Never mix a picture and a text list in one card, never stack everything as one long vertical story, never
+one big blocker. Several small cards spread into the free space (`--region auto`), sized in between (about importance 1.0; text cards 0.85 to 1.0).
+
 **To show something:**
 1. Find the chip below. Open its md (one screen) for the params and the size knobs.
 2. Change only its **data** (a small JSON file with the params) and, if needed, a size knob. The layout JSON stays untouched.

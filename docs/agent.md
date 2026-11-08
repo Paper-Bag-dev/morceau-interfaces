@@ -26,6 +26,7 @@ Before you build anything, use what already exists, in this order. `morc help` l
    `morc use <chip> --data @file.json --region auto`.
 3. Only if neither fits: add a chip (layout JSON in `cache/seed/`, a short md in `docs/chips/`, a line in INDEX.md). Never a one-off spec or code.
 
+**Group by kind:** numbers and text together in ONE card (`stat-tiles`); each picture (chart) in its own separate card. Never mix them in one card, never one long vertical story.
 Show many small cards in the free space, not one big blocker. Dark stat tiles read small: give them more room (`--importance 1.35`) than the light charts (1.0).
 
 ## 1. When you work
