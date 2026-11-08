@@ -1,4 +1,4 @@
-// Page <-> host plumbing: messages, window shape, hover, hold-to-drag, pin, dismiss.
+﻿// Page <-> host plumbing: messages, window shape, hover, hold-to-drag, pin, dismiss.
 
 const HOLD_MS = 100;      // hold the left button this long (without moving) and the window picks up: 0.1 s on empty areas and text
 const HOLD_MS_CONTROL = 220; // buttons, rows, canvases: a normal click lasts ~100 ms, so these arm a little later and still click
@@ -48,6 +48,7 @@ stage.addEventListener('pointerenter', () => {
     grownFrom = zoom;
     fits = 0;
     applyZoom(Math.min(2.2, zoom * k));
+    measure();   // tell the host NOW, not next frame: the window grows with the card instead of clipping it for a frame
     measureSoon();
   }, 220);                                           // a pass-over does not trigger it
 });
@@ -59,6 +60,7 @@ stage.addEventListener('pointerleave', () => {
     const z = grownFrom; grownFrom = 0;
     fits = 0;
     applyZoom(z);
+    measure();
     measureSoon();
   }, 450);
 });
