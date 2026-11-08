@@ -5,6 +5,7 @@ A **chip** is a ready-made card: a JSON file (the layout, already built) plus a 
 **STRICT RULE: no visual size is hardcoded in CSS or code.** Every size that is a choice (min widths, radii, type sizes, paddings, text floors) is a token in
 `ui/tokens.json` (overridable in your `prefs/ui.json`), sent to each card as a CSS variable and read as `var(--name, fallback)` / `floor()`. Need a new size? Add
 a token and read it; never type the number into `theme.css` or a chart file. Chart heights and widths are fields of the chip's JSON.
+**Where the UI rules live (each in its own small JSON, hot-reloaded):** `ui/tokens/<component>.json` (chart, text, plate ...: sizes, radii, text floors, as CSS variables), `ui/limits.json` (min and max sizes and timings: leave alone unless the user points it out or annoyance says so), `ui/themes.json` (accents, text and surface colors, light/dark schemes). Override any of them in your data folder (`prefs/tokens/<component>.json`, `prefs/ui.json`). The host caches them in memory and re-sends them to every card when a file changes. One file per component, never one big file.
 
 **STRICT RULE: every component is modular and controlled by a JSON file.** Whenever you make or change any component or chip: its layout is one JSON
 in `cache/seed/`, and everything that can vary (data, `align` left/right, `importance`, `min_importance`, `region`, `ttl`, `chip`) is a field in the card's

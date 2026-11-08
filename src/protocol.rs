@@ -112,6 +112,8 @@ pub enum Request {
     Act { id: String, action: Value },
     List,
     Status,
+    /// A token / theme / limits file changed: re-send the UI data (tokens, themes, limits) to every card. Sent by the host's own file watcher.
+    Reload,
     /// Where is free space right now: the active window, the strips around it, other windows, my surfaces.
     Space,
     /// A chore wake for the background agent (gated: live session, PC idle, rate limit, chore cooldown). From a trigger rule, a wake flag, an external tool, or `morc chore`.

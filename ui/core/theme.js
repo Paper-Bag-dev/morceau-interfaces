@@ -10,7 +10,9 @@
 
 import { setInk } from '../charts/util.js';
 
-export const THEMES = {
+// The named accents, the base color variables and the light/dark schemes are DATA in ui/themes.json (your prefs/ui.json can override them); the host sends
+// them and re-sends them when the file changes (setThemes). What is below is only the fallback if that file cannot be read.
+export let THEMES = {
   ocean:   '199 89% 58%',
   violet:  '262 83% 70%',
   rose:    '346 87% 66%',
@@ -23,7 +25,17 @@ export const THEMES = {
   teal:    '174 72% 48%',
 };
 
-const NAMES = Object.keys(THEMES);
+let NAMES = Object.keys(THEMES);
+let CFG = { schemes: {}, 'chart-ink': { dark: '20 20 28', other: '255 255 255' } };
+let schemeKeys = [];
+
+export function setThemes(t) {
+  if (!t || typeof t !== 'object') return;
+  if (t.accents && Object.keys(t.accents).length) { THEMES = t.accents; NAMES = Object.keys(THEMES); }
+  if (t.default) DEFAULT_THEME = t.default;
+  CFG = { ...CFG, ...t };
+  for (const [k, v] of Object.entries(t.base || {})) document.documentElement.style.setProperty('--' + k, String(v));
+}
 
 function hash(s) {
   let h = 2166136261;
@@ -33,7 +45,7 @@ function hash(s) {
 
 // Default is ONE consistent accent (coral, the user's pick 11-08) so pin, dismiss, buttons and charts always match.
 // Variety only when asked: opts.theme a name | 'random' | 'anti' (complement of the page), or the vector's theme = 'auto' (topic + day).
-export const DEFAULT_THEME = 'coral';
+export let DEFAULT_THEME = 'coral';
 
 export function pick(topic, theme, dflt) {
   if (theme === 'anti') return 'anti';
@@ -72,7 +84,12 @@ function setAccent(el, hsl) {
 function setScheme(el, bd) {
   el.dataset.bd = bd;
   // ink for chart labels/grids drawn on canvas sits on the card surface: light cards need dark ink and vice versa
-  setInk(bd === 'dark' ? '20 20 28' : '255 255 255');
+  const ink = CFG['chart-ink'] || {};
+  setInk(bd === 'dark' ? (ink.dark || '20 20 28') : (ink.other || '255 255 255'));
+  // the scheme's color variables (from ui/themes.json) go on the card; the previous scheme's are cleared first
+  for (const k of schemeKeys) el.style.removeProperty('--' + k);
+  schemeKeys = Object.keys((CFG.schemes && CFG.schemes[bd]) || {});
+  for (const k of schemeKeys) el.style.setProperty('--' + k, String(CFG.schemes[bd][k]));
 }
 
 function rgbToHsl([r, g, b]) {

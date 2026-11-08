@@ -1,10 +1,10 @@
-﻿// Page <-> host plumbing: messages, window shape, hover, hold-to-drag, pin, dismiss.
+// Page <-> host plumbing: messages, window shape, hover, hold-to-drag, pin, dismiss.
 
-const HOLD_MS = 100;      // hold the left button this long (without moving) and the window picks up: 0.1 s on empty areas and text
-const HOLD_MS_CONTROL = 220; // buttons, rows, canvases: a normal click lasts ~100 ms, so these arm a little later and still click
-const MOVE_SLOP = 7;
+// Minimum / maximum sizes and timings are DATA: ui/limits.json, sent by the host (overridable in prefs/ui.json). The numbers in lim(...) calls are only fallbacks.
+let limits = {};
+export function setLimits(l) { limits = l || {}; }
+const lim = (k, d) => (typeof limits[k] === 'number' ? limits[k] : d);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;   // no hover morph for people who asked for less motion
-const MIN_ZOOM = 0.85;      // never shrink content below this: text, icons and charts stay readable; the window wraps/scrolls instead
 
 export const send = (m) => window.ipc && window.ipc.postMessage(JSON.stringify(m));
 
@@ -29,31 +29,31 @@ function applyZoom(z) {
 export function setView(v) {
   view = { ...view, ...v };
   fits = 0;
-  applyZoom(Math.max(MIN_ZOOM, view.scale || 1));
+  applyZoom(Math.max(lim('min-zoom', 0.85), view.scale || 1));
   measureSoon();
 }
 
 // ---------- hover-grow: a small 3D / chart / graph window gets a little bigger while the pointer is on it ----------
 let grownFrom = 0, growTimer = 0, shrinkTimer = 0, lastShrinkAt = 0;   // lastShrinkAt: after a shrink, no re-grow for a while (the pointer can sit between the small and the grown edge and make the card flap)
-const GROW = 1.25, SMALL_W = 560;   // grows only when the window is narrower than SMALL_W (logical px); never past the screen cap
+const GROW = () => lim('hover-grow', 1.25), SMALL_W = () => lim('hover-small-w', 560);   // grows only when the window is narrower than SMALL_W (logical px); never past the screen cap
 stage.addEventListener('pointerenter', () => {
   clearTimeout(shrinkTimer);
   if (grownFrom || stage.classList.contains('dragging') || !stage.querySelector('.c-model, .c-graph, .c-chart canvas')) return;
   clearTimeout(growTimer);
   growTimer = setTimeout(() => {
     const w = stage.getBoundingClientRect().width;   // logical px, includes zoom
-    if (grownFrom || w >= SMALL_W || Date.now() - lastShrinkAt < 4000) return;
+    if (grownFrom || w >= SMALL_W() || Date.now() - lastShrinkAt < lim('hover-regrow-cooldown-ms', 4000)) return;
     const room = Math.min(view.maxw / w, view.maxh / stage.getBoundingClientRect().height);
-    const k = Math.min(GROW, room);
+    const k = Math.min(GROW(), room);
     if (k < 1.06) return;                            // no room worth growing into
     grownFrom = zoom;
     fits = 0;
-    const z1 = zoom, z2 = Math.min(2.2, zoom * k);
+    const z1 = zoom, z2 = Math.min(lim('max-zoom', 2.2), zoom * k);
     applyZoom(z2);
     measure();   // tell the host NOW: the window is already full size, then the card eases up to it from its old size
     morph(z1 / z2, 1);
     measureSoon();
-  }, 220);                                           // a pass-over does not trigger it
+  }, lim('hover-delay-ms', 220));                    // a pass-over does not trigger it
 });
 stage.addEventListener('pointerleave', () => {
   clearTimeout(growTimer);
@@ -71,7 +71,7 @@ stage.addEventListener('pointerleave', () => {
 // A size change that the HOST asks for (e.g. a card yields room to the one in use) animates with the same default motion as hover growth, so the intent
 // shows: shrinking eases down first and then the window follows; growing makes the window big first and eases up to it.
 export function setViewSmooth(v) {
-  const target = Math.max(MIN_ZOOM, v.scale || 1), z1 = zoom;
+  const target = Math.max(lim('min-zoom', 0.85), v.scale || 1), z1 = zoom;
   if (Math.abs(target - z1) / z1 < 0.01) { setView(v); return; }
   if (target < z1) morph(1, target / z1, () => setView(v));
   else { setView(v); measure(); morph(z1 / zoom, 1); }
@@ -80,7 +80,7 @@ export function setViewSmooth(v) {
 function morph(from, to, done) {
   const surf = document.getElementById('surface');
   if (!surf || reduced) { if (done) done(); return; }
-  const a = surf.animate([{ transformOrigin: '0 0', transform: `scale(${from})` }, { transformOrigin: '0 0', transform: `scale(${to})` }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
+  const a = surf.animate([{ transformOrigin: '0 0', transform: `scale(${from})` }, { transformOrigin: '0 0', transform: `scale(${to})` }], { duration: lim('morph-ms', 220), easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
   a.onfinish = () => { a.cancel(); if (done) done(); };
 }
 
@@ -99,8 +99,8 @@ function measure() {
   // content can overflow its box (wide charts, long rows): measure the real extent, in zoomed px
   const w0 = Math.max(sr.width, stage.scrollWidth * zoom), h0 = Math.max(sr.height, stage.scrollHeight * zoom);
   const k = Math.min(view.maxw / w0, view.maxh / h0);
-  if (fits < 5 && (k < 1 || (view.fill && k > 1.04 && zoom < 2.2))) {
-    const next = Math.max(MIN_ZOOM, Math.min(2.2, zoom * k * 0.97));
+  if (fits < 5 && (k < 1 || (view.fill && k > 1.04 && zoom < lim('max-zoom', 2.2)))) {
+    const next = Math.max(lim('min-zoom', 0.85), Math.min(lim('max-zoom', 2.2), zoom * k * 0.97));
     if (Math.abs(next - zoom) / zoom > 0.015) { fits++; applyZoom(next); return measureSoon(); }
   }
   let rects;
@@ -148,14 +148,14 @@ stage.addEventListener('pointerdown', (e) => {
   if (e.button !== 0 || e.target.closest('[data-nodrag]')) return;
   const x0 = e.clientX, y0 = e.clientY;
   const cancel = () => { clearTimeout(hold.t); removeEventListener('pointermove', move); removeEventListener('pointerup', cancel); hold = null; };
-  const move = (m) => { if (Math.hypot(m.clientX - x0, m.clientY - y0) > MOVE_SLOP) cancel(); };
+  const move = (m) => { if (Math.hypot(m.clientX - x0, m.clientY - y0) > lim('move-slop', 7)) cancel(); };
   hold = { t: setTimeout(() => {
     cancel();
     stage.classList.add('dragging');
     measureSoon();
     suppressUntil = Infinity;
     send({ t: 'drag' });      // host runs the native move loop; 'dropped' comes back when you let go
-  }, e.target.closest('button, .item.act, canvas, input') ? HOLD_MS_CONTROL : HOLD_MS) };
+  }, e.target.closest('button, .item.act, canvas, input') ? lim('hold-ms-control', 220) : lim('hold-ms', 100)) };
   addEventListener('pointermove', move);
   addEventListener('pointerup', cancel);
 });

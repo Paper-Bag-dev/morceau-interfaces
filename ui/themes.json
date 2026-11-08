@@ -1,0 +1,55 @@
+{
+  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes.",
+  "default": "coral",
+  "accents": {
+    "ocean": "199 89% 58%",
+    "violet": "262 83% 70%",
+    "rose": "346 87% 66%",
+    "amber": "38 92% 56%",
+    "emerald": "152 62% 50%",
+    "coral": "14 90% 63%",
+    "lime": "84 70% 52%",
+    "sky": "217 91% 66%",
+    "fuchsia": "292 80% 68%",
+    "teal": "174 72% 48%"
+  },
+  "base": {
+    "background": "240 10% 3.9%",
+    "foreground": "0 0% 98%",
+    "card": "20 9% 9%",
+    "muted": "20 6% 16%",
+    "muted-foreground": "20 6% 72%",
+    "border": "20 6% 22%",
+    "primary": "0 0% 98%",
+    "primary-foreground": "20 12% 9%",
+    "secondary": "20 6% 17%",
+    "secondary-foreground": "0 0% 98%",
+    "destructive": "0 72% 51%",
+    "good": "142 60% 50%",
+    "warn": "38 92% 55%",
+    "bad": "0 80% 62%",
+    "ring": "217 91% 65%",
+    "sys": "212 92% 62%",
+    "ink": "0 0% 98%",
+    "ink-muted": "20 8% 82%",
+    "ink-shadow": "0 0 0"
+  },
+  "schemes": {
+    "mid": {},
+    "dark": {
+      "card": "30 14% 96%",
+      "foreground": "20 12% 9%",
+      "muted-foreground": "20 6% 34%",
+      "secondary": "30 10% 90%",
+      "secondary-foreground": "20 12% 9%",
+      "border": "30 8% 74%",
+      "primary": "20 12% 10%",
+      "primary-foreground": "0 0% 98%",
+      "good": "142 70% 30%",
+      "warn": "32 92% 38%",
+      "bad": "0 75% 44%"
+    },
+    "light": { "ink-stroke": "3.4px" }
+  },
+  "chart-ink": { "dark": "20 20 28", "other": "255 255 255" }
+}

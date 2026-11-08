@@ -125,7 +125,7 @@ register('chart', (c, ctx) => {
     if (h !== s.hover) { s.hover = h; if (!raf) paint(); }
   });
   cv.addEventListener('pointerleave', () => { s.hover = -1; if (!raf) paint(); });
-  const onZoom = () => { if (!el.isConnected) return removeEventListener('morc-zoom', onZoom); if (!raf && s.values.length) paint(); };
+  const onZoom = () => { if (!el.isConnected) return removeEventListener('morc-zoom', onZoom); fitW(); if (!raf && s.values.length) paint(); };   // fitW: a token (text floor) may have changed the width the labels need
   addEventListener('morc-zoom', onZoom);
   return el;
 });

@@ -1,4 +1,4 @@
-﻿//! The long-lived host: owns every surface, reacts to commands, page messages and the active-window changes.
+//! The long-lived host: owns every surface, reacts to commands, page messages and the active-window changes.
 //! Idle cost: the event loop sleeps (ControlFlow::Wait) when nothing is on screen.
 
 use crate::policy;
@@ -63,6 +63,21 @@ pub fn run() -> ! {
     server::spawn(listener, token, proxy.clone());
     sources::spawn(proxy.clone());
     crate::anticipate::spawn(proxy.clone());
+    // hot reload: when a token / theme / limits file changes, every card gets the new values within a couple of seconds, no restart
+    {
+        let p = proxy.clone();
+        std::thread::spawn(move || {
+            let mut last = ui_stamp();
+            loop {
+                std::thread::sleep(std::time::Duration::from_secs(2));
+                let now = ui_stamp();
+                if now != last {
+                    last = now;
+                    let _ = p.send_event(Ev::Cmd(Request::Reload, None));
+                }
+            }
+        });
+    }
     fgwatch::install(proxy.clone());
     crate::hotkeys::spawn(proxy.clone());
     winstyle::drag_cursor_off(); // in case a previous host died mid-carry with the move cursor installed
@@ -187,6 +202,13 @@ impl Host {
             Request::List => json!({"ok": true, "components": cache::all().iter().map(|c| json!({"name": c["name"], "desc": c["desc"], "params": c["params"]})).collect::<Vec<_>>()}),
             Request::Chore { reason, note } => json!({"ok": true, "result": wake::chore(&reason, &note)}),
             Request::Space => regions::snapshot(&self.surfaces.values().filter(|s| s.phase == Phase::Visible).filter_map(|s| s.rect()).collect::<Vec<_>>()),
+            Request::Reload => {
+                let ui = ui_bundle();
+                for s in self.surfaces.values() {
+                    s.send(&json!({"t": "ui", "ui": ui}));
+                }
+                json!({"ok": true})
+            }
             Request::Status => json!({
                 "ok": true,
                 "surfaces": self.surfaces.values().filter(|s| s.phase != Phase::Spare).map(|s| json!({"id": s.id, "topic": s.topic, "visible": s.phase == Phase::Visible, "pinned": s.life.pinned, "rect": s.rect().map(|r| vec![r.l, r.t, r.r, r.b]), "theme_seen": s.opts.theme})).collect::<Vec<_>>(),
@@ -765,21 +787,81 @@ fn scope_of(topic: &str) -> &str {
     topic.split('.').next().unwrap_or(topic)
 }
 
-/// Design tokens as CSS variables: shipped defaults in <install>/ui/tokens.json, overridden by <data>/prefs/ui.json. Keys become `--key` on every card;
-/// the CSS and the chart code read them with fallbacks, so no size is a constant in the code. "about" is documentation, not a token.
-fn ui_tokens() -> Value {
-    let read = |p: std::path::PathBuf| std::fs::read_to_string(p).ok().and_then(|s| serde_json::from_str::<Value>(s.trim_start_matches('\u{feff}')).ok()).unwrap_or(json!({}));
-    let mut base = read(paths::ui_dir().join("tokens.json"));
-    let over = read(paths::prefs_dir().join("ui.json"));
-    if let (Some(b), Some(o)) = (base.as_object_mut(), over.as_object()) {
-        for (k, v) in o {
-            b.insert(k.clone(), v.clone());
+/// The UI as data. Shipped in <install>/ui, overridden in <data>/prefs; all of it hot-reloads (see ui_stamp and Request::Reload):
+///   tokens: one small JSON per component in ui/tokens/*.json (chart.json, text.json, plate.json ...), overridden by prefs/tokens/*.json. Keys become `--key`.
+///   limits: ui/limits.json (min / max sizes and timings), themes: ui/themes.json (accents, base colors, schemes); both overridable under
+///   "limits" / "themes" in prefs/ui.json. "about" keys are documentation. The result is cached in memory until a file changes.
+fn ui_files() -> Vec<std::path::PathBuf> {
+    let mut v = vec![paths::ui_dir().join("limits.json"), paths::ui_dir().join("themes.json"), paths::prefs_dir().join("ui.json")];
+    for dir in [paths::ui_dir().join("tokens"), paths::prefs_dir().join("tokens")] {
+        if let Ok(rd) = std::fs::read_dir(dir) {
+            let mut f: Vec<_> = rd.filter_map(|e| e.ok()).map(|e| e.path()).filter(|p| p.extension().map(|x| x == "json").unwrap_or(false)).collect();
+            f.sort();
+            v.extend(f);
         }
     }
-    if let Some(b) = base.as_object_mut() {
-        b.remove("about");
+    v
+}
+
+/// A number that changes whenever any UI data file is added, removed or edited.
+fn ui_stamp() -> u128 {
+    ui_files().iter().filter_map(|p| std::fs::metadata(p).and_then(|m| m.modified()).ok()).filter_map(|t| t.duration_since(std::time::UNIX_EPOCH).ok()).map(|d| d.as_millis()).sum::<u128>()
+        + ui_files().len() as u128
+}
+
+fn ui_bundle() -> Value {
+    static CACHE: std::sync::Mutex<Option<(u128, Value)>> = std::sync::Mutex::new(None);
+    let stamp = ui_stamp();
+    if let Some((s, v)) = CACHE.lock().unwrap().as_ref() {
+        if *s == stamp {
+            return v.clone();
+        }
     }
-    base
+    let read = |p: std::path::PathBuf| std::fs::read_to_string(p).ok().and_then(|s| serde_json::from_str::<Value>(s.trim_start_matches('\u{feff}')).ok()).unwrap_or(json!({}));
+    let strip = |mut v: Value| {
+        if let Some(o) = v.as_object_mut() {
+            o.remove("about");
+        }
+        v
+    };
+    let merge = |base: &mut Value, over: &Value| {
+        if let (Some(b), Some(o)) = (base.as_object_mut(), over.as_object()) {
+            for (k, v) in o {
+                if k == "about" {
+                    continue;
+                }
+                match (b.get_mut(k), v) {
+                    (Some(Value::Object(bo)), Value::Object(vo)) => {
+                        for (kk, vv) in vo {
+                            bo.insert(kk.clone(), vv.clone());
+                        }
+                    }
+                    _ => {
+                        b.insert(k.clone(), v.clone());
+                    }
+                }
+            }
+        }
+    };
+    let mut tokens = json!({});
+    for dir in [paths::ui_dir().join("tokens"), paths::prefs_dir().join("tokens")] {
+        if let Ok(rd) = std::fs::read_dir(dir) {
+            let mut f: Vec<_> = rd.filter_map(|e| e.ok()).map(|e| e.path()).filter(|p| p.extension().map(|x| x == "json").unwrap_or(false)).collect();
+            f.sort();
+            for p in f {
+                merge(&mut tokens, &read(p));
+            }
+        }
+    }
+    let mut limits = strip(read(paths::ui_dir().join("limits.json")));
+    let mut themes = strip(read(paths::ui_dir().join("themes.json")));
+    let over = read(paths::prefs_dir().join("ui.json"));
+    merge(&mut tokens, &over["tokens"]);
+    merge(&mut limits, &over["limits"]);
+    merge(&mut themes, &over["themes"]);
+    let bundle = json!({"tokens": tokens, "limits": limits, "themes": themes});
+    *CACHE.lock().unwrap() = Some((stamp, bundle.clone()));
+    bundle
 }
 
 /// How this surface should be drawn: scale (importance x size_bias), the 1/4-screen cap, motion, boldness, simplicity.
@@ -829,7 +911,7 @@ fn view_for(s: &Surface, opts: &Opts, prefs: &prefs::Prefs, topic: &str) -> Valu
         // never wider than the free region the card is aimed at (less the margin and gap): the page zooms DOWN to fit it, but not below its zoom floor
         // (MIN_ZOOM), so a card compromises on size before it ever overlaps the active window or leaves its region
         "maxw": maxw,
-        "tokens": ui_tokens(),
+        "ui": ui_bundle(),
         "maxh": work.h() as f64 / sf * opts.max_frac.unwrap_or(0.5).clamp(0.3, 0.92),
         "theme_default": prefs.theme.clone().unwrap_or_else(|| "coral".into()),
         "debug": std::env::var("MORC_DEBUG").is_ok(),

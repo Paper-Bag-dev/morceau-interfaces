@@ -1,0 +1,13 @@
+{
+  "about": "Minimum and maximum sizes, timings and thresholds the page uses. Leave these alone unless the user points something out or the annoyance vector says so; if you must change one, change it here (or override it in your prefs/ui.json under \"limits\"), never in the code. The host reloads this file by itself.",
+  "min-zoom": 0.85,
+  "max-zoom": 2.2,
+  "hover-grow": 1.25,
+  "hover-small-w": 560,
+  "hover-regrow-cooldown-ms": 4000,
+  "morph-ms": 220,
+  "hover-delay-ms": 220,
+  "hold-ms": 100,
+  "hold-ms-control": 220,
+  "move-slop": 7
+}

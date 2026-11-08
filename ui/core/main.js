@@ -1,9 +1,20 @@
 // Entry point. Registers the catalog, then answers the host.
 
 import { Renderer } from './render.js';
-import { send, measureSoon, dropped, setView, setViewSmooth } from './bridge.js';
+import { send, measureSoon, dropped, setView, setViewSmooth, setLimits } from './bridge.js';
 import { enter, leave, pulse, reduced, setReduced } from './motion.js';
-import { pick as pickTheme, apply as applyTheme, adaptToBackdrop, setBoldness } from './theme.js';
+import { pick as pickTheme, apply as applyTheme, adaptToBackdrop, setBoldness, setThemes } from './theme.js';
+
+// Everything visual and every min/max is DATA (ui/tokens.json, ui/themes.json, ui/limits.json + your prefs/ui.json), sent by the host on every card and again
+// whenever a file changes: CSS variables, color themes, size limits. Nothing is typed into the CSS or the code.
+let lastRgb = null;
+function applyUi(ui) {
+  if (!ui) return;
+  for (const [k, v] of Object.entries(ui.tokens || {})) document.documentElement.style.setProperty('--' + k, String(v));
+  setLimits(ui.limits);
+  setThemes(ui.themes);
+  window.dispatchEvent(new Event('morc-zoom'));   // charts repaint with the new tokens (text floor, colors)
+}
 import * as literacy from './literacy.js';
 import '../components/layout.js';
 import '../components/text.js';
@@ -38,6 +49,7 @@ window.morc = {
       case 'init':
         stage.classList.toggle('urgent', !!(m.opts && m.opts.urgent));
         if (m.view) {   // the annoyance vector + importance, resolved by the host
+          applyUi(m.view.ui);   // first: the limits and colors the rest of this init uses
           setReduced(m.view.motion < 0.3);
           setBoldness(m.view.boldness);
           window.__simplicity = m.view.simplicity || 0;
@@ -46,14 +58,18 @@ window.morc = {
           window.__debug = !!m.view.debug;
           setView(m.view);
         }
-        // design tokens from JSON (ui/tokens.json + your prefs/ui.json) become CSS variables: nothing visual is hardcoded in the CSS or the chart code
-        for (const [k, v] of Object.entries((m.view && m.view.tokens) || {})) document.documentElement.style.setProperty('--' + k, String(v));
         applyTheme(stage, pickTheme(m.opts && m.opts.topic, m.opts && m.opts.theme, m.view && m.view.theme_default));
         literacy.set(m.literacy);
         // card-level alignment from the card's JSON ("align": "right"): titles, rows, text, charts and Close all start from the same edge
         stage.classList.toggle('align-right', /right/.test((m.opts && m.opts.align) || ''));
         r.init(m);
         if (ready) root.classList.add('on');   // refresh of an on-screen surface: stay visible
+        measureSoon();
+        break;
+      case 'ui':   // a token / theme / limits file changed: re-apply live, no restart
+        applyUi(m.ui);
+        applyTheme(stage, stage.dataset.themeName || 'coral');
+        if (lastRgb) adaptToBackdrop(stage, lastRgb);
         measureSoon();
         break;
       case 'view': setViewSmooth(m.view); break;   // the host re-sizes this card (crowded screen: another card is in use)
@@ -63,7 +79,7 @@ window.morc = {
         if (m.data && '/__pulse' in m.data) { pulse(root); break; }
         if (m.data && '/__hover' in m.data) { stage.dispatchEvent(new PointerEvent(m.data['/__hover'] ? 'pointerenter' : 'pointerleave')); break; }
         r.patch(m); measureSoon(); break;
-      case 'backdrop': adaptToBackdrop(stage, m.rgb); break;   // sampled just before the window appears
+      case 'backdrop': lastRgb = m.rgb; adaptToBackdrop(stage, m.rgb); break;   // sampled just before the window appears
       case 'enter': {
         root.classList.add('on');
         ready = true;
