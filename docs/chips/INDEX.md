@@ -12,7 +12,20 @@ when it has: its layout JSON, a short md in `docs/chips/`, a line in this index,
 separate card (`donut-card`, `week-chart`). Never mix a picture and a text list in one card, never stack everything as one long vertical story, never
 one big blocker. Several small cards spread into the free space (`--region auto`), sized in between (about importance 1.0; text cards 0.85 to 1.0).
 
+**The design mentality (confirmed working, 11-08; follow it for every push):**
+- **Look first.** `morc free` shows the free regions around the active window (the centre of the 3x3 grid): the four sides and the four corners.
+- **Biggest free area first, as a side, not a corner.** Fill the biggest free side before any corner. Do not let cards fall into a corner while a side still has
+  room: rearrange (merge) the cards so they fit the side properly. Corners come only after the sides are used.
+- **Group by kind, then fit the shape of the space.** Text/numbers go as ONE flex row in a long strip above or below the window (`stat-strip`). Pictures (charts)
+  may be merged into ONE window on a tall side (`chart-stack`), even when they are different charts. A tall side takes a column, a strip takes a row.
+- **Start at the very edge of the quadrant,** next to the active window (hug it), then fill outward. Use the card's `dx`/`dy` to sit flush with the edge.
+- **Size is what you compromise, never text.** Shrink a card down to its `min_importance` (text stays at the floor) before moving it to a worse place;
+  trim data (5 bars instead of 7) before shrinking text.
+- **Check after pushing:** `morc status` rects and a look at the screen: nothing overlaps the active window or another card. If it does, change the card JSON
+  (chip, region, importance, dx/dy, fewer bars), re-push, and note what worked here.
+
 **The loop (whenever you or the background agent push chips):**
+0. `morc free` and decide which cards go in which region (rows for strips, merged charts for a side).
 1. Decide every card you want to show and write each card once with `morc card <name> --chip <chip> --set key=value ...` (one short command per card; it is
    saved in `cards/<name>.json` and remembered; see [cards.md](cards.md)). Later change only what changed: `morc card <name> --set a.value=820`.
 2. Next turn show them all in one command: `morc push <name> <name> ...` or `morc push --all --prefix tok-`. Do not pick positions yourself; the host does

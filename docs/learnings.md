@@ -1,4 +1,4 @@
-# Learnings (things we hit, and the rule each one became)
+﻿# Learnings (things we hit, and the rule each one became)
 
 Short, so an agent or contributor can read it before touching the UI or the wake path.
 
@@ -27,6 +27,9 @@ Short, so an agent or contributor can read it before touching the UI or the wake
 
 ## Content that is too vague
 - Every metric gets a one-line plain-language caption (what is measured, over what, what good looks like). No internal names ("cold start").
+
+## The design mentality (the loop that works)
+Look first (`morc free`). Biggest free area first, as a side, not a corner: rearrange or merge cards so they fit it; corners only after the sides are used. Group by kind: text as one flex row in a strip above/below the active window (`stat-strip`), charts merged in one window on a tall side (`chart-stack`). Start at the very edge of the quadrant next to the active window (card `dx`/`dy`). Compromise on size down to `min_importance` and on data (fewer bars), never on text size. Check the rects after pushing; if anything overlaps, change the card JSON and re-push. Full text: docs/chips/INDEX.md.
 
 ## Placement
 - A remembered spot, or a region, that overlaps one of our own cards is rejected; the scored fallback treats overlap with own cards as costlier than
