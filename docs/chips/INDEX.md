@@ -12,6 +12,23 @@ when it has: its layout JSON, a short md in `docs/chips/`, a line in this index,
 separate card (`donut-card`, `week-chart`). Never mix a picture and a text list in one card, never stack everything as one long vertical story, never
 one big blocker. Several small cards spread into the free space (`--region auto`), sized in between (about importance 1.0; text cards 0.85 to 1.0).
 
+## THE LADDER (always follow it, in this order, every time you put cards on screen)
+1. **Need.** List the cards you want and their kind: text/numbers or a picture (chart). Rank them: what matters most goes first.
+2. **Look.** `morc free`: the active window (centre of the 3x3 grid) and the free regions around it, sides and corners, with their sizes.
+3. **Count BEFORE you push.** For each card take its size at `min_importance` (text at the floor). Add them up against the free regions. Never open more
+   than fits; never push first and look after.
+4. **Group by kind.** Text becomes one flex row (`stat-strip`) for a strip above/below; charts become one merged window (`chart-stack`) for a tall side.
+5. **Assign.** Biggest free area first, as a side (corners only after the sides are used). Each card starts at the very edge of its quadrant next to the
+   active window (`dx`/`dy`), then fills outward. Tier 0 = free of every window and card.
+6. **Not enough room? Give up things in THIS order:** (a) merge cards of the same kind; (b) trim data (5 bars, not 7); (c) shrink the card down to its
+   `min_importance` (never the text floor, never icon or component minimums); (d) use the remaining Tier 0 spaces, corners included; (e) Tier 1: the free
+   sides of the active window, covering only background windows, never the active window and never one of our own cards; (f) hold the rest back: open
+   fewer cards and say what is waiting (a "more" button) instead of overlapping.
+7. **Write, then push in small batches.** `morc card` for each, then `morc push` three or four at a time. Slowly: re-count after each batch.
+8. **Verify with numbers.** `morc status` rects: no overlap with the active window or another card. Look at the screen only when the user has asked.
+9. **Fix in JSON.** If something is off, change the card's file (chip, region, importance, dx/dy, data), re-push, and write down what worked.
+Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not skip rungs.
+
 **The design mentality (confirmed working, 11-08; follow it for every push):**
 - **Look first.** `morc free` shows the free regions around the active window (the centre of the 3x3 grid): the four sides and the four corners.
 - **Biggest free area first, as a side, not a corner.** Fill the biggest free side before any corner. Do not let cards fall into a corner while a side still has

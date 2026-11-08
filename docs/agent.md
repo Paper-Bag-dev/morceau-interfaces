@@ -27,6 +27,7 @@ Before you build anything, use what already exists, in this order. `morc help` l
 3. Only if neither fits: add a chip (layout JSON in `cache/seed/`, a short md in `docs/chips/`, a line in INDEX.md). Never a one-off spec or code.
 
 **Group by kind:** numbers and text together in ONE card (`stat-tiles`); each picture (chart) in its own separate card. Never mix them in one card, never one long vertical story.
+**Always follow the ladder** (docs/chips/INDEX.md, THE LADDER): need, look (`morc free`), count before you push, group by kind, assign biggest side first from the quadrant edge, give up in order (merge, trim data, shrink to min_importance, remaining Tier 0, Tier 1 background windows only, hold back), push in small batches, verify with numbers, fix in JSON. Never skip a rung and never push more than fits.
 **STRICT: every component is modular and controlled by a JSON file.** Layout in one JSON (`cache/seed/`); data, `align`, `importance`, `min_importance`, `region` and `ttl` are fields of its card JSON (`morc card`, `morc push`); nothing for one component lives in Python or Rust. A new knob is a field read for every card. Done only with: layout JSON, a short md in `docs/chips/`, an INDEX line. See docs/chips/INDEX.md.
 Show many small cards in the free space, not one big blocker. Dark stat tiles read small: give them more room (`--importance 1.35`) than the light charts (1.0).
 
