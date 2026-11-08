@@ -41,7 +41,9 @@ register('chart', (c, ctx) => {
   // the chart sizes itself from its labels (a module may export width(s)): the canvas never clips its own legend, and the window follows
   function fitW() {
     const need = MODS[kind] && MODS[kind].width ? MODS[kind].width(s) : 0;
-    const w = Math.max(c.width || 280, need);
+    // a chart that knows its own width (donut: ring + legend) is exactly as wide as that, never padded out to a default;
+    // the others keep the default width. The card hugs its content instead of leaving an empty white strip that the window can clip.
+    const w = need ? Math.max(c.width || 0, need) : (c.width || 280);
     if (w !== s.W) { s.W = w; cv.style.width = w + 'px'; }
   }
   sizeH();
