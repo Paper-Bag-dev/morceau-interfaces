@@ -7,9 +7,12 @@ separate card (`donut-card`, `week-chart`). Never mix a picture and a text list 
 one big blocker. Several small cards spread into the free space (`--region auto`), sized in between (about importance 1.0; text cards 0.85 to 1.0).
 
 **The loop (whenever you or the background agent push chips):**
-1. Decide every card you want to show, and write each card's data JSON first (fast, one file per card; a recipe like `cache/recipes/tokens-cards.json` lists them).
-2. Next turn pass them all to `morc use <chip> --data @file --region auto`. Do not pick positions yourself; the host does it with the Tier 0 rule below.
-3. To tweak a card later, edit its JSON and re-push. Do not edit scripts or code.
+1. Decide every card you want to show and write each card once with `morc card <name> --chip <chip> --set key=value ...` (one short command per card; it is
+   saved in `cards/<name>.json` and remembered; see [cards.md](cards.md)). Later change only what changed: `morc card <name> --set a.value=820`.
+2. Next turn show them all in one command: `morc push <name> <name> ...` or `morc push --all --prefix tok-`. Do not pick positions yourself; the host does
+   it with the Tier 0 rule below.
+3. Do not edit scripts or code to tweak a card, and do not regenerate a big JSON. Each card keeps a size floor (`min_importance`, default 0.85) that you do
+   not go under unless the user points it out: text, icon and component size are never what you compromise on.
 
 **Tier 0 placement (how the host fills free space, in the 3x3 grid with the active window as the centre cell):**
 - Look for free space beside the active window (free of every other window and card). Active window on the right and the left free: fill the left, starting

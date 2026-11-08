@@ -23,3 +23,5 @@ ui/models/assets/
 bin/morc.exe
 node_modules/
 *.tgz
+
+cards/
