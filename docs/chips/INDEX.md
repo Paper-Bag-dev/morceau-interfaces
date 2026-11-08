@@ -10,7 +10,9 @@ A **chip** is a ready-made card: a JSON file (the layout, already built) plus a 
 
 | chip | use it for | params (data) | md |
 |---|---|---|---|
-| `tokens-dashboard` | Claude token usage: tiles + by model + per day | total, today, reuse, replies, models, days | [tokens-dashboard.md](tokens-dashboard.md) |
+| `tokens-dashboard` | Claude token usage: `morc tokens` pushes SEVERAL SMALL cards into free space (default); the one big card only with `--one-card` | total, today, reuse, replies, models, days | [tokens-dashboard.md](tokens-dashboard.md) |
+| `donut-card` | a share-of-a-whole donut | title, values, labels | [donut-card.md](donut-card.md) |
+| `stat-card-min` | one big number with a label and unit | h.label, h.value, h.unit | (data only: `{"h": {"label": "New today", "value": 4.4, "unit": "M"}}`) |
 | `week-chart` | any 7-point bar or line chart | title, values, labels, unit | [week-chart.md](week-chart.md) |
 | `ask-permission` | an urgent yes/no for the user | title, body, yes, no, ctx | [ask-permission.md](ask-permission.md) |
 | `graph-view` | a node-link graph (code, goals, flows) | title, graph | [graph-view.md](graph-view.md) |
