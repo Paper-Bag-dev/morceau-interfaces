@@ -1,4 +1,4 @@
-//! The long-lived host: owns every surface, reacts to commands, page messages and the active-window changes.
+﻿//! The long-lived host: owns every surface, reacts to commands, page messages and the active-window changes.
 //! Idle cost: the event loop sleeps (ControlFlow::Wait) when nothing is on screen.
 
 use crate::policy;
@@ -132,7 +132,7 @@ impl Host {
         match req {
             Request::Show { id, opts, components, data, sources } => self.show(id, opts, "", components, data, sources, target),
             Request::Use { name, id, opts, data } => {
-                let Some(c) = cache::load(&name) else { return json!({"ok": false, "err": format!("no cached component '{name}'")}) };
+                let Some(c) = cache::load(&name) else { return json!({"ok": false, "err": cache::explain_missing(&name)}) };
                 let base: Opts = serde_json::from_value(c["opts"].clone()).unwrap_or_default();
                 let mut d = c["data"].clone();
                 if d.is_null() {

@@ -1,4 +1,4 @@
-//! Component cache. Every reusable UI spec is stored as cache/components/<name>.json and listed,
+﻿//! Component cache. Every reusable UI spec is stored as cache/components/<name>.json and listed,
 //! with its path, use count and engagement, in cache/registry.md (the memory file Claude reads
 //! before building something new, so it reuses instead of re-spending tokens).
 
@@ -29,6 +29,28 @@ pub fn load(name: &str) -> Option<Value> {
     serde_json::from_str(fs::read_to_string(file_for(name)).ok()?.trim_start_matches('\u{feff}')).ok()
 }
 
+/// Why `use <name>` found nothing, said precisely: the file is there but unreadable (with the parse error), or it is not cached (with near names,
+/// and a pointer when the name is a fragment, which is built with `morc compose` rather than shown with `morc use`).
+pub fn explain_missing(name: &str) -> String {
+    let p = file_for(name);
+    if let Ok(s) = fs::read_to_string(&p) {
+        return match serde_json::from_str::<Value>(s.trim_start_matches('\u{feff}')) {
+            Ok(_) => format!("'{name}' exists but could not be loaded"),
+            Err(e) => format!("'{name}' is cached but is not valid JSON ({e})"),
+        };
+    }
+    let names: Vec<String> = all().iter().filter_map(|c| c["name"].as_str().map(String::from)).collect();
+    let near: Vec<&String> = names.iter().filter(|n| n.contains(name) || name.contains(n.as_str()) || n.split('-').next() == name.split('-').next()).take(5).collect();
+    let frag = paths::app_dir().join("cache").join("fragments").join(format!("{name}.json")).exists() || paths::cache_dir().join("fragments").join(format!("{name}.json")).exists();
+    let mut m = format!("no cached component '{name}'");
+    if frag {
+        m += " (it is a fragment: build it with `morc compose`, then use the saved result)";
+    }
+    if !near.is_empty() {
+        m += &format!("; similar: {}", near.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", "));
+    }
+    m
+}
 pub fn all() -> Vec<Value> {
     let Ok(rd) = fs::read_dir(paths::components_dir()) else { return vec![] };
     let mut v: Vec<Value> = rd
