@@ -12,7 +12,7 @@ for (const f of ['.env', 'prefs', 'triggers', 'actions.json']) if (fs.existsSync
 const pack = spawnSync('npm', ['pack', '--dry-run', '--json'], { cwd: root, shell: true, encoding: 'utf8' });
 try {
   const files = JSON.parse(pack.stdout)[0].files.map((x) => x.path);
-  const bad = files.filter((p) => /(^|\/)\.env$|^prefs\/|^triggers\/|^actions\.json$|models\/assets\/|\.log$|token/i.test(p));
+  const bad = files.filter((p) => /(^|\/)\.env$|^prefs\/|^triggers\/|^actions\.json$|models\/assets\/|\.log$|(^|\/)(\.?token|secrets?|credentials?)(\.|$)/i.test(p));   // a file NAMED token/secret/credentials, not design "tokens" (ui/tokens/, tokens-cards.json)
   if (bad.length) problems.push('these files would be published: ' + bad.join(', '));
   console.log(`package check: ${files.length} files`);
 } catch (e) {
