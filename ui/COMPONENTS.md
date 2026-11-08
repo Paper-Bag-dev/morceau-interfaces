@@ -20,3 +20,4 @@ Each component is one folder with its code, its styles and its metadata. A compo
 
 Paths: `ui/components/<name>/`. Page entry: `ui/core/main.js` loads `ui/components.json` in this order. Tokens live in `ui/tokens/<component>.json`,
 limits in `ui/limits.json`, colors in `ui/themes.json` (each hot-reloaded). To add a component: `morc ui new <name> --deps plate --types mytype`.
+The host keeps this map in memory (hot-reloaded with the other UI files); pull it any time with `morc uimap` or `morc ui map` (absolute paths), `morc ui list` (summary).

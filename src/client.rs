@@ -11,6 +11,7 @@
 //!   morc graph [--file g.json | exporter args] [--title T]   show a node-link graph (docs/graphs.md)
 //!   morc close <id> | dismiss-all | summon | list | status | stop
 //!   morc space                             JSON: the free regions around the active window (see also `morc free`)
+//!   morc uimap                             JSON: the UI component map (paths, types, deps, tokens) from the host's memory
 //!   morc annoy [show|set|nudge|quiet|mute-app|mute-topic|theme ...]   the preference vector (docs/agent.md)
 //!   morc chore <reason> [--note JSON]      ask for a gated wake of the background chore agent
 //!   morc registry                          rewrite cache/registry.md
@@ -423,6 +424,7 @@ pub fn run(args: Vec<String>) -> i32 {
         }
         "list" => Ok(json!({"t": "list"})),
         "status" => Ok(json!({"t": "status"})),
+        "uimap" => Ok(json!({"t": "ui_map"})),
         "space" => Ok(json!({"t": "space"})),
         // morc chore <reason> [--note JSON] : ask for a chore wake (the host applies the gates: live session, PC idle, rate limit, cooldown)
         "chore" => Ok(json!({"t": "chore", "reason": rest.first().cloned().unwrap_or_else(|| "periodic".into()), "note": flag(rest, "--note").and_then(|s| serde_json::from_str::<serde_json::Value>(&s).ok()).unwrap_or(json!({}))})),

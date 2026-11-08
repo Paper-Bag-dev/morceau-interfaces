@@ -1,4 +1,4 @@
-# morc ui: the UI component tree. Usage: morc ui build | list | show NAME | new NAME [--deps a,b] [--types t1,t2]
+# morc ui: the UI component tree. Usage: morc ui build | list | map | show NAME | new NAME [--deps a,b] [--types t1,t2]
 """Every UI component is its own folder, ui/components/<name>/, holding its code (<name>.js), its styles (<name>.css) and a metadata.json
 (name, description, types it registers, deps, tokens it reads). `morc ui build` reads those folders, orders them by dependency (a component loads after the
 things it depends on) and writes the two files everyone starts from:
@@ -10,10 +10,21 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _home import APP  # noqa: E402
+from _home import APP, BIN  # noqa: E402
 
 UI = os.path.join(APP, "ui")
 COMP = os.path.join(UI, "components")
+
+
+def host_map():
+    """The component map held in the host's memory (`morc uimap`): paths, deps, types, tokens. None if the host is not running."""
+    import subprocess
+    try:
+        r = subprocess.run([BIN, "uimap"], capture_output=True, text=True, timeout=8)
+        d = json.loads(r.stdout)
+        return d if d.get("ok") else None
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None
 
 
 def read_all():
@@ -77,7 +88,8 @@ def build():
         files = ", ".join(f"`{m[k]}`" for k in ("js", "css") if m.get(k)) + ", `metadata.json`"
         lines.append(f"| `{n}` | {m.get('description', '')} | {', '.join(m.get('types', [])) or 'style only'} | {', '.join(m.get('deps', [])) or '-'} | {files} | {', '.join(m.get('tokens', [])) or '-'} |")
     lines += ["", "Paths: `ui/components/<name>/`. Page entry: `ui/core/main.js` loads `ui/components.json` in this order. Tokens live in `ui/tokens/<component>.json`,",
-              "limits in `ui/limits.json`, colors in `ui/themes.json` (each hot-reloaded). To add a component: `morc ui new <name> --deps plate --types mytype`.", ""]
+              "limits in `ui/limits.json`, colors in `ui/themes.json` (each hot-reloaded). To add a component: `morc ui new <name> --deps plate --types mytype`.",
+              "The host keeps this map in memory (hot-reloaded with the other UI files); pull it any time with `morc uimap` or `morc ui map` (absolute paths), `morc ui list` (summary).", ""]
     open(os.path.join(UI, "COMPONENTS.md"), "w", encoding="utf-8").write("\n".join(lines))
     print(f"built {len(ordered)} components: " + ", ".join(ordered))
     return 0
@@ -102,7 +114,20 @@ def main(argv):
     cmd = argv[0] if argv else "list"
     if cmd == "build":
         return build()
+    if cmd == "map":  # the component map from the running host's memory (hot-reloaded), with absolute paths
+        hm = host_map()
+        if not hm:
+            print("the host is not running; use `morc ui list` (reads the folders)")
+            return 1
+        print(json.dumps(hm, indent=1))
+        return 0
     if cmd == "list":
+        hm = host_map()   # pulled from the host's memory when it is up, else read from the folders
+        if hm and hm.get("map", {}).get("order"):
+            for n in hm["map"]["order"]:
+                m = hm["map"]["components"][n]
+                print(f"{n:10} deps={','.join(m.get('deps') or []) or '-':8} types={','.join(m.get('types') or []) or 'style'}  {m['path']}   (from the host)")
+            return 0
         metas = read_all()
         for n in order(metas):
             m = metas[n]

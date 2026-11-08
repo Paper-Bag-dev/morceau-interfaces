@@ -112,6 +112,8 @@ pub enum Request {
     Act { id: String, action: Value },
     List,
     Status,
+    /// The UI component map (every component folder: paths, types, deps, tokens), straight from the host's memory. `morc uimap`.
+    UiMap,
     /// A token / theme / limits file changed: re-send the UI data (tokens, themes, limits) to every card. Sent by the host's own file watcher.
     Reload,
     /// Where is free space right now: the active window, the strips around it, other windows, my surfaces.

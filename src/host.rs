@@ -202,6 +202,10 @@ impl Host {
             Request::List => json!({"ok": true, "components": cache::all().iter().map(|c| json!({"name": c["name"], "desc": c["desc"], "params": c["params"]})).collect::<Vec<_>>()}),
             Request::Chore { reason, note } => json!({"ok": true, "result": wake::chore(&reason, &note)}),
             Request::Space => regions::snapshot(&self.surfaces.values().filter(|s| s.phase == Phase::Visible).filter_map(|s| s.rect()).collect::<Vec<_>>()),
+            Request::UiMap => {
+                let b = ui_bundle();
+                json!({"ok": true, "root": paths::ui_dir().display().to_string(), "map": b["components"]})
+            }
             Request::Reload => {
                 let ui = ui_bundle();
                 for s in self.surfaces.values() {
@@ -792,7 +796,7 @@ fn scope_of(topic: &str) -> &str {
 ///   limits: ui/limits.json (min / max sizes and timings), themes: ui/themes.json (accents, base colors, schemes); both overridable under
 ///   "limits" / "themes" in prefs/ui.json. "about" keys are documentation. The result is cached in memory until a file changes.
 fn ui_files() -> Vec<std::path::PathBuf> {
-    let mut v = vec![paths::ui_dir().join("limits.json"), paths::ui_dir().join("themes.json"), paths::prefs_dir().join("ui.json")];
+    let mut v = vec![paths::ui_dir().join("limits.json"), paths::ui_dir().join("themes.json"), paths::ui_dir().join("components.json"), paths::prefs_dir().join("ui.json")];
     for dir in [paths::ui_dir().join("tokens"), paths::prefs_dir().join("tokens")] {
         if let Ok(rd) = std::fs::read_dir(dir) {
             let mut f: Vec<_> = rd.filter_map(|e| e.ok()).map(|e| e.path()).filter(|p| p.extension().map(|x| x == "json").unwrap_or(false)).collect();
@@ -859,7 +863,9 @@ fn ui_bundle() -> Value {
     merge(&mut tokens, &over["tokens"]);
     merge(&mut limits, &over["limits"]);
     merge(&mut themes, &over["themes"]);
-    let bundle = json!({"tokens": tokens, "limits": limits, "themes": themes});
+    // the component map (ui/components.json, written by `morc ui build`) is held in memory with the rest: the CLI pulls it with `morc uimap`
+    let components = read(paths::ui_dir().join("components.json"));
+    let bundle = json!({"tokens": tokens, "limits": limits, "themes": themes, "components": components});
     *CACHE.lock().unwrap() = Some((stamp, bundle.clone()));
     bundle
 }
