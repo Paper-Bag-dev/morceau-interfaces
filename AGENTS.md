@@ -25,6 +25,7 @@ runtime state (`%LOCALAPPDATA%\morc`). Never put user data in the install; never
 - A UI change needs a restart of the host (the warm spare page caches JS). Verify visually: take a screenshot (process must be DPI-aware or it crops).
 
 ## Rules of the house
+- **Show on screen first (hard rule).** Whenever the user asks to be shown something (list, status, report, plan, progress), first check whether it can go on their screen through the `morc` CLI and do that. Terminal text only if morc is unavailable or the host defers, and say why. Text may accompany a card, never replace it.
 1. **Composable, not edited per variation.** A new look, size, model or card is data (fragment params, recipe `vars`, `--set` / `--data` flags), never a
    code edit. If you find yourself editing a CLI tool or Rust to change one widget, stop and make the mechanism generic instead.
 2. **Data-driven policy.** Placement weights and anchors live in `prefs/placement.json` (hot-reloaded), the chore agent in `prefs/worker.json`, taste in
