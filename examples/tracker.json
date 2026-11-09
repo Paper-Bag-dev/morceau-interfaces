@@ -1,0 +1,19 @@
+{
+  "title": "Weekend sprint",
+  "todo": [
+    {"id": "a", "text": "Read chapter 3", "sub": "30 min", "badge": "10:00", "done": true, "kind": "task"},
+    {"id": "b", "text": "Write the summary", "sub": "20 min", "badge": "11:00", "done": false, "kind": "task"},
+    {"id": "c", "text": "Review notes", "sub": "15 min", "badge": "14:00", "done": false, "kind": "task"}
+  ],
+  "progress": {"done": 1, "total": 3, "minutes_left": 35, "days_left": 4},
+  "views": {
+    "todo": {"title": "To do today", "id": "sprint-todo", "run": "tick-", "list": "/todo",
+             "show": {"region": "right", "ttl": 7200, "sticky": true}},
+    "strip": {"id": "sprint-strip", "cells": [
+      {"label": "Tasks done", "value": "/progress/done", "unit": "of {/progress/total}"},
+      {"label": "Time left", "value": "/progress/minutes_left", "unit": "min"},
+      {"label": "Days left", "value": "/progress/days_left", "unit": "days"}],
+     "show": {"region": "above", "align": "left", "importance": 0.6, "ttl": 7200}}
+  },
+  "history": []
+}

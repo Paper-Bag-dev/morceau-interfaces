@@ -301,7 +301,7 @@ impl Host {
             opts.force = true;
             opts.anchor = Some("near_focus".into());
             let comps = p.init["components"].as_array().cloned().unwrap_or_default();
-            self.show(Some(p.id), opts, &p.name, comps, p.init["data"].clone(), Value::Null, target);
+            self.show(Some(p.id), opts, &p.name, comps, p.init["data"].clone(), p.init["sources"].clone(), target);
         }
         // Nothing parked and nothing on screen: bring back the most recently closed one ("undo dismiss").
         let any_visible = self.surfaces.values().any(|s| s.phase == Phase::Visible);
@@ -311,7 +311,7 @@ impl Host {
                 let mut opts = p.opts.clone();
                 opts.force = true;
                 let comps = p.init["components"].as_array().cloned().unwrap_or_default();
-                self.show(Some(p.id), opts, &p.name, comps, p.init["data"].clone(), Value::Null, target);
+                self.show(Some(p.id), opts, &p.name, comps, p.init["data"].clone(), p.init["sources"].clone(), target);
                 restored_recent = true;
             }
         }
