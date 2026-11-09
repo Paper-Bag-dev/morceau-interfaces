@@ -13,6 +13,8 @@ JSON (`cards/<name>.json`, written with `morc card`). Nothing about one componen
 generically for every card, never a branch for one chip. Fields not set fall back to defaults; you only write what differs. A new component is done only
 when it has: its layout JSON, a short md in `docs/chips/`, a line in this index, and works through `morc card` + `morc push`.
 
+**Alignment follows the active window (default):** a card's contents start at the edge NEAREST the active window. A card to the right of it, above it or below it is left-aligned (flex from left to right); a card to the left of it is right-aligned (it hugs the window). The host decides this when it places the card and tells the page (`align` message); you do not set it. Only an explicit `--align left|right` in the card file overrides it (`--align auto` removes the override).
+
 **Group by kind (the user has said this many times):** numbers and text go together in ONE card (`stat-tiles`); pictures (charts) each go in their own
 separate card (`donut-card`, `week-chart`). Never mix a picture and a text list in one card, never stack everything as one long vertical story, never
 one big blocker. Several small cards spread into the free space (`--region auto`), sized in between (about importance 1.0; text cards 0.85 to 1.0).
@@ -106,6 +108,7 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 | `stat-strip` | four numbers in ONE flex row for the strip above or below the active window | a, b, c, d | [stat-strip.md](stat-strip.md) |
 | `stat-line` | up to six short text facts in ONE low row, for the THIN strips (about 100 px high) | t1 .. t6 (strings) | [stat-line.md](stat-line.md) |
 | `progress-card` | loading / download status: up to three live progress bars (update with `morc patch <id> /a/value N`) | title, a, b, c | [progress-card.md](progress-card.md) |
+| `status-row` | a thin row for the strip above/below: one spinner + up to two live progress bars, no buttons | s, a, b | [status-row.md](status-row.md) |
 | `stat-card-min` | one big number with a label and unit | h.label, h.value, h.unit | (data only: `{"h": {"label": "New today", "value": 4.4, "unit": "M"}}`) |
 | `week-chart` | any 7-point bar or line chart | title, values, labels, unit | [week-chart.md](week-chart.md) |
 | `ask-permission` | an urgent yes/no for the user | title, body, yes, no, ctx | [ask-permission.md](ask-permission.md) |

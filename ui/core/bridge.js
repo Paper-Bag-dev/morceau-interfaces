@@ -4,6 +4,7 @@
 let limits = {};
 export function setLimits(l) { limits = l || {}; }
 const lim = (k, d) => (typeof limits[k] === 'number' ? limits[k] : d);
+export const limit = lim;   // read a limit by name from other modules (main.js uses it for the attention pulse)
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;   // no hover morph for people who asked for less motion
 
 export const send = (m) => window.ipc && window.ipc.postMessage(JSON.stringify(m));

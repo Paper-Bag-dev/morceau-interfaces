@@ -6,6 +6,7 @@
   "hover-small-w": 560,
   "hover-regrow-cooldown-ms": 4000,
   "morph-ms": 220,
+  "pulse-ms": 1600,
   "hover-delay-ms": 220,
   "hold-ms": 100,
   "hold-ms-control": 220,

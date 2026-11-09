@@ -1,7 +1,8 @@
 // Entry point. Registers the catalog, then answers the host.
 
 import { Renderer } from './render.js';
-import { send, measureSoon, dropped, setView, setViewSmooth, setLimits } from './bridge.js';
+import { send, measureSoon, dropped, setView, setViewSmooth, setLimits, limit } from './bridge.js';
+import { working } from './working.js';
 import { enter, leave, pulse, reduced, setReduced } from './motion.js';
 import { pick as pickTheme, apply as applyTheme, adaptToBackdrop, setBoldness, setThemes } from './theme.js';
 
@@ -82,11 +83,15 @@ window.morc = {
         if (lastRgb) adaptToBackdrop(stage, lastRgb);
         measureSoon();
         break;
+      case 'align':   // the host placed this card: contents start at the edge nearest the active window (left of it: right-aligned, otherwise left-aligned)
+        stage.classList.toggle('align-right', !!m.right);
+        measureSoon();
+        break;
       case 'view': setViewSmooth(m.view); break;   // the host re-sizes this card (crowded screen: another card is in use)
       case 'patch':
         // test hook: `morc patch <id> /__hover true|false` plays the pointer entering/leaving the card (hover-grow) without touching the user's mouse
         // attention nudge: `morc patch <id> /__pulse true` plays the blue pulse on that card (the "look here" that costs less than opening something new)
-        if (m.data && '/__pulse' in m.data) { pulse(root); break; }
+        if (m.data && '/__pulse' in m.data) { const w = working(root); pulse(root); setTimeout(() => w.done(), limit('pulse-ms', 1600)); break; }   // the blue system pulse, then one ring
         if (m.data && '/__hover' in m.data) { stage.dispatchEvent(new PointerEvent(m.data['/__hover'] ? 'pointerenter' : 'pointerleave')); break; }
         r.patch(m); measureSoon(); break;
       case 'backdrop': lastRgb = m.rgb; adaptToBackdrop(stage, m.rgb); break;   // sampled just before the window appears

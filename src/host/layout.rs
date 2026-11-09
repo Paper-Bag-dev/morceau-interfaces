@@ -62,10 +62,14 @@ impl Host {
             });
             let explicit = s.opts.at.map(|[ax, ay]| placement::clamp_inside(&placement::R { l: ax, t: ay, r: ax + size.0, b: ay + size.1 }));
             // Region placement (--region/--align/--dx/--dy, or anchor "auto"): the host divides the free space and puts the content in a region.
+            let mut region_name: Option<String> = None;
             let by_region = (s.opts.region.is_some() || s.opts.align.is_some() || s.opts.anchor.as_deref() == Some("auto"))
                 .then(|| regions::Spec { region: s.opts.region.clone(), align: s.opts.align.clone().unwrap_or_default(), dx: s.opts.dx.unwrap_or(0), dy: s.opts.dy.unwrap_or(0), sacrifice: prefs::get(&prefs::load(), &s.topic, "overlap") >= 0.2 || is_important(&s.opts) })
-                .and_then(|sp| regions::place(size, &sp, &kin.iter().chain(foreign.iter()).copied().collect::<Vec<_>>()))
-                .map(|(rx, ry)| placement::clamp_inside(&placement::R { l: rx, t: ry, r: rx + size.0, b: ry + size.1 }));
+                .and_then(|sp| regions::place_named(size, &sp, &kin.iter().chain(foreign.iter()).copied().collect::<Vec<_>>()))
+                .map(|((rx, ry), name)| {
+                    region_name = Some(name);
+                    placement::clamp_inside(&placement::R { l: rx, t: ry, r: rx + size.0, b: ry + size.1 })
+                });
             let explicit = explicit.or(by_region);
             let (x, y) = match (explicit, remembered) {
                 (Some(p), _) => p,   // the agent did the math: --at X,Y wins
@@ -82,6 +86,12 @@ impl Host {
                 if let Some(rgb) = backdrop::average_rgb(x, y, size.0, size.1) {
                     s.send(&json!({"t": "backdrop", "rgb": rgb}));
                 }
+            }
+            // Contents start at the edge NEAREST the active window by default: a card left of the window is right-aligned (it hugs the window), a card to its
+            // right, above or below is left-aligned. A card whose JSON names an alignment (`align`) keeps it.
+            if s.opts.align.is_none() {
+                let right = region_name.as_deref().map(|n| n.contains("left")).unwrap_or(false);
+                s.send(&json!({"t": "align", "right": right}));
             }
             winstyle::show_topmost_noactivate(s.hwnd());
             s.phase = Phase::Visible;

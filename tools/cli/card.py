@@ -63,8 +63,11 @@ def main(argv):
             card[a[2:]] = int(nxt)
         elif a == "--region":
             card["region"] = nxt
-        elif a == "--align":  # left | right: where the card's contents start (titles, charts, Close all line up on that edge)
-            card["align"] = nxt
+        elif a == "--align":  # left | right: where the card's contents start (titles, charts, Close line up on that edge); auto (the default) = the edge nearest the active window
+            if nxt == "auto":
+                card.pop("align", None)
+            else:
+                card["align"] = nxt
         else:
             print("unknown option " + a)
             return 2

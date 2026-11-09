@@ -1,0 +1,14 @@
+{
+  "t": "save",
+  "name": "status-row",
+  "desc": "A thin row for the strip above or below the window: one spinner (something is loading) and up to two progress bars (percent). No buttons, the corner x closes it. Update live with `morc patch <id> /a/value 45`. Pass /s (spinner text), /a and /b each {label, value 0..100}; an empty label hides that part.",
+  "params": ["/s", "/a/label", "/a/value", "/b/label", "/b/value"],
+  "opts": { "min": [420, 40], "ttl": 90, "topic": "status.row", "importance": "0.8", "max_frac": 0.9 },
+  "components": [
+    { "id": "root", "type": "row", "gap": 8, "children": ["sp", "a", "b"] },
+    { "id": "sp", "type": "spinner", "label": "{/s}", "when": { "path": "/s", "truthy": true } },
+    { "id": "a", "type": "progress", "label": "{/a/label}", "value": { "bind": "/a/value" }, "max": 100, "unit": "%", "when": { "path": "/a/label", "truthy": true } },
+    { "id": "b", "type": "progress", "label": "{/b/label}", "value": { "bind": "/b/value" }, "max": 100, "unit": "%", "when": { "path": "/b/label", "truthy": true } }
+  ],
+  "data": { "s": "", "a": { "label": "", "value": 0 }, "b": { "label": "", "value": 0 } }
+}

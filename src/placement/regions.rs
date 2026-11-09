@@ -212,6 +212,12 @@ fn candidates<'a>(regs: &'a [Region], wanted: Option<&str>, tiers: u8) -> Vec<&'
 /// Where a content box of `size` goes for this spec: the wanted region if it fits (tier 0 then 1), else the first region that fits in
 /// fill order. None = nothing fits anywhere (the caller falls back to scoring placement).
 pub fn place(size: (i32, i32), spec: &Spec, widgets: &[R]) -> Option<(i32, i32)> {
+    place_named(size, spec, widgets).map(|(p, _)| p)
+}
+
+/// Same as `place`, and also says WHICH region it chose ("left", "right", "above", "below", a corner ...): the card's contents then start at the edge
+/// nearest the active window (a card left of the window right-aligns, a card right of it left-aligns).
+pub fn place_named(size: (i32, i32), spec: &Spec, widgets: &[R]) -> Option<((i32, i32), String)> {
     let (regs, _, _) = compute(widgets);
     let pol = policy::load();
     let (m, gap) = (pol.margin, pol.gap);
@@ -220,7 +226,7 @@ pub fn place(size: (i32, i32), spec: &Spec, widgets: &[R]) -> Option<(i32, i32)>
     // ACTIVE window (tier 1) are the free space: background windows never block a card. (`sacrifice` no longer gates this.)
     let _ = spec.sacrifice;
     let r = candidates(&regs, wanted, 2).into_iter().find(|r| r.rect.w() >= size.0 + m + gap && r.rect.h() >= size.1 + m + gap)?;
-    Some(aligned(&r.rect, size, &spec.align, &r.name, spec.dx, spec.dy, m, gap))
+    Some((aligned(&r.rect, size, &spec.align, &r.name, spec.dx, spec.dy, m, gap), r.name.clone()))
 }
 
 /// The size (physical px) of the region a spec will aim at, BEFORE the content is measured, so the page can wrap and flow to fit it.
