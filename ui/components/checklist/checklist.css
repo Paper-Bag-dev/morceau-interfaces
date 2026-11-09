@@ -1,0 +1,27 @@
+/* checklist: tickable rows under one plate; the count and a hairline fill are the one memorable thing. Sizes are tokens (ui/tokens/checklist.json). */
+.c-check.plate { display: flex; flex-direction: column; gap: var(--check-gap, 8px); min-width: var(--check-min-w, 300px); padding: var(--check-pad, 10px 12px 8px); align-self: stretch; width: auto; }
+.c-check .head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.c-check .ttl { font-size: var(--text-size-lg, 18px); font-weight: 600; }
+.c-check .count { font-family: Bahnschrift, 'Segoe UI Variable Display', sans-serif; font-variation-settings: 'wdth' 92; font-size: var(--check-count-size, 26px); font-variant-numeric: tabular-nums; line-height: 1; }
+.c-check .count .n { font-weight: 600; color: hsl(var(--accent, var(--primary))); }
+.c-check .count .of { font-size: var(--check-of-size, 15px); color: rgb(255 255 255 / .68); }
+.c-check .track { height: var(--check-track, 3px); border-radius: 99px; background: rgb(255 255 255 / .12); overflow: hidden; }
+.c-check .fill { height: 100%; width: 100%; transform-origin: left center; transform: scaleX(.02); background: hsl(var(--accent, var(--primary))); border-radius: 99px; transition: transform .6s var(--spring, cubic-bezier(.16, 1, .3, 1)); }
+.c-check .rows { display: flex; flex-direction: column; }
+.c-check .row { display: flex; align-items: center; gap: var(--check-row-gap, 10px); padding: var(--check-row-pad, 6px 6px); border-radius: var(--check-row-radius, 10px); cursor: pointer; position: relative; overflow: hidden; transition: background .15s; outline: none; }
+.c-check .row:hover, .c-check .row:focus-visible { background: rgb(255 255 255 / .07); }
+.c-check .row:focus-visible { box-shadow: 0 0 0 2px hsl(var(--accent, var(--primary)) / .7); }
+.c-check .box { flex: none; width: var(--check-size, 18px); height: var(--check-size, 18px); border-radius: 50%; border: 1.5px solid rgb(255 255 255 / .45); display: grid; place-items: center; transition: background .18s, border-color .18s, transform .22s var(--spring, cubic-bezier(.16, 1, .3, 1)); }
+.c-check .box svg { width: 70%; height: 70%; fill: none; stroke: hsl(20 9% 9%); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .28s ease .05s; }
+.c-check .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: var(--check-text-size, 15px); }
+.c-check .t, .c-check .sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.c-check .sub { font-size: var(--check-sub-size, 12.5px); color: rgb(255 255 255 / .6); transition: opacity .2s, max-height .25s; max-height: 1.4em; }
+.c-check .badge { flex: none; font-size: var(--check-badge-size, 12.5px); font-variant-numeric: tabular-nums; color: rgb(255 255 255 / .68); }
+.c-check .row.due .box { border-color: hsl(var(--accent, var(--primary))); border-width: 2px; }
+.c-check .row.due .badge { color: hsl(var(--accent, var(--primary))); font-weight: 600; }
+.c-check .row.done .box { background: hsl(var(--accent, var(--primary))); border-color: hsl(var(--accent, var(--primary))); transform: scale(1.06); }
+.c-check .row.done .box svg { stroke-dashoffset: 0; }
+.c-check .row.done .t { color: rgb(255 255 255 / .5); text-decoration: line-through; text-decoration-color: rgb(255 255 255 / .35); }
+.c-check .row.done .sub { opacity: 0; max-height: 0; }
+.c-check .row.done .badge { opacity: .5; }
+@media (prefers-reduced-motion: reduce) { .c-check *, .c-check *::before { transition: none !important; } }

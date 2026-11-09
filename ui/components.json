@@ -3,6 +3,7 @@
   "button",
   "plate",
   "chart",
+  "checklist",
   "graph",
   "input",
   "layout",
@@ -54,6 +55,25 @@
     "chart-text-floor"
    ],
    "description": "Charts on a canvas (bar, line, donut, gauge, heatmap, ...). Drawing code lives in ui/charts/."
+  },
+  "checklist": {
+   "path": "components/checklist",
+   "js": "checklist.js",
+   "css": "checklist.css",
+   "types": [
+    "checklist"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "check-min-w",
+    "check-size",
+    "check-count-size",
+    "check-text-size",
+    "check-row-pad"
+   ],
+   "description": "A tickable to-do list: a count and hairline progress up top, round checkboxes, clock-time badges, a coral ring on what is due. A tick answers at once, then runs the allowlisted tick-<id> action that stores the state as JSON."
   },
   "graph": {
    "path": "components/graph",

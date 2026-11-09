@@ -1,0 +1,19 @@
+{
+    "name":  "checklist",
+    "description":  "A tickable to-do list: a count and hairline progress up top, round checkboxes, clock-time badges, a coral ring on what is due. A tick answers at once, then runs the allowlisted tick-<id> action that stores the state as JSON.",
+    "types":  [
+                  "checklist"
+              ],
+    "js":  "checklist.js",
+    "css":  "checklist.css",
+    "deps":  [
+                 "plate"
+             ],
+    "tokens":  [
+                   "check-min-w",
+                   "check-size",
+                   "check-count-size",
+                   "check-text-size",
+                   "check-row-pad"
+               ]
+}
