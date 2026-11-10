@@ -5,8 +5,7 @@
   "params": [
     "/title",
     "/values",
-    "/labels",
-    "/unit"
+    "/labels"
   ],
   "opts": {
     "min": [
@@ -38,7 +37,6 @@
       "labels": {
         "bind": "/labels"
       },
-      "unit": "{/unit}",
       "height": 120
     }
   ],
@@ -49,7 +47,6 @@
     ],
     "labels": [
       "all"
-    ],
-    "unit": ""
+    ]
   }
 }

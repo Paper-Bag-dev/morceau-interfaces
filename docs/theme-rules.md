@@ -34,8 +34,8 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
 16. **No Close buttons.** Every card has the built-in dismiss (x); a card never adds its own Close. **The accent edge marks a compact list card
     only**; chips (`opts.size: "chip"`: stats, short status: one rectangular row, white hero numerals, grey captions, no tiles), working
     cards (`medium`, a little bigger: `limits.medium-scale`) and charts keep a neutral edge.
-17. **Numbers:** several = ONE long strip (`stat-tiles`, size chip): a single row, each number in its own small rectangle. One number =
-    `stat-chip`, a simple squircle rectangle. Never a square of four. Charts and graphs (`large`) start big (`limits.large-scale`), grow on
+17. **Numbers:** several = ONE long strip (`stat-tiles`, size chip): a single row, the numbers straight on the glass (no box per number).
+    One number = `stat-chip`, a flat rectangle (`chip-radius`, never a pill). Never a square of four. Charts and graphs (`large`) start big (`limits.large-scale`), grow on
     hover and then show every value.
 18. Skins are words: `glass`, or `glass flat` for the same glass without texture. Chart text uses the skin's `chart-ink` (light on glass).
 
@@ -46,7 +46,7 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
     `components/plate/plate.css` (truncate to a few rows, a fading peek) and the selector list in `core/compact.js`. Opening and folding
     are mirrors (`compact.expand` / `compact.collapse`): nothing pops, nothing jumps.
 12. **Motion is a damped spring** (`limits.spring-*`) or a short ease, triggered by the user (hover, press, arrival). Never loop for
-    attention; an arrival glow (`arrive-pulse-ms`) is the only unasked motion. Honor `prefers-reduced-motion`.
+    attention; no arrival glow (`arrive-pulse-ms` 0: the user found the orange glow annoying); cards just spring and fade in. Honor `prefers-reduced-motion`.
 13. **Native glass follows the plate.** The page reports each `.card-plate` rect (`layout.glass`) and streams it during a morph; do not
     animate the plate's outer size any other way.
 

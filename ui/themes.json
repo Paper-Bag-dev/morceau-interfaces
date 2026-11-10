@@ -40,9 +40,7 @@
     "sheen": "255 255 255 / 0",
     "compact-dim": "0 0 0 / .16",
     "ghost-btn": "255 255 255 / .14",
-    "chip-caption": "200 200 205 / .62",
-    "chip-tile": "255 255 255 / .04",
-    "chip-tile-edge": "255 255 255 / .07"
+    "chip-caption": "200 200 205 / .62"
   },
   "schemes": {
     "mid": {},

@@ -105,8 +105,7 @@ html[data-skin~="glass"] #stage[data-size="compact"] .card-plate, html[data-skin
 /* chips (opts.size "chip": stats, short status): simple and rectangular, fit anywhere. Several stats run in ONE row, plain on the plate
    (no tiles): a grey caption under a white hero numeral. */
 #stage[data-size="chip"] .row:has(> .stat + .stat) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(var(--chip-stat-min-w, 92px), 1fr); gap: var(--chip-stat-gap, 4px); }
-#stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { padding: var(--chip-stat-pad, 6px 10px); border-radius: var(--chip-tile-radius, 12px); corner-shape: squircle;
-  background: rgb(var(--chip-tile, 255 255 255 / .04)); border: 1px solid rgb(var(--chip-tile-edge, 255 255 255 / .07)); box-shadow: none; }   /* each number in its own small rectangle in the strip */
+#stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { background: none; border: 0; box-shadow: none; padding: var(--chip-stat-pad, 4px 8px); }   /* numbers sit straight on the glass */
 #stage[data-size="chip"] .stat .num { font-size: var(--chip-hero-size, 28px); color: hsl(0 0% 96%); }
 #stage[data-size="chip"] .stat :is(.lbl, .unit) { color: rgb(var(--chip-caption, 200 200 205 / .62)); }
 #stage[data-size="chip"] .card-plate { padding: var(--chip-pad, 10px 14px); }
@@ -114,3 +113,5 @@ html[data-skin~="glass"] #stage[data-size="compact"] .card-plate, html[data-skin
 #stage[data-size="chip"] .card-plate:has(> .stat:only-child) > .stat { flex-direction: row; align-items: baseline; gap: var(--chip-gap, 10px); padding: 0; min-width: 0; }
 #stage[data-size="chip"] .card-plate:has(> .stat:only-child) > .stat .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #stage[data-size="chip"] .card-plate:has(> .stat:only-child) > .stat .needle { display: none; }
+/* chips are flat rectangles, not pills: a modest radius whatever their height (a short card with the big plate radius reads as a pill) */
+#stage[data-size="chip"] .card-plate { border-radius: var(--chip-radius, 12px); corner-shape: squircle; }
