@@ -70,6 +70,9 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
     live, so with a session open every click goes to that session; `true` = any time; `false` = never (`agent/worker.rs` `Mode`, `wake/gate.rs`).
     `morc hook` hands every click to the session, including `bg:true` ones, unless the agent was allowed to run when the click happened
     (`agent/inbox.rs`). A session only counts as live through the Claude Code hooks (`integrations/claude-code/`).
+- **Paste blocks (both platforms):** the `pastes` component (`ui/components/paste/`) and the `paste-blocks` chip hand over text with a Copy
+  button. The `copy` action now also goes to the host, which copies with `pbcopy` on macOS (`surface/actions.rs`); the `open` action uses
+  `open` on macOS instead of `rundll32`.
 - **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
   target. A cfg mistake only shows up when that target is compiled.
 

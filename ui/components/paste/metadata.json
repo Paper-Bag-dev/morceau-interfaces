@@ -1,0 +1,9 @@
+{
+    "name": "paste",
+    "description": "Numbered paste blocks to hand over in order: title, size, a Copy button (host-side on macOS) and a preview that opens on click.",
+    "types": ["pastes"],
+    "js": "paste.js",
+    "css": "paste.css",
+    "deps": ["plate", "button"],
+    "tokens": []
+}

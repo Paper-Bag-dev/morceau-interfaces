@@ -1,0 +1,17 @@
+/* pastes: numbered paste blocks, each with a Copy button and a preview that opens on click. */
+.c-pastes { display: flex; flex-direction: column; gap: 6px; min-width: 300px; max-width: 520px; }
+.c-pastes .paste { border-radius: 14px; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); overflow: hidden; transition: background .15s; }
+.c-pastes .paste.copied { background: rgb(255 255 255 / .02); }
+.c-pastes .head { display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 10px; cursor: pointer; }
+.c-pastes .head:hover { background: rgb(255 255 255 / .05); }
+.c-pastes .num { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12.5px; font-weight: 600;
+  background: hsl(var(--accent, var(--ring)) / .9); color: #fff; font-variant-numeric: tabular-nums; }
+.c-pastes .copied .num { background: rgb(255 255 255 / .18); }
+.c-pastes .name { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; color: hsl(0 0% 97%); overflow-wrap: anywhere; }
+.c-pastes .size { font-size: 12.5px; font-weight: 400; color: rgb(255 255 255 / .62); }
+.c-pastes .copy { flex: none; }
+.c-pastes .copied .copy { opacity: .75; }
+.c-pastes .body { display: none; margin: 0 8px 8px; padding: 8px 10px; border-radius: 10px; background: rgb(0 0 0 / .35); color: hsl(0 0% 92%);
+  font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto;
+  user-select: text; -webkit-user-select: text; cursor: text; }
+.c-pastes .open .body { display: block; }

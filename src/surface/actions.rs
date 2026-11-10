@@ -22,7 +22,28 @@ pub fn run(surface: &str, topic: &str, action: &Value, proxy: &Proxy) -> Effect 
             let t = action["target"].as_str().unwrap_or("");
             let ok = t.starts_with("https://") || t.starts_with("http://") || std::path::Path::new(t).exists();
             if ok {
+                #[cfg(windows)]
                 let _ = util::hidden(Command::new("rundll32").args(["url.dll,FileProtocolHandler", t])).spawn();
+                #[cfg(target_os = "macos")]
+                let _ = Command::new("open").arg(t).spawn();
+            }
+            Effect::None
+        }
+        // Put text on the clipboard. The page also tries the browser clipboard; on macOS the host does it with pbcopy, because WKWebView may
+        // refuse clipboard writes from the morc:// page. Windows keeps the browser path (WebView2 allows it on http://morc.localhost).
+        "copy" => {
+            #[cfg(target_os = "macos")]
+            {
+                use std::io::Write;
+                let text = action["text"].as_str().unwrap_or("").to_string();
+                std::thread::spawn(move || {
+                    if let Ok(mut child) = Command::new("pbcopy").stdin(Stdio::piped()).spawn() {
+                        if let Some(mut stdin) = child.stdin.take() {
+                            let _ = stdin.write_all(text.as_bytes());
+                        }
+                        let _ = child.wait();
+                    }
+                });
             }
             Effect::None
         }

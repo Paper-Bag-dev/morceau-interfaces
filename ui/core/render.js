@@ -179,7 +179,8 @@ export class Renderer {
         switch (a.do) {
           case 'set': return self.store.set(a.path, a.value);
           case 'toggle': return self.store.set(a.path, !self.store.get(a.path));
-          case 'copy': return navigator.clipboard && navigator.clipboard.writeText(String(a.text ?? '')).catch(() => {});
+          // the browser clipboard is tried, AND the host copies too (pbcopy on macOS, where WKWebView may refuse a morc:// page; surface/actions.rs)
+          case 'copy': if (navigator.clipboard) navigator.clipboard.writeText(String(a.text ?? '')).catch(() => {}); return self.send({ t: 'act', action: a, comp: c.id });
           case 'close': return self.send({ t: 'close' });
           default: return self.send({ t: 'act', action: a, comp: c.id });
         }

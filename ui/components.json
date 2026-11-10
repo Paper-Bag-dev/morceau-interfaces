@@ -8,6 +8,7 @@
   "input",
   "layout",
   "list",
+  "paste",
   "progress",
   "skeleton",
   "spinner",
@@ -127,6 +128,20 @@
    "deps": [],
    "tokens": [],
    "description": "Rows of text, optionally clickable."
+  },
+  "paste": {
+   "path": "components/paste",
+   "js": "paste.js",
+   "css": "paste.css",
+   "types": [
+    "pastes"
+   ],
+   "deps": [
+    "plate",
+    "button"
+   ],
+   "tokens": [],
+   "description": "Numbered paste blocks to hand over in order: title, size, a Copy button (host-side on macOS) and a preview that opens on click."
   },
   "progress": {
    "path": "components/progress",

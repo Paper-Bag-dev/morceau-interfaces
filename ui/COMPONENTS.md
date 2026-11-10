@@ -13,6 +13,7 @@ Each component is one folder with its code, its styles and its metadata. A compo
 | `input` | A text field. | input | - | `input.js`, `input.css`, `metadata.json` | - |
 | `layout` | Flex layout: columns, rows, panels, spacer, divider, wing; right-aligned cards and the leftward flow. | column, row, panel, spacer, divider, wing | plate | `layout.js`, `layout.css`, `metadata.json` | - |
 | `list` | Rows of text, optionally clickable. | list | - | `list.js`, `list.css`, `metadata.json` | - |
+| `paste` | Numbered paste blocks to hand over in order: title, size, a Copy button (host-side on macOS) and a preview that opens on click. | pastes | plate, button | `paste.js`, `paste.css`, `metadata.json` | - |
 | `progress` | A labelled progress bar (percent). | progress | plate | `progress.js`, `progress.css`, `metadata.json` | - |
 | `skeleton` | Shimmering placeholder shapes. | skeleton | - | `skeleton.js`, `skeleton.css`, `metadata.json` | - |
 | `spinner` | The building indicator (system blue). | spinner | - | `spinner.js`, `spinner.css`, `metadata.json` | - |

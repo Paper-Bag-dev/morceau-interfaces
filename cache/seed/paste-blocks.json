@@ -1,0 +1,14 @@
+{
+  "t": "save",
+  "name": "paste-blocks",
+  "desc": "Paste blocks to hand over in order (prompts, tool configs, bodies): a title, then one numbered row per block with its size and a Copy button; a click on a row shows the exact text. Rows stay marked Copied. Pass /title, /body (one line: where to paste) and /items [{title, text, note?}]. Long text: write a JSON file and use --data @file.json. Sticky until closed.",
+  "params": ["/title", "/body", "/items"],
+  "opts": { "min": [340, 120], "sticky": true, "topic": "handover.pastes", "max_frac": 0.8 },
+  "components": [
+    { "id": "root", "type": "column", "gap": 8, "children": ["t", "b", "list"] },
+    { "id": "t", "type": "text", "size": "lg", "bold": true, "text": "{/title}" },
+    { "id": "b", "type": "text", "tone": "muted", "text": "{/body}", "when": { "path": "/body", "truthy": true } },
+    { "id": "list", "type": "pastes", "items": { "bind": "/items" } }
+  ],
+  "data": { "title": "Paste these in order", "body": "", "items": [] }
+}
