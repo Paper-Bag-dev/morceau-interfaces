@@ -5,8 +5,9 @@ Each component is one folder with its code, its styles and its metadata. A compo
 
 | component | what | registers | depends on | files | tokens |
 |---|---|---|---|---|---|
-| `button` | Buttons: primary, ghost, icon-only, yes/no, swatches, toggles, ripple and shine. | button | - | `button.js`, `button.css`, `metadata.json` | - |
 | `plate` | The shared frosted-glass material (grain + dark gradient + blur) that text, stat, progress, kv and chart titles sit on. Style only. | style only | - | `plate.css`, `metadata.json` | plate-radius, plate-padding |
+| `button` | Buttons: primary, ghost, icon-only, yes/no, swatches, toggles, ripple and shine. | button | - | `button.js`, `button.css`, `metadata.json` | - |
+| `asks` | Several yes/no questions answered in any order, then one Send: a single wake with every answer. | asks | plate, button | `asks.js`, `asks.css`, `metadata.json` | - |
 | `chart` | Charts on a canvas (bar, line, donut, gauge, heatmap, ...). Drawing code lives in ui/charts/. | chart | plate | `chart.js`, `chart.css`, `metadata.json` | chart-min-w, chart-title-size, chart-canvas-radius, chart-text-floor |
 | `checklist` | A tickable to-do list: a count and hairline progress up top, round checkboxes, clock-time badges, a coral ring on what is due. A tick answers at once, then runs the allowlisted tick-<id> action that stores the state as JSON. | checklist | plate | `checklist.js`, `checklist.css`, `metadata.json` | check-min-w, check-size, check-count-size, check-text-size, check-row-pad |
 | `graph` | A node-link graph on Cytoscape. | graph | plate | `graph.js`, `graph.css`, `metadata.json` | - |

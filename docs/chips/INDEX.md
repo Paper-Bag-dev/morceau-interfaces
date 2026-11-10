@@ -128,6 +128,8 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 | `stat-card-min` | one big number with a label and unit | h.label, h.value, h.unit | (data only: `{"h": {"label": "New today", "value": 4.4, "unit": "M"}}`) |
 | `week-chart` | any 7-point bar or line chart | title, values, labels, unit | [week-chart.md](week-chart.md) |
 | `ask-permission` | an urgent yes/no for the user | title, body, yes, no, ctx | [ask-permission.md](ask-permission.md) |
+| `confirm-run` | ask once, then the button runs a staged command itself (no model wakes) | title, body, run (staged id), yes, no, ctx | [confirm-run.md](confirm-run.md) |
+| `ask-many` | several yes/no questions on one card, one Send, one wake | title, body, ctx, items [{id, q}] | [ask-many.md](ask-many.md) |
 | `paste-blocks` | paste blocks to hand over in order, each with a Copy button | title, body, items [{title, text, note}] | [paste-blocks.md](paste-blocks.md) |
 | `graph-view` | a node-link graph (code, goals, flows) | title, graph | [graph-view.md](graph-view.md) |
 | `bike-viewer` | the interactive 3D bike demo | title, paint, spin, explode | [bike-viewer.md](bike-viewer.md) |

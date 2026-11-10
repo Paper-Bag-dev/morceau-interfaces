@@ -7,8 +7,9 @@ use super::*;
 pub(super) fn gate(w: &worker::Worker, chore: bool, direct: bool, click: bool) -> Result<Vec<u128>, &'static str> {
     match w.enabled {
         worker::Mode::Off => return Err("disabled"),
-        // the default: with a Claude session open, its hook hands the click to it, so no second agent (not even for a direct click)
-        worker::Mode::NoSession if w.session_live() => return Err("session-live"),
+        // the default: with a Claude session open, its hook hands the click to it. Only a click the card explicitly routed to the background
+        // agent ("bg": true, e.g. a small follow-up task the session attached) still goes to it, so the session's model does not wake for it.
+        worker::Mode::NoSession if w.session_live() && !direct => return Err("session-live"),
         _ => {}
     }
     if !direct {

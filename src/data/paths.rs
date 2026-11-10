@@ -16,6 +16,9 @@ pub fn app_dir() -> PathBuf {
         }
     }
     if let Ok(exe) = std::env::current_exe() {
+        // Resolve links first: on macOS current_exe() is the link's own path (a `~/.local/bin/morc` link or an npm global bin), and the
+        // install folder is beside the real binary, not beside the link.
+        let exe = std::fs::canonicalize(&exe).unwrap_or(exe);
         let mut d = exe.parent().map(|p| p.to_path_buf());
         for _ in 0..6 {
             match d {

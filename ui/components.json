@@ -1,7 +1,8 @@
 {
  "order": [
-  "button",
   "plate",
+  "button",
+  "asks",
   "chart",
   "checklist",
   "graph",
@@ -16,17 +17,6 @@
   "text"
  ],
  "components": {
-  "button": {
-   "path": "components/button",
-   "js": "button.js",
-   "css": "button.css",
-   "types": [
-    "button"
-   ],
-   "deps": [],
-   "tokens": [],
-   "description": "Buttons: primary, ghost, icon-only, yes/no, swatches, toggles, ripple and shine."
-  },
   "plate": {
    "path": "components/plate",
    "js": null,
@@ -38,6 +28,31 @@
     "plate-padding"
    ],
    "description": "The shared frosted-glass material (grain + dark gradient + blur) that text, stat, progress, kv and chart titles sit on. Style only."
+  },
+  "button": {
+   "path": "components/button",
+   "js": "button.js",
+   "css": "button.css",
+   "types": [
+    "button"
+   ],
+   "deps": [],
+   "tokens": [],
+   "description": "Buttons: primary, ghost, icon-only, yes/no, swatches, toggles, ripple and shine."
+  },
+  "asks": {
+   "path": "components/asks",
+   "js": "asks.js",
+   "css": "asks.css",
+   "types": [
+    "asks"
+   ],
+   "deps": [
+    "plate",
+    "button"
+   ],
+   "tokens": [],
+   "description": "Several yes/no questions answered in any order, then one Send: a single wake with every answer."
   },
   "chart": {
    "path": "components/chart",

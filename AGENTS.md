@@ -73,6 +73,11 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
 - **Paste blocks (both platforms):** the `pastes` component (`ui/components/paste/`) and the `paste-blocks` chip hand over text with a Copy
   button. The `copy` action now also goes to the host, which copies with `pbcopy` on macOS (`surface/actions.rs`); the `open` action uses
   `open` on macOS instead of `rundll32`.
+- **Cheaper cards (three tiers):** (1) fixed follow-ups run straight from the button: `morc stage` + the `confirm-run` chip (no model);
+  (2) small follow-ups go to the background agent with `"bg": true` and a `task`; it does the simple ones and hands the rest to the session
+  with `morc escalate` (guards in docs/agent.md "Hand over to the session"); in "no_session" mode a routed (`bg`) click reaches it even while
+  a session is live; (3) decisions for the session batch on one `ask-many` card. `morc session` marks a session live without the hooks.
+- `paths::app_dir` resolves links before looking for the install, so a `morc` link in a bin folder (or an npm global bin) finds its plugins.
 - **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
   target. A cfg mistake only shows up when that target is compiled.
 

@@ -1,0 +1,10 @@
+/* asks: several yes/no questions, one Send. */
+.c-asks { display: flex; flex-direction: column; gap: 8px; min-width: 300px; max-width: 460px; }
+.c-asks .ask { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 14px; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); }
+.c-asks .q { font-size: 15px; color: hsl(0 0% 97%); overflow-wrap: anywhere; }
+.c-asks .picks { display: flex; gap: 6px; }
+.c-asks .pick { opacity: .55; }
+.c-asks .pick.on, .c-asks .ask:not(.answered) .pick { opacity: 1; }
+.c-asks .pick.on { box-shadow: 0 0 0 2px hsl(var(--accent, var(--ring)) / .9); }
+.c-asks .send { align-self: flex-start; }
+.c-asks .send:disabled { opacity: .45; cursor: default; }

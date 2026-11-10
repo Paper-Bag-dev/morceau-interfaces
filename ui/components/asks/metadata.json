@@ -1,0 +1,9 @@
+{
+    "name": "asks",
+    "description": "Several yes/no questions answered in any order, then one Send: a single wake with every answer.",
+    "types": ["asks"],
+    "js": "asks.js",
+    "css": "asks.css",
+    "deps": ["plate", "button"],
+    "tokens": []
+}
