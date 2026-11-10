@@ -66,9 +66,9 @@ body { color: hsl(var(--ink)); cursor: default; }
 #pin { position: absolute; top: 5px; right: 44px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
   color: hsl(var(--accent, var(--ring))); background: hsl(var(--ink-shadow) / .0); opacity: 0; pointer-events: none; transition: opacity .2s, color .15s, transform .3s var(--spring), background .25s ease, box-shadow .25s ease; }
 #pin svg { width: 19px; height: 19px; transform: rotate(45deg); transition: transform .35s var(--spring), fill .2s; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
-#stage:hover #pin { opacity: .8; pointer-events: auto; }
-#pin:hover { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
-#pin:hover svg { transform: rotate(35deg); }
+#stage:is(:hover, .hov) #pin { opacity: .8; pointer-events: auto; }
+#pin:is(:hover, .hov) { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
+#pin:is(:hover, .hov) svg { transform: rotate(35deg); }
 #stage.pinned #pin { opacity: .95; color: hsl(var(--accent, var(--ring))); pointer-events: auto; }
 #stage.pinned #pin svg { transform: rotate(0deg); fill: hsl(var(--accent, var(--ring)) / .4); }
 
@@ -84,8 +84,8 @@ body { color: hsl(var(--ink)); cursor: default; }
 #dismiss { position: absolute; top: 36px; right: 8px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
   color: hsl(var(--accent, var(--ring))); background: transparent; opacity: 0; pointer-events: none; transition: opacity .2s, transform .3s var(--spring), background .25s ease, box-shadow .25s ease; }
 #dismiss svg { width: 16px; height: 16px; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
-#stage:hover #dismiss { opacity: .7; pointer-events: auto; }
-#dismiss:hover { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
+#stage:is(:hover, .hov) #dismiss { opacity: .7; pointer-events: auto; }
+#dismiss:is(:hover, .hov) { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
 #pin.holding { transform: scale(1.25); opacity: 1 !important; background: hsl(var(--accent, var(--ring)) / .35); }
 
 /* 3D model (plugins/model3d.js): just the model and its shadow on a transparent canvas; the read-out is a plate like all raw text */

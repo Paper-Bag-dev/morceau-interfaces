@@ -10,13 +10,20 @@
         "arrive-glow-r",
         "compact-border-w",
         "compact-edge-a",
+        "compact-fade",
         "compact-fade-ms",
+        "compact-glow-a",
+        "compact-glow-r",
         "compact-h",
+        "compact-list-w",
         "compact-peek",
         "compact-radius",
         "compact-rows",
+        "edge-a",
+        "edge-w",
         "plate-padding",
         "plate-radius",
+        "reveal-stagger-ms",
         "title-align"
     ]
 }

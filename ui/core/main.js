@@ -124,7 +124,9 @@ window.morc = {
       case 'leave': leave(root).finished.then(() => send({ t: 'left' })).catch(() => send({ t: 'left' })); break;
       case 'pulse': pulse(root); break;
       // macOS: the host's hit test saw the pointer go onto / off the card (the web view cannot while our app is inactive)
-      case 'hover': stage.dispatchEvent(new PointerEvent(m.on ? 'pointerenter' : 'pointerleave')); break;
+      case 'hover': stage.dispatchEvent(new PointerEvent(m.on ? 'pointerenter' : 'pointerleave')); if (!m.on) markHover(null); break;
+      // macOS: where the pointer is on the card; every hover style keys off :hover OR .hov, so rows, buttons and pills react without a click
+      case 'pointer': { const el = document.elementFromPoint(m.x, m.y); markHover(el); document.dispatchEvent(new PointerEvent('pointermove', { clientX: m.x, clientY: m.y })); break; }
       case 'dropped': dropped(); break;
     }
   },
@@ -138,3 +140,14 @@ async function loadPlugins() {
   } catch (e) { send({ t: 'log', msg: 'plugins: ' + e.message }); }
 }
 loadPlugins().finally(() => send({ t: 'ready' }));
+
+// .hov = "the pointer is here" when the page cannot see the pointer itself (macOS, our app inactive). The element under it and all its
+// ancestors get it, exactly like :hover; the previous chain loses it.
+let hovChain = [];
+function markHover(el) {
+  const next = [];
+  for (let e = el; e && e !== document.documentElement; e = e.parentElement) next.push(e);
+  for (const e of hovChain) if (!next.includes(e)) e.classList.remove('hov');
+  for (const e of next) e.classList.add('hov');
+  hovChain = next;
+}

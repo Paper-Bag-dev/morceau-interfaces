@@ -3,11 +3,18 @@
   "arrive-glow-r": "6px",
   "arrive-glow-ms": "1300",
   "title-align": "center",
-  "compact-rows": "4",
-  "compact-peek": "20px",
-  "compact-border-w": "1.5px",
+  "compact-rows": "2",
+  "compact-peek": "28px",
+  "compact-border-w": "2px",
   "compact-radius": "30px",
   "compact-h": "190px",
-  "compact-fade-ms": "380ms",
-  "compact-edge-a": "70%"
+  "compact-fade-ms": "220ms",
+  "compact-edge-a": "70%",
+  "compact-fade": "64px",
+  "compact-glow-r": "18px",
+  "compact-glow-a": "42%",
+  "reveal-stagger-ms": "55",
+  "compact-list-w": "220px",
+  "edge-w": "1px",
+  "edge-a": "55%"
 }

@@ -1,4 +1,4 @@
-import { simulate } from './motion.js';
+import { simulate, enter } from './motion.js';
 // Page <-> host plumbing: messages, window shape, hover, hold-to-drag, pin, dismiss.
 
 // Minimum / maximum sizes and timings are DATA: ui/limits.json, sent by the host (overridable in prefs/ui.json). The numbers in lim(...) calls are only fallbacks.
@@ -122,6 +122,11 @@ const REVEAL = () => lim('reveal-ms', 380);
 function setCompact(on) {
   if (!on) {
     for (const el of stage.querySelectorAll('.c-list, .c-pastes, .c-check')) { el.style.setProperty('--full-h', el.scrollHeight + 'px'); el.classList.add('revealing'); }
+    // the rows that were tucked away come in as the card opens downward: each scales up and fades in, top to bottom
+    if (!reduced) {
+      const cs = getComputedStyle(stage), shown = parseInt(cs.getPropertyValue('--compact-rows')) || 2, step = parseFloat(cs.getPropertyValue('--reveal-stagger-ms')) || 55;
+      stage.querySelectorAll('.c-list').forEach((l) => [...l.children].slice(shown).forEach((row, i) => enter(row, 60 + i * step)));
+    }
     setTimeout(() => stage.querySelectorAll('.c-list, .c-pastes, .c-check').forEach((el) => { el.style.removeProperty('--full-h'); el.classList.remove('revealing'); }), REVEAL() + 80);
   }
   stage.classList.toggle('compact', on);

@@ -35,6 +35,12 @@ pub fn watch_hover(proxy: crate::ev::Proxy) {
     }
 }
 
+/// The last pointer spot sent per card (points), so a still pointer sends nothing.
+fn last_pointer() -> &'static Mutex<HashMap<isize, (i32, i32)>> {
+    static L: OnceLock<Mutex<HashMap<isize, (i32, i32)>>> = OnceLock::new();
+    L.get_or_init(Default::default)
+}
+
 fn shapes() -> &'static Mutex<HashMap<isize, Rects>> {
     static S: OnceLock<Mutex<HashMap<isize, Rects>>> = OnceLock::new();
     S.get_or_init(Default::default)
@@ -210,6 +216,18 @@ extern "C" fn hit_test_tick(_: *mut c_void) {
                 if let Some(p) = hover_proxy().lock().ok().and_then(|p| p.clone()) {
                     let _ = p.send_event(crate::ev::Ev::Hover(*win, take));
                 }
+            }
+            // while on the card, where (points from the window's top-left): the page marks what is under it as hovered
+            if take {
+                let (px, py) = ((mouse.x - f.origin.x).round() as i32, (f.origin.y + f.size.height - mouse.y).round() as i32);
+                let moved = last_pointer().lock().ok().map(|mut l| l.insert(*win, (px, py)) != Some((px, py))).unwrap_or(false);
+                if moved {
+                    if let Some(p) = hover_proxy().lock().ok().and_then(|p| p.clone()) {
+                        let _ = p.send_event(crate::ev::Ev::Pointer(*win, px as f64, py as f64));
+                    }
+                }
+            } else if let Ok(mut l) = last_pointer().lock() {
+                l.remove(win);
             }
             let ignoring: bool = msg_send![w, ignoresMouseEvents];
             if ignoring == take {

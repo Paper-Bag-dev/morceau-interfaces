@@ -2,7 +2,7 @@
 .c-list { display: flex; flex-direction: column; gap: var(--list-gap, 6px); min-width: var(--list-min-w, 320px); max-width: var(--list-max-w, 420px); }
 /* every row is the same even pill: a minimum height, the same padding, one line for the title and one for the sub line (ellipsis, full text in the tooltip) */
 .c-list .item { display: flex; align-items: center; justify-content: space-between; gap: var(--row-gap, 14px); min-height: var(--row-min-h, 42px); padding: var(--row-pad-y, 6px) var(--row-pad-x, 16px); font-size: var(--row-title-size, 12.5px); border-radius: var(--row-radius, 14px); corner-shape: squircle; color: hsl(var(--foreground)); background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border) / .8); transition: transform .2s var(--spring), background .15s; font-variant-numeric: tabular-nums; }
-.c-list .item.act { position: relative; overflow: hidden; cursor: pointer; } .c-list .item.act:hover { transform: translateX(3px); background: hsl(var(--secondary)); }
+.c-list .item.act { position: relative; overflow: hidden; cursor: pointer; } .c-list .item.act:is(:hover, .hov) { transform: translateX(3px); background: hsl(var(--secondary)); }
 .c-list .txt { flex: 1 1 auto; min-width: 0; }
 .c-list .ttl, .c-list .sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .c-list .sub { color: hsl(var(--muted-foreground)); font-size: var(--row-sub-size, 11.5px); }
@@ -13,5 +13,5 @@
 html[data-skin="glass"] .c-list .item { background: rgb(var(--lens-center, 6 8 12 / .42));
   border-color: rgb(var(--lens-rim, 0 0 0 / .62));
   box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-c), inset 0 1px 0 1px rgb(255 255 255 / .04), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .70)); }
-html[data-skin="glass"] .c-list .item.act:hover { background: rgb(var(--lens-center, 6 8 12 / .30)) linear-gradient(rgb(255 255 255 / .05), rgb(255 255 255 / .05));
+html[data-skin="glass"] .c-list .item.act:is(:hover, .hov) { background: rgb(var(--lens-center, 6 8 12 / .30)) linear-gradient(rgb(255 255 255 / .05), rgb(255 255 255 / .05));
   box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-hover-c), inset 0 1px 0 1px rgb(255 255 255 / .05), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .56)), 0 0 var(--lens-glow-r, 7px) var(--lens-glow-c); }

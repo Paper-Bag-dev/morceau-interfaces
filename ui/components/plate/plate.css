@@ -34,7 +34,7 @@ html[data-skin="glass"] {
   --specks: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='1' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 14 -11.4'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>");
 }
 html.os-mac[data-skin="glass"] .card-plate { backdrop-filter: none; }  /* only where native glass sits under the page; elsewhere the glass skin keeps the CSS blur */
-html[data-skin="glass"] .card-plate { border: 1px solid transparent;
+html[data-skin="glass"] .card-plate { border: var(--edge-w, 1px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-a, 55%), transparent);   /* a thin accent edge stays when grown (the compact one thins down to it) */
   background:
     var(--grain-dark),
     var(--specks),
@@ -67,14 +67,18 @@ html[data-skin="glass"] .card-plate { border: 1px solid transparent;
 .card-plate::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--compact-dim, 0 0 0 / .42)); opacity: 0; pointer-events: none;
   transition: opacity var(--compact-fade-ms, 380ms) ease; }
 #stage.compact .card-plate::before { opacity: 1; }
+/* squeezed: the accent edge leaks inward as a soft glow; it fades out quickly (compact-fade-ms) with the dark layer and the edge */
+.card-plate::before { box-shadow: inset 0 0 var(--compact-glow-r, 18px) color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--compact-glow-a, 42%), transparent); }
 #stage.compact .card-plate { border: var(--compact-border-w, 1.5px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--compact-edge-a, 70%), transparent); border-radius: var(--compact-radius, 30px); }
 @property --fade-stop { syntax: '<length>'; inherits: false; initial-value: 0px; }
 :is(.c-list, .c-pastes, .c-check) { max-height: var(--full-h, none); --fade-stop: 0px;
   -webkit-mask-image: linear-gradient(to bottom, black calc(100% - var(--fade-stop)), transparent); mask-image: linear-gradient(to bottom, black calc(100% - var(--fade-stop)), transparent);
-  transition: max-height var(--reveal-ms, 380ms) var(--ease-out), --fade-stop var(--reveal-ms, 380ms) ease; }
+  transition: max-height var(--reveal-ms, 380ms) var(--ease-out), --fade-stop var(--reveal-ms, 380ms) ease, min-width var(--reveal-ms, 380ms) var(--ease-out), max-width var(--reveal-ms, 380ms) var(--ease-out); }
 :is(.c-list, .c-pastes, .c-check).revealing { overflow: hidden; }
-#stage.compact .c-list { max-height: calc(var(--compact-rows, 4) * (var(--row-min-h, 42px) + 2px + var(--list-gap, 6px)) + var(--compact-peek, 20px)); overflow: hidden; --fade-stop: calc(var(--compact-peek, 20px) + 10px); }
-#stage.compact :is(.c-pastes, .c-check) { max-height: var(--compact-h, 190px); overflow: hidden; --fade-stop: calc(var(--compact-peek, 20px) + 10px); }
+/* squeezed lists are narrower too: titles cut sooner, and as the card opens the width eases out so more of each title appears */
+#stage.compact .c-list { min-width: var(--compact-list-w, 220px); max-width: var(--compact-list-w, 220px); }
+#stage.compact .c-list { max-height: calc(var(--compact-rows, 4) * (var(--row-min-h, 42px) + 2px + var(--list-gap, 6px)) + var(--compact-peek, 20px)); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
+#stage.compact :is(.c-pastes, .c-check) { max-height: var(--compact-h, 190px); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
 /* compact: no pin or dismiss (they come back on hover, as translucent grey buttons) */
 #pin, #dismiss { transition: opacity .25s ease, background .3s ease, color .3s ease, transform .35s var(--spring); }
 #stage.compact :is(#pin, #dismiss) { opacity: 0; pointer-events: none; }
@@ -89,4 +93,4 @@ html[data-skin="glass"] #stage {
 /* glass skin: checklist and paste rows are the same dark lens rows as list rows */
 html[data-skin="glass"] :is(.c-check .row, .c-pastes .paste) { background: rgb(var(--lens-center, 6 8 12 / .05)); border: 1px solid rgb(var(--lens-rim, 0 0 0 / .62));
   box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)); border-radius: var(--row-radius, 14px); }
-html[data-skin="glass"] :is(.c-check .row, .c-pastes .paste):hover { box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-hover-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)), 0 0 var(--lens-glow-r, 7px) var(--lens-glow-c); }
+html[data-skin="glass"] :is(.c-check .row, .c-pastes .paste):is(:hover, .hov) { box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-hover-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)), 0 0 var(--lens-glow-r, 7px) var(--lens-glow-c); }

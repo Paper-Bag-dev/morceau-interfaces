@@ -152,6 +152,11 @@ impl Host {
             }
             Ev::Ipc(key, text) => self.ipc(key, &text),
             Ev::Foreground => self.on_foreground(),
+            Ev::Pointer(win, x, y) => {
+                if let Some(s) = self.surfaces.values().find(|s| s.hwnd() == win) {
+                    s.send(&json!({"t": "pointer", "x": x, "y": y}));
+                }
+            }
             Ev::Hover(win, on) => {
                 if let Some(s) = self.surfaces.values().find(|s| s.hwnd() == win) {
                     s.send(&json!({"t": "hover", "on": on}));

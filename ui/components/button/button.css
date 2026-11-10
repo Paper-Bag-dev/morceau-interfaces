@@ -2,7 +2,7 @@
 .btn { position: relative; overflow: hidden; font: inherit; font-weight: 600; font-size: 11.5px; color: hsl(var(--secondary-foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); border-radius: var(--btn-radius, 10px); corner-shape: squircle; padding: var(--btn-pad-y, 4px) var(--btn-pad-x, 14px); min-height: var(--btn-min-h, 26px); max-width: var(--btn-max-w, 220px); white-space: nowrap; cursor: pointer;
   transition: transform .22s var(--spring), background .15s, box-shadow .2s; box-shadow: 0 2px 8px rgb(0 0 0 / .3);
   display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
-.btn:hover { transform: translateY(-1px) scale(1.035); box-shadow: 0 2px 6px hsl(var(--accent, var(--ring)) / .4), 0 1px 4px rgb(0 0 0 / .3); filter: brightness(1.06); }   /* shadows stay inside the 8px window margin, or they clip on light cards */
+.btn:is(:hover, .hov) { transform: translateY(-1px) scale(1.035); box-shadow: 0 2px 6px hsl(var(--accent, var(--ring)) / .4), 0 1px 4px rgb(0 0 0 / .3); filter: brightness(1.06); }   /* shadows stay inside the 8px window margin, or they clip on light cards */
 .btn:active { transform: scale(.95); transition-duration: .08s; }
 .btn.primary { background: hsl(var(--accent, var(--primary))); color: hsl(var(--on-accent, var(--primary-foreground))); border-color: transparent; }
 .btn.destructive { background: hsl(var(--destructive)); color: white; border-color: transparent; }
@@ -22,11 +22,11 @@
 
 /* swatches + pressed toggles */
 .btn.swatch { width: 24px; height: 24px; padding: 0; border-radius: 50%; background: var(--sw); border: 2px solid rgb(255 255 255 / .7); }
-.btn.swatch:hover { filter: brightness(1.12); }
+.btn.swatch:is(:hover, .hov) { filter: brightness(1.12); }
 .btn.on { background: hsl(var(--accent, var(--ring)) / .26); box-shadow: inset 0 0 0 1.5px hsl(var(--accent, var(--ring))); }
 .btn.swatch.on { box-shadow: 0 0 0 2px hsl(var(--card)), 0 0 0 4px hsl(var(--accent, var(--ring))); background: var(--sw); }
 .btn .lb { min-width: 0; overflow: hidden; text-overflow: ellipsis; }   /* sizes: ui/tokens/button.json */
 /* glass skin: buttons are flat accent pills with black text, like the badges (user, 11-10: flat, no gradient or grain).
    Hover brightens the color a touch; the ripple stays. Toggles, swatches and destructive keep their own look. */
 html[data-skin="glass"] .btn:not(.swatch):not(.on):not(.destructive) { background: color-mix(in oklab, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 85%, white) var(--fill-alpha, 80%), transparent); color: hsl(var(--fill-ink, 220 30% 6%)); font-weight: 650; text-shadow: none; border-color: transparent; box-shadow: none; }
-html[data-skin="glass"] .btn:not(.swatch):not(.on):not(.destructive):hover { filter: brightness(1.08); box-shadow: none; }
+html[data-skin="glass"] .btn:not(.swatch):not(.on):not(.destructive):is(:hover, .hov) { filter: brightness(1.08); box-shadow: none; }

@@ -14,6 +14,9 @@ pub enum Ev {
     /// The pointer went onto (true) or off (false) a card's content: (native window handle, inside). macOS only: its web views do not
     /// see the pointer in a window of an inactive app, so the platform's hit test reports it (Windows' WebView2 sees it by itself).
     Hover(isize, bool),
+    /// Where the pointer is on a card (native window handle, x, y in points from the window's top-left), while it is on it. macOS only,
+    /// same reason: the page marks what is under it so every hover style works without a click.
+    Pointer(isize, f64, f64),
 }
 
 pub type Proxy = EventLoopProxy<Ev>;

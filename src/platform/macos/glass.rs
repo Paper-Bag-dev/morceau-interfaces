@@ -115,8 +115,8 @@ unsafe fn make_view(frame: CGRect) -> Id {
         let v: Id = msg_send![cls, alloc];
         let v: Id = msg_send![v, initWithFrame: frame];
         if !v.is_null() {
-            const CLEAR: isize = 1; // NSGlassEffectViewStyleClear: lets more of what is behind through than Regular (user, 10 Nov)
-            let _: () = msg_send![v, setStyle: CLEAR];
+            const STYLE: isize = 0; // Regular. Clear (1) let more through but bent bright things above the card (a tab bar) into a band along its top edge
+            let _: () = msg_send![v, setStyle: STYLE];
         }
         return v;
     }

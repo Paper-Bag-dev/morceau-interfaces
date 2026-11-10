@@ -4,7 +4,7 @@
 .c-pastes .paste { border-radius: 14px; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); overflow: hidden; transition: background .15s; }
 .c-pastes .paste.copied { background: rgb(255 255 255 / .02); }
 .c-pastes .head { display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 10px; cursor: pointer; }
-.c-pastes .head:hover { background: rgb(255 255 255 / .05); }
+.c-pastes .head:is(:hover, .hov) { background: rgb(255 255 255 / .05); }
 .c-pastes .num { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12.5px; font-weight: 600;
   background: hsl(var(--accent, var(--ring)) / .9); color: #fff; font-variant-numeric: tabular-nums; }
 .c-pastes .copied .num { background: rgb(255 255 255 / .18); }
