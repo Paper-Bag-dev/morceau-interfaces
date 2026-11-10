@@ -120,6 +120,7 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 | chip | use it for | params (data) | md |
 |---|---|---|---|
 | `tokens-dashboard` | Claude token usage: `morc tokens` pushes SEVERAL SMALL cards into free space (default); the one big card only with `--one-card` | total, today, reuse, replies, models, days | [tokens-dashboard.md](tokens-dashboard.md) |
+| `stat-chip` | ONE number as a small rectangular chip (hero numeral, unit, grey caption); several numbers = several chips | label, value, unit | [stat-chip.md](stat-chip.md) |
 | `donut-card` | a share-of-a-whole donut | title, values, labels | [donut-card.md](donut-card.md) |
 | `chart-stack` | two charts in ONE window (donut over bars) for a tall free side | pie, bars | [chart-stack.md](chart-stack.md) |
 | `stat-strip` | four numbers in ONE flex row for the strip above or below the active window | a, b, c, d | [stat-strip.md](stat-strip.md) |

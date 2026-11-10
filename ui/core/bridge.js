@@ -33,7 +33,9 @@ export function setView(v) {
   view = { ...view, ...v };
   fits = 0;
   // compact by default: a card shows at `compact` of its size until hovered (then it grows to full, below)
-  applyZoom(Math.max(lim('min-zoom', 0.85), (view.scale || 1) * (grownFrom ? 1 : COMPACT())));
+  // medium (info-dense working cards: pastes, to-dos, asks) start a little bigger (limits medium-scale); large (charts, graphs) bigger still
+  const sizeK = stage.dataset.size === 'medium' ? lim('medium-scale', 1.12) : stage.dataset.size === 'large' ? lim('large-scale', 1.3) : 1;   // charts and graphs start big
+  applyZoom(Math.max(lim('min-zoom', 0.85), (view.scale || 1) * sizeK * (grownFrom ? 1 : COMPACT())));
   // squeezed: lists show their first rows with the next one fading out, the plate gets a solid accent edge (plate.css #stage.compact)
   setCompact(COMPACT() < 0.99 && !grownFrom);
   measureSoon();
@@ -69,6 +71,7 @@ stage.addEventListener('pointerenter', () => {
     fits = 0;
     const z1 = zoom, z2 = Math.min(lim('max-zoom', 2.2), zoom * k);
     compact.expand(stage, REVEAL());   // show everything that was tucked away (slides open)
+    stage.classList.add('grown');      // charts show their values while grown
     morphing = true;     // the measure below sizes the window; the glass waits for the spring to drive it
     applyZoom(z2);
     measure();   // tell the host NOW: the window is already full size, then the card eases up to it from its old size
@@ -88,6 +91,7 @@ stage.addEventListener('pointerleave', () => {
     // since the card already looks exactly like that, nothing jumps
     const fold = COMPACT() < 0.99;
     if (fold) compact.collapse(stage, REVEAL());
+    stage.classList.remove('grown');
     const settle = () => { applyZoom(z); measure(); measureSoon(); };
     let left = 2;
     const both = () => { if (--left === 0) settle(); };

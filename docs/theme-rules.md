@@ -31,7 +31,13 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
     No size: a plain list starts compact, everything else at full size. Focusing one card never shrinks the others.
 15. Several stats in one row are a hero grid (centered tiles, big numeral, small unit, one-line caption; tokens/stat.json). A card that
     ends in a lone button centers it.
-16. Skins are words: `glass`, or `glass flat` for the same glass without texture. Chart text uses the skin's `chart-ink` (light on glass).
+16. **No Close buttons.** Every card has the built-in dismiss (x); a card never adds its own Close. **The accent edge marks a compact list card
+    only**; chips (`opts.size: "chip"`: stats, short status: one rectangular row, white hero numerals, grey captions, no tiles), working
+    cards (`medium`, a little bigger: `limits.medium-scale`) and charts keep a neutral edge.
+17. **Numbers:** several = ONE long strip (`stat-tiles`, size chip): a single row, each number in its own small rectangle. One number =
+    `stat-chip`, a simple squircle rectangle. Never a square of four. Charts and graphs (`large`) start big (`limits.large-scale`), grow on
+    hover and then show every value.
+18. Skins are words: `glass`, or `glass flat` for the same glass without texture. Chart text uses the skin's `chart-ink` (light on glass).
 
 ## Behavior
 10. **Every hover rule is written `:is(:hover, .hov)`.** On macOS the page cannot see the pointer while our app is inactive; the host

@@ -16,5 +16,12 @@
   "reveal-stagger-ms": "55",
   "compact-list-w": "220px",
   "edge-w": "1px",
-  "edge-a": "28%"
+  "edge-a": "28%",
+  "chip-stat-min-w": "92px",
+  "chip-stat-gap": "6px",
+  "chip-stat-pad": "6px 10px",
+  "chip-hero-size": "28px",
+  "chip-pad": "10px 14px",
+  "chip-gap": "10px",
+  "chip-tile-radius": "12px"
 }

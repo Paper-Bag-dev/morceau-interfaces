@@ -24,8 +24,7 @@
       "type": "column",
       "gap": 6,
       "children": [
-        "c",
-        "ok"
+        "c"
       ]
     },
     {
@@ -41,21 +40,6 @@
       },
       "height": 110,
       "unit": "m"
-    },
-    {
-      "id": "ok",
-      "type": "row",
-      "children": [
-        "b"
-      ]
-    },
-    {
-      "id": "b",
-      "type": "button",
-      "label": "Close",
-      "action": {
-        "do": "close"
-      }
     }
   ],
   "data": {

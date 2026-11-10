@@ -127,7 +127,7 @@ impl Default for Policy {
             gap: 6,
             step: 20,
             toast_zone: [420, 380],
-            crowd_yield: 0.8,
+            crowd_yield: 1.0, // off: hovering one card leaves the others alone (user, 11-10)
             explicit_anchors: ["right_bottom", "left_bottom", "bottom", "corner", "below"].iter().map(|s| s.to_string()).collect(),
             anchors: serde_json::from_str(DEFAULT_ANCHORS).unwrap_or_default(),
         }

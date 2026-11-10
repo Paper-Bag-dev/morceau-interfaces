@@ -16,5 +16,7 @@
   "reveal-ms": 380,
   "spring-stiffness": 260,
   "spring-damping": 28,
-  "shrink-delay-ms": 450
+  "shrink-delay-ms": 450,
+  "medium-scale": 1.12,
+  "large-scale": 1.3
 }

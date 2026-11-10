@@ -10,6 +10,11 @@ impl Host {
         static YIELDED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
         use std::sync::atomic::Ordering::Relaxed;
         let pol = policy::load();
+        // off (the default since 11-10: the user found the others shrinking while one is in use too much): touch nothing at all, so no
+        // card re-lays itself out because another one is hovered
+        if pol.crowd_yield >= 0.999 {
+            return;
+        }
         let prefs = prefs::load();
         let visible: Vec<u64> = self.surfaces.iter().filter(|(_, s)| s.phase == Phase::Visible).map(|(k, _)| *k).collect();
         // "crowded" is not a count: it is how much of the free room (the work area minus the active window) our cards already cover, compared with the

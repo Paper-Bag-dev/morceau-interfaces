@@ -2,20 +2,165 @@
   "t": "save",
   "name": "bike-viewer",
   "desc": "Interactive 3D bike (three.js, procedural): drag to orbit, wheel to zoom, hover/click a part, Spin, Explode, repaint with swatches. Any model in ui/models/ works via the model3d component.",
-  "params": ["/title", "/paint", "/spin", "/explode"],
-  "opts": { "min": [560,360], "ttl": 600, "topic": "viz.model", "max_frac": 0.8 },
-  "components": [
-    { "id": "root", "type": "column", "gap": 8, "children": ["t", "m", "tools"] },
-    { "id": "t", "type": "text", "size": "lg", "text": "{/title}" },
-    { "id": "m", "type": "model3d", "model": "bike", "width": 620, "height": 380, "spin": { "bind": "/spin" }, "explode": { "bind": "/explode" }, "paint": { "bind": "/paint" }, "hover": "/part", "pick": "/picked" },
-    { "id": "tools", "type": "row", "children": ["spin", "explode", "c1", "c2", "c3", "c4", "x"] },
-    { "id": "spin", "type": "button", "icon": "refresh", "label": "Spin", "pressed": { "bind": "/spin" }, "action": { "do": "toggle", "path": "/spin" } },
-    { "id": "explode", "type": "button", "icon": "arrow-right", "label": "Explode", "pressed": { "bind": "/explode" }, "action": { "do": "toggle", "path": "/explode" } },
-    { "id": "c1", "type": "button", "swatch": "#f4764e", "title": "Coral", "role": "tab", "pressed": { "bind": "/paint", "eq": "#f4764e" }, "action": { "do": "set", "path": "/paint", "value": "#f4764e" } },
-    { "id": "c2", "type": "button", "swatch": "#3d7bf4", "title": "Electric blue", "role": "tab", "pressed": { "bind": "/paint", "eq": "#3d7bf4" }, "action": { "do": "set", "path": "/paint", "value": "#3d7bf4" } },
-    { "id": "c3", "type": "button", "swatch": "#e9e6df", "title": "Pearl white", "role": "tab", "pressed": { "bind": "/paint", "eq": "#e9e6df" }, "action": { "do": "set", "path": "/paint", "value": "#e9e6df" } },
-    { "id": "c4", "type": "button", "swatch": "#2b2c30", "title": "Graphite", "role": "tab", "pressed": { "bind": "/paint", "eq": "#2b2c30" }, "action": { "do": "set", "path": "/paint", "value": "#2b2c30" } },
-    { "id": "x", "type": "button", "icon": "x", "title": "Close", "action": { "do": "close" } }
+  "params": [
+    "/title",
+    "/paint",
+    "/spin",
+    "/explode"
   ],
-  "data": { "title": "Naked sport bike", "paint": "#f4764e", "spin": false, "explode": false, "part": "", "picked": "" }
+  "opts": {
+    "min": [
+      560,
+      360
+    ],
+    "ttl": 600,
+    "topic": "viz.model",
+    "max_frac": 0.8
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 8,
+      "children": [
+        "t",
+        "m",
+        "tools"
+      ]
+    },
+    {
+      "id": "t",
+      "type": "text",
+      "size": "lg",
+      "text": "{/title}"
+    },
+    {
+      "id": "m",
+      "type": "model3d",
+      "model": "bike",
+      "width": 620,
+      "height": 380,
+      "spin": {
+        "bind": "/spin"
+      },
+      "explode": {
+        "bind": "/explode"
+      },
+      "paint": {
+        "bind": "/paint"
+      },
+      "hover": "/part",
+      "pick": "/picked"
+    },
+    {
+      "id": "tools",
+      "type": "row",
+      "children": [
+        "spin",
+        "explode",
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ]
+    },
+    {
+      "id": "spin",
+      "type": "button",
+      "icon": "refresh",
+      "label": "Spin",
+      "pressed": {
+        "bind": "/spin"
+      },
+      "action": {
+        "do": "toggle",
+        "path": "/spin"
+      }
+    },
+    {
+      "id": "explode",
+      "type": "button",
+      "icon": "arrow-right",
+      "label": "Explode",
+      "pressed": {
+        "bind": "/explode"
+      },
+      "action": {
+        "do": "toggle",
+        "path": "/explode"
+      }
+    },
+    {
+      "id": "c1",
+      "type": "button",
+      "swatch": "#f4764e",
+      "title": "Coral",
+      "role": "tab",
+      "pressed": {
+        "bind": "/paint",
+        "eq": "#f4764e"
+      },
+      "action": {
+        "do": "set",
+        "path": "/paint",
+        "value": "#f4764e"
+      }
+    },
+    {
+      "id": "c2",
+      "type": "button",
+      "swatch": "#3d7bf4",
+      "title": "Electric blue",
+      "role": "tab",
+      "pressed": {
+        "bind": "/paint",
+        "eq": "#3d7bf4"
+      },
+      "action": {
+        "do": "set",
+        "path": "/paint",
+        "value": "#3d7bf4"
+      }
+    },
+    {
+      "id": "c3",
+      "type": "button",
+      "swatch": "#e9e6df",
+      "title": "Pearl white",
+      "role": "tab",
+      "pressed": {
+        "bind": "/paint",
+        "eq": "#e9e6df"
+      },
+      "action": {
+        "do": "set",
+        "path": "/paint",
+        "value": "#e9e6df"
+      }
+    },
+    {
+      "id": "c4",
+      "type": "button",
+      "swatch": "#2b2c30",
+      "title": "Graphite",
+      "role": "tab",
+      "pressed": {
+        "bind": "/paint",
+        "eq": "#2b2c30"
+      },
+      "action": {
+        "do": "set",
+        "path": "/paint",
+        "value": "#2b2c30"
+      }
+    }
+  ],
+  "data": {
+    "title": "Naked sport bike",
+    "paint": "#f4764e",
+    "spin": false,
+    "explode": false,
+    "part": "",
+    "picked": ""
+  }
 }

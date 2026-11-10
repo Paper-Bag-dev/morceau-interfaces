@@ -1,11 +1,12 @@
 {
   "t": "save",
   "name": "donut-card",
-  "desc": "One donut chart with a title and Close: share of a whole, values in millions (M). Pass /title, /values (numbers), /labels (short names).",
+  "desc": "One donut chart with a title: share of a whole, values in millions (M). Pass /title, /values (numbers), /labels (short names).",
   "params": [
     "/title",
     "/values",
-    "/labels"
+    "/labels",
+    "/unit"
   ],
   "opts": {
     "min": [
@@ -23,8 +24,7 @@
       "type": "column",
       "gap": 6,
       "children": [
-        "c",
-        "ok"
+        "c"
       ]
     },
     {
@@ -38,23 +38,8 @@
       "labels": {
         "bind": "/labels"
       },
-      "unit": "M",
+      "unit": "{/unit}",
       "height": 120
-    },
-    {
-      "id": "ok",
-      "type": "row",
-      "children": [
-        "b"
-      ]
-    },
-    {
-      "id": "b",
-      "type": "button",
-      "label": "Close",
-      "action": {
-        "do": "close"
-      }
     }
   ],
   "data": {

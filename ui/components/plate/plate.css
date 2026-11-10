@@ -34,7 +34,7 @@ html[data-skin~="glass"] {
   --specks: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='1' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .66  0 0 0 0 .6  0 0 0 0 .56  0 0 0 10 -8.6'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>");
 }
 html.os-mac[data-skin~="glass"] .card-plate { backdrop-filter: none; }  /* only where native glass sits under the page; elsewhere the glass skin keeps the CSS blur */
-html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-a, 55%), transparent);   /* a thin accent edge stays when grown (the compact one thins down to it) */
+html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid rgb(var(--plate-edge, 255 255 255 / .10));   /* neutral edge; only compact list cards carry the accent (below) */
   background:
     var(--grain-dark),
     var(--specks),
@@ -99,3 +99,18 @@ html[data-skin~="glass"] :is(.c-check .row, .c-pastes .paste):is(:hover, .hov) {
 /* skin word "flat" (e.g. skin "glass flat"): the same glass without texture: no grain, no glints, no pointer light */
 html[data-skin~="flat"] { --grain: none; --grain-dark: none; --specks: none; }
 html[data-skin~="flat"] .card-plate { --sheen: 0 0 0 / 0; --glass-glow: 0 0 0 / 0; }
+/* the accent edge marks a compact LIST card only (squeezed: thick and glowing; grown: thin). Chips, working cards and charts stay neutral. */
+html[data-skin~="glass"] #stage[data-size="compact"] .card-plate, html[data-skin~="glass"] #stage:not([data-size]) .card-plate:has(.c-list) {
+  border-color: color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-a, 28%), transparent); }
+/* chips (opts.size "chip": stats, short status): simple and rectangular, fit anywhere. Several stats run in ONE row, plain on the plate
+   (no tiles): a grey caption under a white hero numeral. */
+#stage[data-size="chip"] .row:has(> .stat + .stat) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(var(--chip-stat-min-w, 92px), 1fr); gap: var(--chip-stat-gap, 4px); }
+#stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { padding: var(--chip-stat-pad, 6px 10px); border-radius: var(--chip-tile-radius, 12px); corner-shape: squircle;
+  background: rgb(var(--chip-tile, 255 255 255 / .04)); border: 1px solid rgb(var(--chip-tile-edge, 255 255 255 / .07)); box-shadow: none; }   /* each number in its own small rectangle in the strip */
+#stage[data-size="chip"] .stat .num { font-size: var(--chip-hero-size, 28px); color: hsl(0 0% 96%); }
+#stage[data-size="chip"] .stat :is(.lbl, .unit) { color: rgb(var(--chip-caption, 200 200 205 / .62)); }
+#stage[data-size="chip"] .card-plate { padding: var(--chip-pad, 10px 14px); }
+/* a single stat chip is a rectangle: the numeral and unit on the left, the grey caption beside it */
+#stage[data-size="chip"] .card-plate:has(> .stat:only-child) > .stat { flex-direction: row; align-items: baseline; gap: var(--chip-gap, 10px); padding: 0; min-width: 0; }
+#stage[data-size="chip"] .card-plate:has(> .stat:only-child) > .stat .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#stage[data-size="chip"] .card-plate:has(> .stat:only-child) > .stat .needle { display: none; }

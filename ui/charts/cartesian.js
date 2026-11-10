@@ -64,6 +64,10 @@ export function draw(g, s) {
     if (hover >= 0) { g.beginPath(); g.arc(X(hover), Y(v[hover]), 5, 0, 7); g.fillStyle = base(1); g.fill(); g.lineWidth = 2; g.strokeStyle = ink(1); g.stroke(); }
   }
 
+  // grown on hover (#stage.grown): every bar / point shows its value, so the bigger card also tells more
+  if (hover < 0 && kind !== 'spark' && n <= 14 && document.getElementById('stage').classList.contains('grown')) {
+    v.forEach((val, i) => label(g, fmt(val, s.unit), X(i), Math.max(10, Y(val) - 8), { size: 9, weight: 600, color: ink(.85) }));
+  }
   if (hover >= 0) {
     const txt = `${s.labels[hover] ? s.labels[hover] + ': ' : ''}${fmt(v[hover], s.unit)}`;
     label(g, txt, Math.min(W - 44, Math.max(44, X(hover))), 9, { weight: 600 });

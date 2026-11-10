@@ -127,7 +127,7 @@ window.morc = {
       // macOS: the host's hit test saw the pointer go onto / off the card (the web view cannot while our app is inactive)
       case 'hover': stage.dispatchEvent(new PointerEvent(m.on ? 'pointerenter' : 'pointerleave')); if (!m.on) markHover(null); break;
       // macOS: where the pointer is on the card; every hover style keys off :hover OR .hov, so rows, buttons and pills react without a click
-      case 'pointer': { const el = document.elementFromPoint(m.x, m.y); markHover(el); document.dispatchEvent(new PointerEvent('pointermove', { clientX: m.x, clientY: m.y })); break; }
+      case 'pointer': { const el = document.elementFromPoint(m.x, m.y); markHover(el); (el || document).dispatchEvent(new PointerEvent('pointermove', { clientX: m.x, clientY: m.y, bubbles: true })); break; }
       case 'dropped': dropped(); break;
     }
   },
@@ -148,7 +148,7 @@ let hovChain = [];
 function markHover(el) {
   const next = [];
   for (let e = el; e && e !== document.documentElement; e = e.parentElement) next.push(e);
-  for (const e of hovChain) if (!next.includes(e)) e.classList.remove('hov');
+  for (const e of hovChain) if (!next.includes(e)) { e.classList.remove('hov'); e.dispatchEvent(new PointerEvent('pointerleave')); }   // e.g. a chart clears its hover
   for (const e of next) e.classList.add('hov');
   hovChain = next;
 }

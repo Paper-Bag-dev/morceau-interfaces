@@ -22,8 +22,7 @@
       "gap": 8,
       "children": [
         "t",
-        "g",
-        "row"
+        "g"
       ]
     },
     {
@@ -40,22 +39,6 @@
       },
       "width": 880,
       "height": 500
-    },
-    {
-      "id": "row",
-      "type": "row",
-      "children": [
-        "x"
-      ]
-    },
-    {
-      "id": "x",
-      "type": "button",
-      "icon": "x",
-      "title": "Close",
-      "action": {
-        "do": "close"
-      }
     }
   ],
   "data": {

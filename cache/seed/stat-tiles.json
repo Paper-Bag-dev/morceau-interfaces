@@ -1,115 +1,100 @@
 {
-    "t":  "save",
-    "name":  "stat-tiles",
-    "desc":  "Four big numbers together in one text card, in a line (they wrap only when the room is narrow), each with a label and unit, and Close. Pass /a /b /c /d, each {label, value, unit}. The text counterpart of the picture cards (donut-card, week-chart).",
-    "params":  [
-                   "/a/label",
-                   "/a/value",
-                   "/a/unit",
-                   "/b/label",
-                   "/b/value",
-                   "/b/unit",
-                   "/c/label",
-                   "/c/value",
-                   "/c/unit",
-                   "/d/label",
-                   "/d/value",
-                   "/d/unit"
-               ],
-    "opts":  {
-                 "min":  [
-                             320,
-                             200
-                         ],
-                 "ttl":  90,
-                 "topic":  "stats.tiles",
-                 "importance":  "0.85"
-             },
-    "components":  [
-                       {
-                           "id":  "root",
-                           "type":  "column",
-                           "gap":  8,
-                           "children":  [
-                                            "r1",
-                                            "ok"
-                                        ]
-                       },
-                       {
-                           "id":  "r1",
-                           "type":  "row",
-                           "gap":  8,
-                           "children":  [
-                                            "a",
-                                            "b",
-                                            "c",
-                                            "d"
-                                        ]
-                       },
-                       {
-                           "id":  "a",
-                           "type":  "stat",
-                           "label":  "{/a/label}",
-                           "value":  "{/a/value}",
-                           "unit":  "{/a/unit}"
-                       },
-                       {
-                           "id":  "b",
-                           "type":  "stat",
-                           "label":  "{/b/label}",
-                           "value":  "{/b/value}",
-                           "unit":  "{/b/unit}"
-                       },
-                       {
-                           "id":  "c",
-                           "type":  "stat",
-                           "label":  "{/c/label}",
-                           "value":  "{/c/value}",
-                           "unit":  "{/c/unit}"
-                       },
-                       {
-                           "id":  "d",
-                           "type":  "stat",
-                           "label":  "{/d/label}",
-                           "value":  "{/d/value}",
-                           "unit":  "{/d/unit}"
-                       },
-                       {
-                           "id":  "ok",
-                           "type":  "row",
-                           "children":  [
-                                            "b1"
-                                        ]
-                       },
-                       {
-                           "id":  "b1",
-                           "type":  "button",
-                           "label":  "Close",
-                           "action":  {
-                                          "do":  "close"
-                                      }
-                       }
-                   ],
-    "data":  {
-                 "a":  {
-                           "label":  "A",
-                           "value":  0,
-                           "unit":  ""
-                       },
-                 "b":  {
-                           "label":  "B",
-                           "value":  0,
-                           "unit":  ""
-                       },
-                 "c":  {
-                           "label":  "C",
-                           "value":  0,
-                           "unit":  ""
-                       },
-                 "d":  {
-                           "label":  "D",
-                           "value":  0,
-                           "unit":  ""
-                       }
-             }
+  "t": "save",
+  "name": "stat-tiles",
+  "desc": "Four big numbers together in one text card, in a line (they wrap only when the room is narrow), each with a label and unit. Pass /a /b /c /d, each {label, value, unit}. The text counterpart of the picture cards (donut-card, week-chart).",
+  "params": [
+    "/a/label",
+    "/a/value",
+    "/a/unit",
+    "/b/label",
+    "/b/value",
+    "/b/unit",
+    "/c/label",
+    "/c/value",
+    "/c/unit",
+    "/d/label",
+    "/d/value",
+    "/d/unit"
+  ],
+  "opts": {
+    "min": [
+      320,
+      200
+    ],
+    "ttl": 90,
+    "topic": "stats.tiles",
+    "importance": "0.85",
+    "size": "chip"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 8,
+      "children": [
+        "r1"
+      ]
+    },
+    {
+      "id": "r1",
+      "type": "row",
+      "gap": 8,
+      "children": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ]
+    },
+    {
+      "id": "a",
+      "type": "stat",
+      "label": "{/a/label}",
+      "value": "{/a/value}",
+      "unit": "{/a/unit}"
+    },
+    {
+      "id": "b",
+      "type": "stat",
+      "label": "{/b/label}",
+      "value": "{/b/value}",
+      "unit": "{/b/unit}"
+    },
+    {
+      "id": "c",
+      "type": "stat",
+      "label": "{/c/label}",
+      "value": "{/c/value}",
+      "unit": "{/c/unit}"
+    },
+    {
+      "id": "d",
+      "type": "stat",
+      "label": "{/d/label}",
+      "value": "{/d/value}",
+      "unit": "{/d/unit}"
+    }
+  ],
+  "data": {
+    "a": {
+      "label": "A",
+      "value": 0,
+      "unit": ""
+    },
+    "b": {
+      "label": "B",
+      "value": 0,
+      "unit": ""
+    },
+    "c": {
+      "label": "C",
+      "value": 0,
+      "unit": ""
+    },
+    "d": {
+      "label": "D",
+      "value": 0,
+      "unit": ""
+    }
+  }
 }

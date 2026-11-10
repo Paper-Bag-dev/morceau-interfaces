@@ -2,16 +2,100 @@
   "t": "save",
   "name": "progress-card",
   "desc": "Loading or download status: a title and up to three progress bars (percent) that you update live with `morc patch <id> /a/value 40`. Use it to pass along what another app is doing (browser downloads, a Windows update). Pass /title and /a /b /c, each {label, value (0 to 100)}; a row with an empty label is hidden.",
-  "params": ["/title", "/a/label", "/a/value", "/b/label", "/b/value", "/c/label", "/c/value"],
-  "opts": { "min": [300, 140], "ttl": 90, "topic": "status.progress", "importance": "0.8" },
-  "components": [
-    { "id": "root", "type": "column", "gap": 8, "children": ["title", "a", "b", "c", "ok"] },
-    { "id": "title", "type": "text", "size": "lg", "bold": true, "text": "{/title}" },
-    { "id": "a", "type": "progress", "label": "{/a/label}", "value": { "bind": "/a/value" }, "max": 100, "unit": "%", "when": { "path": "/a/label", "truthy": true } },
-    { "id": "b", "type": "progress", "label": "{/b/label}", "value": { "bind": "/b/value" }, "max": 100, "unit": "%", "when": { "path": "/b/label", "truthy": true } },
-    { "id": "c", "type": "progress", "label": "{/c/label}", "value": { "bind": "/c/value" }, "max": 100, "unit": "%", "when": { "path": "/c/label", "truthy": true } },
-    { "id": "ok", "type": "row", "children": ["x"] },
-    { "id": "x", "type": "button", "label": "Close", "action": { "do": "close" } }
+  "params": [
+    "/title",
+    "/a/label",
+    "/a/value",
+    "/b/label",
+    "/b/value",
+    "/c/label",
+    "/c/value"
   ],
-  "data": { "title": "Working", "a": { "label": "", "value": 0 }, "b": { "label": "", "value": 0 }, "c": { "label": "", "value": 0 } }
+  "opts": {
+    "min": [
+      300,
+      140
+    ],
+    "ttl": 90,
+    "topic": "status.progress",
+    "importance": "0.8",
+    "size": "chip"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 8,
+      "children": [
+        "title",
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    {
+      "id": "title",
+      "type": "text",
+      "size": "lg",
+      "bold": true,
+      "text": "{/title}"
+    },
+    {
+      "id": "a",
+      "type": "progress",
+      "label": "{/a/label}",
+      "value": {
+        "bind": "/a/value"
+      },
+      "max": 100,
+      "unit": "%",
+      "when": {
+        "path": "/a/label",
+        "truthy": true
+      }
+    },
+    {
+      "id": "b",
+      "type": "progress",
+      "label": "{/b/label}",
+      "value": {
+        "bind": "/b/value"
+      },
+      "max": 100,
+      "unit": "%",
+      "when": {
+        "path": "/b/label",
+        "truthy": true
+      }
+    },
+    {
+      "id": "c",
+      "type": "progress",
+      "label": "{/c/label}",
+      "value": {
+        "bind": "/c/value"
+      },
+      "max": 100,
+      "unit": "%",
+      "when": {
+        "path": "/c/label",
+        "truthy": true
+      }
+    }
+  ],
+  "data": {
+    "title": "Working",
+    "a": {
+      "label": "",
+      "value": 0
+    },
+    "b": {
+      "label": "",
+      "value": 0
+    },
+    "c": {
+      "label": "",
+      "value": 0
+    }
+  }
 }

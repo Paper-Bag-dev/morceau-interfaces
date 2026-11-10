@@ -1,0 +1,40 @@
+{
+  "t": "save",
+  "name": "stat-chip",
+  "desc": "ONE number as a simple squircle rectangle: a white hero numeral, a small unit and a grey caption beside it. Several numbers go in one stat-tiles strip. Pass /label, /value, /unit.",
+  "params": [
+    "/label",
+    "/value",
+    "/unit"
+  ],
+  "opts": {
+    "min": [
+      150,
+      56
+    ],
+    "ttl": 90,
+    "topic": "stats.chip",
+    "size": "chip"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "children": [
+        "s"
+      ]
+    },
+    {
+      "id": "s",
+      "type": "stat",
+      "label": "{/label}",
+      "value": "{/value}",
+      "unit": "{/unit}"
+    }
+  ],
+  "data": {
+    "label": "",
+    "value": 0,
+    "unit": ""
+  }
+}

@@ -27,8 +27,7 @@
       "gap": 8,
       "children": [
         "pie",
-        "bars",
-        "ok"
+        "bars"
       ]
     },
     {
@@ -58,21 +57,6 @@
       },
       "unit": "M",
       "height": 130
-    },
-    {
-      "id": "ok",
-      "type": "row",
-      "children": [
-        "b"
-      ]
-    },
-    {
-      "id": "b",
-      "type": "button",
-      "label": "Close",
-      "action": {
-        "do": "close"
-      }
     }
   ],
   "data": {
