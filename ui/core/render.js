@@ -79,8 +79,20 @@ export class Renderer {
     // Every card sits on ONE plate by default (the frosted material of ui/components/plate), so its pieces never float loose on a busy page.
     // Only a layout root gets it (a lone text or stat already is a plate); "plate": false on the root opts out.
     const rc = rootId && this.comps.get(rootId);
-    if (rc && rc.plate !== false && ['column', 'row', 'panel'].includes(rc.type)) { rootEl.classList.add('card-plate'); rootEl.dataset.hit = ''; }
+    // A 3D card (a model3d among the root's children) is the exception by default: the model floats bare, and only the containers beside
+    // it (title, controls) sit on plates of their own (user, 11-11). Any container can also ask for its own plate with "plate": true.
+    const kids = (rc && rc.children) || [];
+    const has3d = kids.some((k) => (this.comps.get(k) || {}).type === 'model3d');
+    if (rc && rc.plate !== false && !has3d && ['column', 'row', 'panel'].includes(rc.type)) { rootEl.classList.add('card-plate'); rootEl.dataset.hit = ''; }
     this.root.replaceChildren(rootEl);
+    if (has3d) rootEl.querySelectorAll(':scope > [data-cid]').forEach((el) => {
+      const c = this.comps.get(el.dataset.cid) || {};
+      if (c.plate !== false && ['column', 'row', 'panel'].includes(c.type)) { el.classList.add('card-plate'); el.dataset.hit = ''; }
+    });
+    this.root.querySelectorAll('[data-cid]').forEach((el) => {
+      const c = this.comps.get(el.dataset.cid) || {};
+      if (c.plate === true && !el.classList.contains('card-plate')) { el.classList.add('card-plate'); el.dataset.hit = ''; }
+    });
   }
 
   node(id) {

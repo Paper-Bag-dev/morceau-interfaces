@@ -5,6 +5,8 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
 
 ## Look
 1. **One plate per card.** The card's root sits on `.card-plate`; pieces inside go flat. Never add your own background.
+   **3D cards are the exception:** the model floats bare and only the containers beside it (title, controls, placed under the model)
+   get plates. Any container can ask for its own plate with `"plate": true`.
 2. **The skin decides the material.** Style the look under `html[data-skin="<name>"]` (today: `glass`). Never style a look with
    `html.os-mac` / `os-win`; that class is only for what truly needs the platform (dropping the CSS blur where native glass sits under the page).
 3. **Colors are data.** Every color comes from `ui/themes.json` (base, the skin's base, `platforms.<os>`), read as a CSS variable.
@@ -55,7 +57,7 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
     `components/plate/plate.css` (truncate to a few rows, a fading peek) and the selector list in `core/compact.js`. Opening and folding
     are mirrors (`compact.expand` / `compact.collapse`): nothing pops, nothing jumps.
 12. **Motion is a damped spring** (`limits.spring-*`) or a short ease, triggered by the user (hover, press, arrival). Never loop for
-    attention; the only unasked motion is the arrival: a spring + fade, and one soft accent glow OUTSIDE the
+    attention; the only unasked motion is the arrival: the card grows from nothing on a damped spring (`arrive-*`), overshoots a touch and rests, and one soft accent glow OUTSIDE the
     plate that only fades out (`arrive-*`). Never put an accent glow ON the glass (it colors the plate). Honor `prefers-reduced-motion`.
 13. **Native glass follows the plate.** The page reports each `.card-plate` rect (`layout.glass`) and streams it during a morph; do not
     animate the plate's outer size any other way.

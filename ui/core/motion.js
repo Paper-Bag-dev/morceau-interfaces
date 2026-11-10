@@ -20,6 +20,15 @@ export function simulate({ stiffness = 320, damping = 24, mass = 1 } = {}) {
 
 const SPRING = simulate();
 
+/** Arrive: a card appears from nothing, scales up on a damped spring (a little overshoot, then it settles) and rests. The spring and the
+ *  start size come from limits (arrive-from, arrive-stiffness, arrive-damping); returns the animation (its duration drives the glass). */
+export function arrive(el, lim) {
+  const from = lim('arrive-from', 0.08);
+  const sp = simulate({ stiffness: lim('arrive-stiffness', 230), damping: lim('arrive-damping', 19) });
+  const kf = sp.values.map((p, i) => ({ opacity: Math.min(1, (i / sp.values.length) * 5), transform: `scale(${from + (1 - from) * p})`, transformOrigin: '50% 50%' }));
+  return el.animate(kf, { duration: sp.ms, easing: 'linear', fill: 'backwards' });
+}
+
 /** Pop in: slide up a little, scale from .92, fade. `delay` staggers siblings. */
 export function enter(el, delay = 0) {
   const kf = SPRING.values.map((p) => ({

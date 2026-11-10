@@ -10,36 +10,37 @@
   ],
   "opts": {
     "min": [
-      560,
-      360
+      340,
+      260
     ],
     "ttl": 600,
     "topic": "viz.model",
-    "max_frac": 0.8
+    "max_frac": 0.45,
+    "size": "large"
   },
   "components": [
     {
       "id": "root",
       "type": "column",
-      "gap": 8,
+      "gap": 10,
       "children": [
-        "t",
         "m",
-        "tools"
+        "bar"
       ]
     },
     {
       "id": "t",
       "type": "text",
-      "size": "lg",
-      "text": "{/title}"
+      "size": "md",
+      "text": "{/title}",
+      "bold": true
     },
     {
       "id": "m",
       "type": "model3d",
       "model": "bike",
-      "width": 620,
-      "height": 380,
+      "width": 380,
+      "height": 240,
       "spin": {
         "bind": "/spin"
       },
@@ -153,6 +154,15 @@
         "path": "/paint",
         "value": "#2b2c30"
       }
+    },
+    {
+      "id": "bar",
+      "type": "column",
+      "gap": 6,
+      "children": [
+        "t",
+        "tools"
+      ]
     }
   ],
   "data": {

@@ -81,19 +81,18 @@ impl Host {
             // Order: --at, then a region the card NAMES, then the spot you carried this topic to, then the tier ladder for everything else.
             let named = s.opts.region.is_some() || s.opts.align.is_some();
             let (explicit, ladder) = if named { (explicit.or(by_region), None) } else { (explicit, by_region) };
-            if !named && remembered.is_some() {
+            if !named && ladder.is_none() && remembered.is_some() {
                 region_name = None;   // a remembered spot is not a ladder region: keep the card's own alignment
             }
-            let (x, y) = match (explicit, remembered) {
-                (Some(p), _) => p,   // the agent did the math: --at X,Y wins
-                (None, Some((rx, ry))) => placement::clamp_inside(&placement::R { l: rx, t: ry, r: rx + size.0, b: ry + size.1 }),
-                (None, None) if ladder.is_some() => ladder.unwrap(),
-                // Nothing in the ladder fits: start from the right (docs/chips/INDEX.md, Tier 0), top-right of the work area, not the scorer's corner.
-                (None, None) if !explicit_anchor => {
-                    let (w, m) = (placement::foreground().work, crate::policy::load().margin);
-                    placement::clamp_inside(&placement::R { l: w.r - size.0 - m, t: w.t + m, r: w.r - m, b: w.t + m + size.1 })
-                }
-                (None, None) => placement::pick(size, s.opts.anchor.as_deref().unwrap_or("right"), scope_of(&s.topic), &kin, &foreign, ow, cohesion_for(s)),
+            // Fitting first (user, 11-11: "remembered positions are nice but things fitting matter"): --at, then the tier ladder (free room
+            // beside the active window), then a spot you carried this topic to (only if it is free), then the scorer, which starts from
+            // the right and avoids every card already up. (It used to drop every card the ladder could not fit at one fixed top-right
+            // spot, so they piled up there while other room stayed empty.)
+            let (x, y) = match (explicit, ladder, remembered) {
+                (Some(p), _, _) => p,   // the agent did the math: --at X,Y wins
+                (None, Some(p), _) => p,
+                (None, None, Some((rx, ry))) => placement::clamp_inside(&placement::R { l: rx, t: ry, r: rx + size.0, b: ry + size.1 }),
+                (None, None, None) => placement::pick(size, s.opts.anchor.as_deref().unwrap_or("right"), scope_of(&s.topic), &kin, &foreign, ow, cohesion_for(s)),
             };
             s.window.set_outer_position(PhysicalPosition::new(x - il, y - it));
             if std::env::var("MORC_DEBUG").is_ok() {

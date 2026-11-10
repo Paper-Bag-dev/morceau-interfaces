@@ -1,9 +1,9 @@
 // Entry point. Registers the catalog, then answers the host.
 
 import { Renderer } from './render.js';
-import { send, measureSoon, dropped, setView, setViewSmooth, setLimits, limit } from './bridge.js';
+import { send, measureSoon, dropped, setView, setViewSmooth, setLimits, limit, followGlass } from './bridge.js';
 import { working } from './working.js';
-import { enter, leave, pulse, reduced, setReduced } from './motion.js';
+import { enter, arrive, leave, pulse, reduced, setReduced } from './motion.js';
 import { pick as pickTheme, apply as applyTheme, adaptToBackdrop, setBoldness, setThemes } from './theme.js';
 
 // Everything visual and every min/max is DATA (ui/tokens.json, ui/themes.json, ui/limits.json + your prefs/ui.json), sent by the host on every card and again
@@ -113,11 +113,11 @@ window.morc = {
           send({ t: 'log', msg: 'TOP-ELEMENTS ' + stage.dataset.bd + ' | ' + out.join(' || ') });
         }, 900);
         window.dispatchEvent(new Event('morc-enter'));          // charts start their intro now, not while hidden
-        if (reduced) break;
+        if (reduced) { followGlass(null); break; }
         const top = root.firstElementChild;
         const kids = top ? [...top.children] : [];
-        // the whole surface springs in; direct children follow in a short stagger
-        enter(root);
+        // the card appears from nothing and springs up to size (the glass grows with it); its children follow in a short stagger
+        followGlass(arrive(root, limit));
         kids.slice(0, 8).forEach((k, i) => enter(k, 40 + i * 35));
         // a new card glows softly for a moment (limits arrive-pulse-ms; 0 = off), then stays still
         if (limit('arrive-pulse-ms', 0) > 0) { stage.classList.add('arrive'); setTimeout(() => stage.classList.remove('arrive'), limit('arrive-pulse-ms', 0)); }

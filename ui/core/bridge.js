@@ -114,12 +114,21 @@ export function setViewSmooth(v) {
 }
 
 // a damped spring (limits spring-stiffness / spring-damping): settles with the barest overshoot, so growth feels physical, not linear
-let SPRING_K = null, morphing = false;
+let SPRING_K = null, morphing = false, entered = false;   // entered: no native glass before the card's arrival starts (it flashed full size)
 function spring() {
   const k = `${lim('spring-stiffness', 260)}|${lim('spring-damping', 28)}`;
   if (!SPRING_K || SPRING_K.key !== k) SPRING_K = { key: k, ...simulate({ stiffness: lim('spring-stiffness', 260), damping: lim('spring-damping', 28) }) };
   return SPRING_K;
 }
+/** The native glass follows the card through an animation it did not start (the arrival): the plate's live rect every frame until `anim` ends. */
+export function followGlass(anim) {
+  entered = true;
+  if (!anim) { measure(); return; }
+  morphing = true;
+  const tick = () => { if (anim.playState === 'finished' || anim.playState === 'idle') { morphing = false; measure(); return; } send({ t: 'glass', glass: glassRects(1) }); requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+
 function morph(from, to, done) {
   const surf = document.getElementById('surface');
   if (!surf || reduced) { if (done) done(); return; }
@@ -200,7 +209,7 @@ function measure() {
   }
   if (!grownFrom && !morphing && stage.classList.contains('compact') !== FOLDS()) { setView({}); return; }
   const glass = glassRects(1);
-  const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, ...(morphing ? {} : { glass }), settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
+  const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, ...(morphing || !entered ? {} : { glass }), settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
   const key = JSON.stringify(msg);
   if (key !== lastSent) { lastSent = key; send(msg); }
 }

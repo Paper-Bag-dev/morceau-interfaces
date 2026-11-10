@@ -30,7 +30,13 @@ pub fn foreground_now() -> Foreground {
     // Our own card can be "active" while you type in a field; Finder with no window open is the desktop. Neither is something to avoid.
     let fg_pid = sys::frontmost_pid().filter(|p| *p != me);
     let wins = sys::window_list();
-    let fg_rect = fg_pid.and_then(|p| wins.iter().find(|w| w.pid == p && w.layer == 0 && w.alpha > 0.0)).map(|w| px(&w.bounds, s));
+    // When WE are frontmost (you clicked or hovered a card, or typed in one) the active window is still the one you were working in: the
+    // front-most normal window of another app (the list is front to back), as foreground_watch does. Without this, placement saw no active
+    // window at all and every card fell back to scored placement, ignoring the tiers around the active window (user, 11-11).
+    let fg_rect = fg_pid
+        .and_then(|p| wins.iter().find(|w| w.pid == p && w.layer == 0 && w.alpha > 0.0))
+        .or_else(|| wins.iter().find(|w| w.pid != me && w.layer == 0 && w.alpha > 0.0))
+        .map(|w| px(&w.bounds, s));
     let mon = match fg_rect {
         Some(r) => screens.iter().max_by_key(|m| px(&m.frame, s).overlap(&r)),
         None => screens.first(),
