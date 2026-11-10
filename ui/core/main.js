@@ -123,6 +123,8 @@ window.morc = {
       }
       case 'leave': leave(root).finished.then(() => send({ t: 'left' })).catch(() => send({ t: 'left' })); break;
       case 'pulse': pulse(root); break;
+      // macOS: the host's hit test saw the pointer go onto / off the card (the web view cannot while our app is inactive)
+      case 'hover': stage.dispatchEvent(new PointerEvent(m.on ? 'pointerenter' : 'pointerleave')); break;
       case 'dropped': dropped(); break;
     }
   },

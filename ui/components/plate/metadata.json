@@ -8,6 +8,10 @@
     "tokens": [
         "arrive-glow-ms",
         "arrive-glow-r",
+        "compact-border-w",
+        "compact-peek",
+        "compact-radius",
+        "compact-rows",
         "plate-padding",
         "plate-radius",
         "title-align"

@@ -92,6 +92,7 @@ pub fn run() -> ! {
         });
     }
     fgwatch::install(proxy.clone());
+    winstyle::watch_hover(proxy.clone());
     crate::hotkeys::spawn(proxy.clone());
     winstyle::drag_cursor_off(); // in case a previous host died mid-carry with the move cursor installed
     cache::write_registry();
@@ -151,6 +152,11 @@ impl Host {
             }
             Ev::Ipc(key, text) => self.ipc(key, &text),
             Ev::Foreground => self.on_foreground(),
+            Ev::Hover(win, on) => {
+                if let Some(s) = self.surfaces.values().find(|s| s.hwnd() == win) {
+                    s.send(&json!({"t": "hover", "on": on}));
+                }
+            }
         }
     }
 

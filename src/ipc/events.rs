@@ -11,6 +11,9 @@ pub enum Ev {
     Ipc(u64, String),
     /// The active window changed.
     Foreground,
+    /// The pointer went onto (true) or off (false) a card's content: (native window handle, inside). macOS only: its web views do not
+    /// see the pointer in a window of an inactive app, so the platform's hit test reports it (Windows' WebView2 sees it by itself).
+    Hover(isize, bool),
 }
 
 pub type Proxy = EventLoopProxy<Ev>;

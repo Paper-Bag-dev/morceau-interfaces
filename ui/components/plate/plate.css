@@ -57,3 +57,8 @@ html[data-skin="glass"] .card-plate { border: 1px solid transparent;
 @media (prefers-reduced-motion: reduce) { #stage.arrive .card-plate { animation: none; } }
 /* card titles are centered by default (token title-align: left to undo) */
 .card-plate > .c-text.lg:first-child { text-align: var(--title-align, center); align-self: stretch; width: auto; }
+/* compact (limits.compact < 1, until hovered): lists show their first rows (token compact-rows) and the next one fades out; the plate gets
+   a solid accent edge and rounder corners, so a squeezed card reads as "there is more here". Hover removes .compact and shows everything. */
+#stage.compact .c-list { max-height: calc(var(--compact-rows, 3) * (var(--row-min-h, 42px) + 2px + var(--list-gap, 6px)) + var(--compact-peek, 20px)); overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - var(--compact-peek, 20px) - 10px), transparent); mask-image: linear-gradient(to bottom, black calc(100% - var(--compact-peek, 20px) - 10px), transparent); }
+#stage.compact .card-plate { border: var(--compact-border-w, 1.5px) solid hsl(var(--accent, var(--ring))); border-radius: var(--compact-radius, 30px); }

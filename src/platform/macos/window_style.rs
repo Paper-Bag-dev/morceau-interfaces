@@ -17,6 +17,24 @@ use std::sync::{Mutex, Once, OnceLock};
 
 type Rects = Vec<(i32, i32, i32, i32, i32)>;
 
+/// Where hover changes go (set once at startup by watch_hover) and which cards the pointer is on now.
+fn hover_proxy() -> &'static Mutex<Option<crate::ev::Proxy>> {
+    static P: OnceLock<Mutex<Option<crate::ev::Proxy>>> = OnceLock::new();
+    P.get_or_init(Default::default)
+}
+fn hovered() -> &'static Mutex<HashMap<isize, bool>> {
+    static H: OnceLock<Mutex<HashMap<isize, bool>>> = OnceLock::new();
+    H.get_or_init(Default::default)
+}
+
+/// WKWebView only tracks the pointer in the active app's key window, so a floating card never gets pointerenter until it is clicked.
+/// The hit test below already knows when the pointer is over a card's content; it sends `Ev::Hover` on every change.
+pub fn watch_hover(proxy: crate::ev::Proxy) {
+    if let Ok(mut p) = hover_proxy().lock() {
+        *p = Some(proxy);
+    }
+}
+
 fn shapes() -> &'static Mutex<HashMap<isize, Rects>> {
     static S: OnceLock<Mutex<HashMap<isize, Rects>>> = OnceLock::new();
     S.get_or_init(Default::default)
@@ -183,6 +201,16 @@ extern "C" fn hit_test_tick(_: *mut c_void) {
             let x = (mouse.x - f.origin.x) * s;
             let y = (f.origin.y + f.size.height - mouse.y) * s;
             let take = wants_mouse(x, y, rects);
+            // tell the page when the pointer goes onto or off the card (it cannot see that itself in an inactive app)
+            let was = hovered().lock().ok().and_then(|h| h.get(win).copied()).unwrap_or(false);
+            if was != take {
+                if let Ok(mut h) = hovered().lock() {
+                    h.insert(*win, take);
+                }
+                if let Some(p) = hover_proxy().lock().ok().and_then(|p| p.clone()) {
+                    let _ = p.send_event(crate::ev::Ev::Hover(*win, take));
+                }
+            }
             let ignoring: bool = msg_send![w, ignoresMouseEvents];
             if ignoring == take {
                 let _: () = msg_send![w, setIgnoresMouseEvents: !take];

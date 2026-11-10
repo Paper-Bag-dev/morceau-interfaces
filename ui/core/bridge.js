@@ -32,6 +32,8 @@ export function setView(v) {
   fits = 0;
   // compact by default: a card shows at `compact` of its size until hovered (then it grows to full, below)
   applyZoom(Math.max(lim('min-zoom', 0.85), (view.scale || 1) * (grownFrom ? 1 : COMPACT())));
+  // squeezed: lists show their first rows with the next one fading out, the plate gets a solid accent edge (plate.css #stage.compact)
+  stage.classList.toggle('compact', COMPACT() < 0.99 && !grownFrom);
   measureSoon();
 }
 
@@ -53,6 +55,7 @@ stage.addEventListener('pointerenter', () => {
     grownFrom = zoom;
     fits = 0;
     const z1 = zoom, z2 = Math.min(lim('max-zoom', 2.2), zoom * k);
+    stage.classList.remove('compact');   // show everything that was tucked away
     applyZoom(z2);
     measure();   // tell the host NOW: the window is already full size, then the card eases up to it from its old size
     morph(z1 / z2, 1);
@@ -67,7 +70,7 @@ stage.addEventListener('pointerleave', () => {
     const z = grownFrom; grownFrom = 0; lastShrinkAt = Date.now();
     fits = 0;
     // ease the card down inside the still-large window, then shrink the window and drop the transform
-    morph(1, z / zoom, () => { applyZoom(z); measure(); measureSoon(); });
+    morph(1, z / zoom, () => { stage.classList.toggle('compact', COMPACT() < 0.99); applyZoom(z); measure(); measureSoon(); });
   }, 450);
 });
 
@@ -114,7 +117,7 @@ function measure() {
     rects = [...document.querySelectorAll('[data-hit]')].map((el) => {
       let r = el.getBoundingClientRect();
       // a child scrolled out of its scroll box must not leave an invisible clickable zone: clip to the scroller
-      const sc = el.parentElement && el.parentElement.closest('.scroll');
+      const sc = el.parentElement && el.parentElement.closest(stage.classList.contains('compact') ? '.scroll, .c-list' : '.scroll');
       if (sc) { const s = sc.getBoundingClientRect(); const l = Math.max(r.left, s.left), t = Math.max(r.top, s.top), rr = Math.min(r.right, s.right), bb = Math.min(r.bottom, s.bottom); r = { left: l, top: t, width: Math.max(0, rr - l), height: Math.max(0, bb - t), right: rr, bottom: bb }; }
       const pad = 8;
       // follow the element's own rounding (pills stay pills); radius is in zoomed px
