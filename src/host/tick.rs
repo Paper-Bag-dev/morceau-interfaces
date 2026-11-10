@@ -50,6 +50,14 @@ impl Host {
                 }
             }
         }
+        // away: no input for a while stops every card's clock, so nothing expires unseen (and nothing is logged as ignored)
+        let dt = now.saturating_duration_since(self.last_tick);
+        self.last_tick = now;
+        if crate::worker::idle_seconds() >= crate::lifetime::AWAY_AFTER_S {
+            for s in self.surfaces.values_mut().filter(|s| s.phase == Phase::Visible) {
+                s.life.hold(dt);
+            }
+        }
         // expiry (quiet, silent)
         let due: Vec<(u64, Outcome)> = self.surfaces.values().filter(|s| s.phase == Phase::Visible).filter_map(|s| s.life.due(now).map(|o| (s.key, o))).collect();
         for (k, o) in due {

@@ -24,7 +24,6 @@ use serde_json::{json, Value};
 const MIN_W: i32 = 160;
 const MIN_H: i32 = 90;
 const PER_NAME: usize = 2;
-const ORDER: [&str; 14] = ["right", "below", "left", "bottom-right", "top-right", "bottom-left", "top-left", "above", "right-col", "below-row", "left-col", "above-row", "mid", "gap"];
 
 #[derive(Clone, Debug)]
 pub struct Region {
@@ -207,17 +206,11 @@ fn candidates<'a>(regs: &'a [Region], wanted: Option<&str>, tiers: u8) -> Vec<&'
         here.sort_by_key(|r| (!matches!(r.name.as_str(), "left" | "right" | "above" | "below"), std::cmp::Reverse(r.rect.w() as i64 * r.rect.h() as i64)));
         order.extend(here);
     }
-    let _ = ORDER;
     order
 }
 
-/// Where a content box of `size` goes for this spec: the wanted region if it fits (tier 0 then 1), else the first region that fits in
-/// fill order. None = nothing fits anywhere (the caller falls back to scoring placement).
-pub fn place(size: (i32, i32), spec: &Spec, widgets: &[R]) -> Option<(i32, i32)> {
-    place_named(size, spec, widgets).map(|(p, _)| p)
-}
-
-/// Same as `place`, and also says WHICH region it chose ("left", "right", "above", "below", a corner ...): the card's contents then start at the edge
+/// Where a content box of `size` goes for this spec (the wanted region if it fits, tier 0 then 1, else the first that fits in fill order),
+/// and WHICH region it chose ("left", "right", "above", "below", a corner ...): the card's contents then start at the edge
 /// nearest the active window (a card left of the window right-aligns, a card right of it left-aligns).
 pub fn place_named(size: (i32, i32), spec: &Spec, widgets: &[R]) -> Option<((i32, i32), String)> {
     let (regs, _, _) = compute(widgets);

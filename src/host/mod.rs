@@ -52,6 +52,8 @@ struct Host {
     parked: Vec<Parked>,
     recent: Vec<Parked>,
     last_use: Instant,
+    /// when the last tick ran: while the user is away, every card's clock is held for the time between ticks
+    last_tick: Instant,
     quit: bool,
 }
 
@@ -104,7 +106,7 @@ pub fn run() -> ! {
     cache::write_registry();
     util::log("host started");
 
-    let mut host = Host { proxy, surfaces: HashMap::new(), by_id: HashMap::new(), next_key: 1, parked: vec![], recent: vec![], last_use: Instant::now(), quit: false };
+    let mut host = Host { proxy, surfaces: HashMap::new(), by_id: HashMap::new(), next_key: 1, parked: vec![], recent: vec![], last_use: Instant::now(), last_tick: Instant::now(), quit: false };
     event_loop.run(move |event, target, flow| {
         if let Event::UserEvent(ev) = event {
             host.handle(ev, target);
@@ -368,6 +370,7 @@ impl Host {
     }
 
     fn on_foreground(&mut self) {
+        placement::invalidate(); // a new active window: the next placement must look again
         crate::worker::note_foreground(); // remember what you are working in (exe + title) for the chore agent
         let keys: Vec<u64> = self.surfaces.values().filter(|s| s.phase == Phase::Visible).map(|s| s.key).collect();
         for k in keys {

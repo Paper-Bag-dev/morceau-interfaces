@@ -71,6 +71,7 @@ unsafe extern "system" fn collect_monitors(mon: HMONITOR, _: HDC, _: *mut RECT, 
     BOOL(1)
 }
 
+#[derive(Clone)]
 pub struct Foreground {
     pub rect: Option<R>,
     pub work: R,
@@ -78,8 +79,8 @@ pub struct Foreground {
 }
 
 #[cfg(windows)]
-/// The active window and the work area of the monitor it is on (primary if none).
-pub fn foreground() -> Foreground {
+/// The active window and the work area of the monitor it is on (primary if none). Uncached: callers use `foreground()`.
+pub fn foreground_now() -> Foreground {
     unsafe {
         let mut mons: Vec<(HMONITOR, R)> = vec![];
         let _ = EnumDisplayMonitors(None, None, Some(collect_monitors), LPARAM(&mut mons as *mut _ as isize));
@@ -117,13 +118,52 @@ pub fn foreground() -> Foreground {
 }
 
 #[cfg(windows)]
-/// Every visible, non-minimised top-level window except ours and the shell (physical px).
-pub fn windows() -> Vec<R> {
+/// Every visible, non-minimised top-level window except ours and the shell (physical px). Uncached: callers use `windows()`.
+pub fn windows_now() -> Vec<R> {
     let mut wins: Vec<R> = vec![];
     unsafe {
         let _ = EnumWindows(Some(collect), LPARAM(&mut wins as *mut _ as isize));
     }
     wins
+}
+
+// One snapshot per placement: a single placement asks for the active window and the window list many times (regions, docking, covers,
+// work areas). Each answer is kept for SNAPSHOT, so every check in one placement sees the same screen and the OS is asked once.
+// `invalidate` drops it the moment the active window changes (host on_foreground).
+const SNAPSHOT: std::time::Duration = std::time::Duration::from_millis(150);
+static FG_SNAP: std::sync::Mutex<Option<(std::time::Instant, Foreground)>> = std::sync::Mutex::new(None);
+static WIN_SNAP: std::sync::Mutex<Option<(std::time::Instant, Vec<R>)>> = std::sync::Mutex::new(None);
+
+fn snapshot<T: Clone>(slot: &std::sync::Mutex<Option<(std::time::Instant, T)>>, now: fn() -> T) -> T {
+    let Ok(mut g) = slot.lock() else { return now() };
+    if let Some((at, v)) = g.as_ref() {
+        if at.elapsed() < SNAPSHOT {
+            return v.clone();
+        }
+    }
+    let v = now();
+    *g = Some((std::time::Instant::now(), v.clone()));
+    v
+}
+
+/// The active window and the work area of its monitor (snapshot, see above).
+pub fn foreground() -> Foreground {
+    snapshot(&FG_SNAP, foreground_now)
+}
+
+/// Every visible window except ours and the shell (snapshot, see above).
+pub fn windows() -> Vec<R> {
+    snapshot(&WIN_SNAP, windows_now)
+}
+
+/// The desktop changed (a new active window): the next question asks the OS again.
+pub fn invalidate() {
+    if let Ok(mut g) = FG_SNAP.lock() {
+        *g = None;
+    }
+    if let Ok(mut g) = WIN_SNAP.lock() {
+        *g = None;
+    }
 }
 
 /// Free height under the active window (physical px); 0 = no neighbour (or fullscreen). Lets a long list flow into the strip below it.
@@ -231,8 +271,8 @@ mod mac {
 
     const FALLBACK: R = R { l: 0, t: 0, r: 1920, b: 1080 };
 
-    /// The active window (the front-most normal window of the front-most app) and the work area of its display.
-    pub fn foreground() -> Foreground {
+    /// The active window (the front-most normal window of the front-most app) and the work area of its display. Uncached.
+    pub fn foreground_now() -> Foreground {
         let s = sys::scale();
         let screens = sys::screens();
         let me = std::process::id() as i32;
@@ -256,8 +296,8 @@ mod mac {
         Foreground { rect: fg_rect, work, fullscreen }
     }
 
-    /// Every visible normal window except ours (physical px). Menu bar, Dock and other system layers are left out by `layer == 0`.
-    pub fn windows() -> Vec<R> {
+    /// Every visible normal window except ours (physical px). Menu bar, Dock and other system layers are left out by `layer == 0`. Uncached.
+    pub fn windows_now() -> Vec<R> {
         let s = sys::scale();
         let me = std::process::id() as i32;
         sys::window_list()

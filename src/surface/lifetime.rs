@@ -9,6 +9,8 @@ pub const AFTER_HOVER: f64 = 5.0;
 pub const AFTER_INTERACT: f64 = 14.0;
 pub const AFTER_DRAG: f64 = 12.0;
 pub const STALE_AFTER: Duration = Duration::from_secs(600);
+/// No keyboard or mouse input for this long = the user is away: every card's clock stops (see `hold`).
+pub const AWAY_AFTER_S: u64 = 45;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Outcome {
@@ -96,6 +98,13 @@ impl Life {
         }
     }
 
+    /// The user is away: stop this card's clock for `dt`. A card must never expire unseen, and an unseen expiry would be logged as
+    /// "ignored" and teach the annoyance vector that the user wants fewer cards when they were simply not there.
+    pub fn hold(&mut self, dt: Duration) {
+        self.deadline += dt;
+        self.last_touch += dt;
+    }
+
     /// Should this surface leave now? Returns why.
     pub fn due(&self, now: Instant) -> Option<Outcome> {
         if self.pinned || self.hover || self.dragging {
@@ -150,5 +159,17 @@ mod tests {
         let l = Life::new(None, true, t0);
         assert_eq!(l.due(t0 + Duration::from_secs(300)), None);
         assert_eq!(l.due(t0 + Duration::from_secs(601)), Some(Outcome::Stale));
+    }
+
+    #[test]
+    fn away_time_does_not_count() {
+        let t0 = Instant::now();
+        let mut l = Life::new(Some(15.0), false, t0);
+        l.hold(Duration::from_secs(300)); // the user was away for 5 minutes
+        assert_eq!(l.due(t0 + Duration::from_secs(20)), None);
+        assert_eq!(l.due(t0 + Duration::from_secs(316)), Some(Outcome::Ignored));
+        let mut st = Life::new(None, true, t0);
+        st.hold(Duration::from_secs(900)); // a sticky card survives a long absence
+        assert_eq!(st.due(t0 + Duration::from_secs(700)), None);
     }
 }

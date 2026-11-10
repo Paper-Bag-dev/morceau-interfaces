@@ -78,6 +78,10 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
   with `morc escalate` (guards in docs/agent.md "Hand over to the session"); in "no_session" mode a routed (`bg`) click reaches it even while
   a session is live; (3) decisions for the session batch on one `ask-many` card. `morc session` marks a session live without the hooks.
 - `paths::app_dir` resolves links before looking for the install, so a `morc` link in a bin folder (or an npm global bin) finds its plugins.
+- **Host rules tightened (both platforms):** cards' clocks stop while the user is away (no input for `lifetime::AWAY_AFTER_S` = 45 s,
+  `Life::hold` from `host/tick.rs`), so nothing expires unseen or is logged as ignored; `placement::foreground()` / `windows()` are
+  150 ms snapshots over the OS calls (`*_now`), dropped on every active-window change (`placement::invalidate`); the unused
+  `regions::place` and `ORDER` are gone. macOS: the click-through timer and the foreground poll idle when no card is up.
 - **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
   target. A cfg mistake only shows up when that target is compiled.
 

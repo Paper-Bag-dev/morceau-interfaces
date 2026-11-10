@@ -130,12 +130,20 @@ fn wants_mouse(x: f64, y: f64, rects: &[(i32, i32, i32, i32, i32)]) -> bool {
     })
 }
 
+/// Is any card on screen with a content shape? (cheap; the timers below idle when not)
+pub fn cards_up() -> bool {
+    shapes().lock().map(|m| !m.is_empty()).unwrap_or(false)
+}
+
 fn start_hit_test() {
     static ONCE: Once = Once::new();
     ONCE.call_once(|| {
         std::thread::spawn(|| loop {
             std::thread::sleep(std::time::Duration::from_millis(40));
-            sys::on_main(hit_test_tick);
+            // nothing on screen: nothing to flip, so do not wake the main thread 25 times a second
+            if cards_up() {
+                sys::on_main(hit_test_tick);
+            }
         });
     });
 }
