@@ -23,7 +23,7 @@ register('list', (c, ctx) => {
       if (it.badge) { const b = document.createElement('span'); b.className = 'badge'; b.textContent = it.badge; row.append(b); }
       if (it.action) row.addEventListener('click', (e) => { rippleAt(row, e); ctx.act(it.action); });
       el.append(row);
-      if (!first && !reduced) enter(row, i * 30);
+      if (!reduced) enter(row, (first ? 60 : 0) + i * 35);   // rows fade in one after another, also on first show
     });
     first = false;
   });

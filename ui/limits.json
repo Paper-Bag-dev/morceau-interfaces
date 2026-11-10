@@ -1,6 +1,6 @@
 {
-  "about": "Minimum and maximum sizes, timings and thresholds the page uses. Leave these alone unless the user points something out or the annoyance vector says so; if you must change one, change it here (or override it in your prefs/ui.json under \"limits\"), never in the code. The host reloads this file by itself.",
-  "min-zoom": 0.85,
+  "about": "Minimum and maximum sizes, timings and thresholds the page uses. Leave these alone unless the user points something out or the annoyance vector says so; if you must change one, change it here (or override it in your prefs/ui.json under \"limits\"), never in the code. The host reloads this file by itself. `compact` (user, 11-10): every card first shows at this fraction of its size and grows smoothly to full size on hover (1 = off); `arrive-pulse-ms`: how long a new card's soft glow lasts.",
+  "min-zoom": 0.7,
   "max-zoom": 2.2,
   "hover-grow": 1.25,
   "hover-small-w": 560,
@@ -10,5 +10,7 @@
   "hover-delay-ms": 220,
   "hold-ms": 100,
   "hold-ms-control": 220,
-  "move-slop": 7
+  "move-slop": 7,
+  "compact": 0.72,
+  "arrive-pulse-ms": 2600
 }

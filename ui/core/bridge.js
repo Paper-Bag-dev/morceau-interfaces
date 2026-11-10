@@ -30,22 +30,25 @@ function applyZoom(z) {
 export function setView(v) {
   view = { ...view, ...v };
   fits = 0;
-  applyZoom(Math.max(lim('min-zoom', 0.85), view.scale || 1));
+  // compact by default: a card shows at `compact` of its size until hovered (then it grows to full, below)
+  applyZoom(Math.max(lim('min-zoom', 0.85), (view.scale || 1) * (grownFrom ? 1 : COMPACT())));
   measureSoon();
 }
 
 // ---------- hover-grow: a small 3D / chart / graph window gets a little bigger while the pointer is on it ----------
 let grownFrom = 0, growTimer = 0, shrinkTimer = 0, lastShrinkAt = 0;   // lastShrinkAt: after a shrink, no re-grow for a while (the pointer can sit between the small and the grown edge and make the card flap)
-const GROW = () => lim('hover-grow', 1.25), SMALL_W = () => lim('hover-small-w', 560);   // grows only when the window is narrower than SMALL_W (logical px); never past the screen cap
+const GROW = () => lim('hover-grow', 1.25), SMALL_W = () => lim('hover-small-w', 560);
+const COMPACT = () => Math.min(1, lim('compact', 1));   // < 1: every card is compact until hovered, and hover grows it to full size   // grows only when the window is narrower than SMALL_W (logical px); never past the screen cap
 stage.addEventListener('pointerenter', () => {
   clearTimeout(shrinkTimer);
-  if (grownFrom || stage.classList.contains('dragging') || !stage.querySelector('.c-model, .c-graph, .c-chart canvas')) return;
+  const any = COMPACT() < 0.99;   // compact cards grow on hover whatever they hold; otherwise only 3D / graph / chart windows do
+  if (grownFrom || stage.classList.contains('dragging') || (!any && !stage.querySelector('.c-model, .c-graph, .c-chart canvas'))) return;
   clearTimeout(growTimer);
   growTimer = setTimeout(() => {
     const w = stage.getBoundingClientRect().width;   // logical px, includes zoom
-    if (grownFrom || w >= SMALL_W() || Date.now() - lastShrinkAt < lim('hover-regrow-cooldown-ms', 4000)) return;
+    if (grownFrom || (!any && w >= SMALL_W()) || Date.now() - lastShrinkAt < lim('hover-regrow-cooldown-ms', 4000)) return;
     const room = Math.min(view.maxw / w, view.maxh / stage.getBoundingClientRect().height);
-    const k = Math.min(GROW(), room);
+    const k = Math.min(any ? Math.max(1, (view.scale || 1) / zoom) : GROW(), room);   // compact: back to its full size
     if (k < 1.06) return;                            // no room worth growing into
     grownFrom = zoom;
     fits = 0;

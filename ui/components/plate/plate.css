@@ -51,3 +51,9 @@ html[data-skin="glass"] .card-plate { border: 1px solid transparent;
   transition: --mx .7s var(--ease-out), --my .7s var(--ease-out); }
 
 @media (prefers-reduced-motion: reduce) { html[data-skin="glass"] .card-plate { transition: none; } }
+/* arrival glow (core/main.js adds #stage.arrive for limits arrive-pulse-ms): two soft breaths of the accent around the plate, then still */
+@keyframes arrive-glow { 0%, 100% { filter: drop-shadow(0 0 0 hsl(var(--accent, var(--ring)) / 0)); } 50% { filter: drop-shadow(0 0 var(--arrive-glow-r, 6px) hsl(var(--accent, var(--ring)) / .45)); } }
+#stage.arrive .card-plate { animation: arrive-glow calc(var(--arrive-glow-ms, 1300) * 1ms) ease-in-out 2; }
+@media (prefers-reduced-motion: reduce) { #stage.arrive .card-plate { animation: none; } }
+/* card titles are centered by default (token title-align: left to undo) */
+.card-plate > .c-text.lg:first-child { text-align: var(--title-align, center); align-self: stretch; width: auto; }

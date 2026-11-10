@@ -6,7 +6,10 @@
     "css": "plate.css",
     "deps": [],
     "tokens": [
+        "arrive-glow-ms",
+        "arrive-glow-r",
+        "plate-padding",
         "plate-radius",
-        "plate-padding"
+        "title-align"
     ]
 }

@@ -109,7 +109,12 @@ unsafe fn make(frame: CGRect) -> Id {
 unsafe fn make_view(frame: CGRect) -> Id {
     if let Some(cls) = AnyClass::get(c"NSGlassEffectView") {
         let v: Id = msg_send![cls, alloc];
-        return msg_send![v, initWithFrame: frame];
+        let v: Id = msg_send![v, initWithFrame: frame];
+        if !v.is_null() {
+            const CLEAR: isize = 1; // NSGlassEffectViewStyleClear: lets more of what is behind through than Regular (user, 10 Nov)
+            let _: () = msg_send![v, setStyle: CLEAR];
+        }
+        return v;
     }
     let v: Id = msg_send![class!(NSVisualEffectView), alloc];
     let v: Id = msg_send![v, initWithFrame: frame];

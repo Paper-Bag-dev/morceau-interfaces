@@ -117,6 +117,8 @@ window.morc = {
         // the whole surface springs in; direct children follow in a short stagger
         enter(root);
         kids.slice(0, 8).forEach((k, i) => enter(k, 40 + i * 35));
+        // a new card glows softly for a moment (limits arrive-pulse-ms; 0 = off), then stays still
+        if (limit('arrive-pulse-ms', 0) > 0) { stage.classList.add('arrive'); setTimeout(() => stage.classList.remove('arrive'), limit('arrive-pulse-ms', 0)); }
         break;
       }
       case 'leave': leave(root).finished.then(() => send({ t: 'left' })).catch(() => send({ t: 'left' })); break;
