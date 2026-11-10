@@ -1,5 +1,6 @@
 /* pastes: numbered paste blocks, each with a Copy button and a preview that opens on click. */
-.c-pastes { display: flex; flex-direction: column; gap: 6px; min-width: 300px; max-width: 520px; }
+.c-pastes { display: flex; flex-direction: column; gap: 6px; min-width: 300px; max-width: 520px; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
+.c-pastes .paste { flex: none; }
 .c-pastes .paste { border-radius: 14px; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); overflow: hidden; transition: background .15s; }
 .c-pastes .paste.copied { background: rgb(255 255 255 / .02); }
 .c-pastes .head { display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 10px; cursor: pointer; }

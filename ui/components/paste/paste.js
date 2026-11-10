@@ -3,13 +3,17 @@ import { enter, reduced } from '../../core/motion.js';
 import { rippleAt } from '../../core/ripple.js';
 import { icon } from '../../core/icons.js';
 
-// {type:"pastes", items:{bind:"/items"}, lines?:12}   item: {title, text, note?}
+// {type:"pastes", items:{bind:"/items"}, lines?:12, max_frac?:0.6}   item: {title, text, note?}
+// The list never grows past max_frac of the screen height: past that it scrolls inside the card, so every row and its Copy button stays reachable.
 // Paste blocks to hand over in order: one numbered row each with its size and a Copy button. A click on the row shows the exact text
 // (scrollable, selectable); Copy puts it on the clipboard (the host does it with pbcopy on macOS, see surface/actions.rs) and the row
 // stays marked "Copied", so you can see which ones are done.
 register('pastes', (c, ctx) => {
   const el = document.createElement('div');
   el.className = 'c-pastes';
+  el.dataset.hit = '';
+  // screen.availHeight is in CSS px, the same unit as the card; the window itself is sized to its content, so vh would be circular
+  el.style.maxHeight = Math.round((screen.availHeight || 900) * (c.max_frac || 0.6)) + 'px';
   const done = new Set();
   ctx.bind(c.items, (items) => {
     el.replaceChildren();
