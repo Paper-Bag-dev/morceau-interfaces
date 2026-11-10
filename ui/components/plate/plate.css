@@ -128,6 +128,6 @@ html[data-skin~="glass"] .c-check .row:nth-child(4n+3).done .box { background: h
 #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+2) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-3) / .8); }
 #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+3) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-5) / .8); }
 #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+4) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-2) / .8); }
-/* yes / no: each its own flat palette color, black text (as specific as the flat-accent button rule, and later, so it wins) */
-html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--pal-3)); color: hsl(var(--fill-ink, 220 30% 6%)); }
-html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--pal-1)); color: hsl(var(--fill-ink, 220 30% 6%)); border: 0; }
+/* yes / no: a rich deep green and a deep coral-red from the theme (yes-fill, no-fill; user, 11-10: deeper green, not dimmed lime), black text (as specific as the flat-accent button rule, and later, so it wins) */
+html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--yes-fill, var(--pal-3-deep))); color: hsl(var(--fill-ink, 220 30% 6%)); }
+html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--no-fill, var(--pal-1-deep))); color: hsl(var(--fill-ink, 220 30% 6%)); border: 0; }

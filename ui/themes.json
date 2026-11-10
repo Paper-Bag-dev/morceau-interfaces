@@ -126,7 +126,11 @@
         "chart-hue-spread": "200",
         "chart-light-spread": "14",
         "lens-line": "200 200 205 / .15",
-        "lens-line-hover": "215 215 220 / .26"
+        "lens-line-hover": "215 215 220 / .26",
+        "pal-deep-sat": "0.8",
+        "pal-deep-light": "6",
+        "yes-fill": "146 58% 40%",
+        "no-fill": "9 62% 50%"
       },
       "chart-ink": {
         "dark": "245 240 236",

@@ -103,6 +103,9 @@ function setAccent(el, hsl) {
     const t = i / 5, hue = (h0 + t * (Number.isFinite(hs) ? hs : 70) + 360) % 360;
     const light = Math.max(18, Math.min(86, l0 + (t - 0.5) * (Number.isFinite(lsp) ? lsp : 0)));
     el.style.setProperty(`--pal-${i + 1}`, `${Math.round(hue)} ${s0}% ${Math.round(light)}%`);
+    // the deep twin for filled controls (Yes / No): calmer saturation and darker, so a big filled area sits with the dark glass (themes: pal-deep-sat, pal-deep-light)
+    const ds = parseFloat(b['pal-deep-sat']), dl = parseFloat(b['pal-deep-light']);
+    el.style.setProperty(`--pal-${i + 1}-deep`, `${Math.round(hue)} ${Math.round(s0 * (Number.isFinite(ds) ? ds : 0.62))}% ${Math.round(Math.max(18, light - (Number.isFinite(dl) ? dl : 12)))}%`);
   }
 }
 
