@@ -96,6 +96,14 @@ function setAccent(el, hsl) {
   el.style.setProperty('--ring', hsl);
   const l = parseFloat(hsl.split(/\s+/)[2]);
   el.style.setProperty('--on-accent', l > 52 ? '240 10% 8%' : '0 0% 100%');   // readable text on the accent
+  // the palette as CSS variables (--pal-1 .. --pal-6), the same walk the charts use, so any component can give each of its items a color
+  const [h0, s0, l0] = hsl.split(/\s+/).map(parseFloat), b = CFG.base || {};
+  const hs = parseFloat(b['chart-hue-spread']), lsp = parseFloat(b['chart-light-spread']);
+  for (let i = 0; i < 6; i++) {
+    const t = i / 5, hue = (h0 + t * (Number.isFinite(hs) ? hs : 70) + 360) % 360;
+    const light = Math.max(18, Math.min(86, l0 + (t - 0.5) * (Number.isFinite(lsp) ? lsp : 0)));
+    el.style.setProperty(`--pal-${i + 1}`, `${Math.round(hue)} ${s0}% ${Math.round(light)}%`);
+  }
 }
 
 function setScheme(el, bd) {

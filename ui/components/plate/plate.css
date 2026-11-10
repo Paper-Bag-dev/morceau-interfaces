@@ -115,3 +115,19 @@ html[data-skin~="glass"] #stage[data-size="compact"] .card-plate, html[data-skin
 #stage[data-size="chip"] .card-plate:has(> .stat:only-child) > .stat .needle { display: none; }
 /* chips are flat rectangles, not pills: a modest radius whatever their height (a short card with the big plate radius reads as a pill) */
 #stage[data-size="chip"] .card-plate { border-radius: var(--chip-radius, 12px); corner-shape: squircle; }
+/* ---------- palette colors on items (glass skin): each item of a set gets the next --pal-n (theme.js), never on the glass itself ---------- */
+html[data-skin~="glass"] .c-prog:nth-of-type(6n+1) .fill { background: hsl(var(--pal-1)); } html[data-skin~="glass"] .c-prog:nth-of-type(6n+2) .fill { background: hsl(var(--pal-3)); }
+html[data-skin~="glass"] .c-prog:nth-of-type(6n+3) .fill { background: hsl(var(--pal-5)); } html[data-skin~="glass"] .c-prog:nth-of-type(6n+4) .fill { background: hsl(var(--pal-2)); }
+html[data-skin~="glass"] .c-pastes .paste:nth-child(6n+1) .num { background: hsl(var(--pal-1)); } html[data-skin~="glass"] .c-pastes .paste:nth-child(6n+2) .num { background: hsl(var(--pal-3)); }
+html[data-skin~="glass"] .c-pastes .paste:nth-child(6n+3) .num { background: hsl(var(--pal-5)); } html[data-skin~="glass"] .c-pastes .paste:nth-child(6n+4) .num { background: hsl(var(--pal-2)); }
+html[data-skin~="glass"] .c-pastes .paste:not(.copied) .num { color: hsl(var(--fill-ink, 220 30% 6%)); }
+html[data-skin~="glass"] .c-check .row:nth-child(4n+1).done .box { background: hsl(var(--pal-1)); border-color: hsl(var(--pal-1)); } html[data-skin~="glass"] .c-check .row:nth-child(4n+2).done .box { background: hsl(var(--pal-3)); border-color: hsl(var(--pal-3)); }
+html[data-skin~="glass"] .c-check .row:nth-child(4n+3).done .box { background: hsl(var(--pal-5)); border-color: hsl(var(--pal-5)); } html[data-skin~="glass"] .c-check .row:nth-child(4n+4).done .box { background: hsl(var(--pal-2)); border-color: hsl(var(--pal-2)); }
+/* the number strip: a thin colored line under each number */
+#stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-1) / .8); border-radius: 0; }
+#stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+2) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-3) / .8); }
+#stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+3) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-5) / .8); }
+#stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+4) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-2) / .8); }
+/* yes / no: each its own flat palette color, black text (as specific as the flat-accent button rule, and later, so it wins) */
+html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--pal-3)); color: hsl(var(--fill-ink, 220 30% 6%)); }
+html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--pal-1)); color: hsl(var(--fill-ink, 220 30% 6%)); border: 0; }

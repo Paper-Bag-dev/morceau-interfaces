@@ -16,7 +16,8 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
    modest radii (`row-radius`, `btn-radius`, `badge-radius`) plus `corner-shape: squircle`.
 6. **Charts and graphs** take colors from `charts/util.js` (`palette`, `base`, `accent`, `ink`, `themeNum`): one family from the accent,
    spread set by the theme (`chart-hue-spread`, `chart-light-spread`; the glass skin walks 200 deg so pies and lines are colorful, bars keep the
-   accent). Line charts run their stroke and fill through the palette. Status colors come from `--good`, `--warn`, `--bad`. Never pick a
+   accent). Line charts run their stroke and fill through the palette. Non-chart sets use the same colors through `--pal-1..6` (theme.js):
+   progress bars, paste numbers, done ticks, a line under each number in a strip, Yes / No. Colors go on items, never on the glass. Status colors come from `--good`, `--warn`, `--bad`. Never pick a
    color in chart code.
 
 ## Text and sizing
