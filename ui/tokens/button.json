@@ -1,5 +1,5 @@
 {
-  "about": "buttons and badges: even padding and one line; a label that does not fit ends in an ellipsis and shows in full as a tooltip. Corners are squircles (a modest radius + corner-shape: squircle where supported), not full pills.",
+  "about": "buttons and badges: even padding and one line; a label that does not fit ends in an ellipsis and shows in full as a tooltip. Corners are squircles (a modest radius + corner-shape: squircle where supported), not full pills. Filled buttons (a tone or the accent Yes) are flat: btn-rim-w / btn-rim-mix = one dark inner rim of their own colour (lower mix = darker).",
   "btn-min-h": "26px",
   "btn-pad-y": "4px",
   "btn-pad-x": "14px",
@@ -8,5 +8,7 @@
   "badge-pad-y": "2px",
   "badge-pad-x": "11px",
   "btn-radius": "10px",
-  "badge-radius": "9px"
+  "badge-radius": "9px",
+  "btn-rim-w": "1.5px",
+  "btn-rim-mix": "45%"
 }

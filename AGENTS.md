@@ -1,6 +1,6 @@
-﻿# AGENTS.md: working on Morceau (for any coding agent)
+# AGENTS.md: working on Morceau (for any coding agent)
 
-Morceau is a Windows-only host that shows borderless, transparent, self-expiring UI windows ("surfaces") driven by an AI agent through a CLI (`morc`).
+Morceau is a Windows and macOS host that shows borderless, transparent, self-expiring UI windows ("surfaces") driven by an AI agent through a CLI (`morc`).
 Rust engine (tao + wry/WebView2 + the `windows` crate) + an ES-module web UI served from disk + CLI plugins (Python). Read `README.md` first.
 
 ## Layout (what lives where)
@@ -12,7 +12,8 @@ Rust engine (tao + wry/WebView2 + the `windows` crate) + an ES-module web UI ser
 | `cache/seed/`, `cache/fragments/`, `cache/recipes/` | shipped generic components, reusable sub-trees, example recipes |
 | `docs/` | protocol, design tokens, charts, graphs, extending, the agent system prompt (`agent.md`) and the chore prompt |
 | `examples/`, `integrations/` | sample triggers/actions/data; Claude Code hooks and skill |
-| `bin/` | `morc.js` (npm shim); `morc.exe` is a build artefact (git-ignored) |
+| `bin/` | `morc.js` (npm launcher: picks the platform build, `setup` to choose); builds live in `bin/native/<platform>/` (git-ignored) |
+| `scripts/` | `windows/`, `macos/` (build scripts per platform), `npm/` (platform list, from-source build, publish guard); see `scripts/README.md` |
 
 Three folders at runtime (see `src/paths.rs`): the install (`MORC_APP`), the user's data (`MORC_HOME`, or `<runtime>/home.txt`), and per-machine
 runtime state (`%LOCALAPPDATA%\morc`). Never put user data in the install; never write secrets anywhere tracked.
@@ -53,8 +54,8 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
     layouts are on; the CLI (`morc summon`) always works.
 - **Known gaps (see BACKLOG.md):**
   - Clicking a card activates morc (a plain NSWindow cannot be a non-activating panel). Fixing it means turning the window into an NSPanel.
-  - The npm launcher (`bin/morc.js`), `build.cmd`, `scripts/release-build.ps1` and CI are still Windows-only. On a Mac, build with `cargo build --release`
-    and run `target/release/morc`.
+  - Builds are per platform: `scripts/windows/`, `scripts/macos/`; the npm launcher and CI release (`.github/workflows/release.yml`)
+    cover both. Gatekeeper signing for the macOS binary is still to do.
 - **Also changed on this branch (both platforms):**
   - Every card sits on ONE plate by default: `ui/core/render.js` gives a layout root (column, row, panel) the `.card-plate` class, styled in
     `ui/components/plate/plate.css`; pieces inside go flat, and an urgent ring hugs the plate. `"plate": false` on the root opts out. `layout` now

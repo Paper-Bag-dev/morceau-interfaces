@@ -129,6 +129,7 @@ register('chart', (c, ctx) => {
   }
 
   ctx.bind(c.data, setData);
+  if (typeof c.unit === 'string' && c.unit.includes('{/')) ctx.bind(c.unit, (v) => { s.unit = v ?? ''; kick(); });   // "unit": "{/unit}" comes from the data
   if (c.labels) ctx.bind(c.labels, (v) => { s.labels = Array.isArray(v) ? v : []; fitW(); kick(); });
   cv.addEventListener('pointermove', (e) => {
     const z = window.__zoom || 1, r = cv.getBoundingClientRect(), h = MODS[kind].hit(s, (e.clientX - r.left) / z, (e.clientY - r.top) / z);

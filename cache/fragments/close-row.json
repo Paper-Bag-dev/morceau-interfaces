@@ -1,3 +1,0 @@
-{"name":"close-row","desc":"A single Close button: every flow ends. No data.","root":"r","components":[
- {"id":"r","type":"row","children":["b"]},
- {"id":"b","type":"button","label":"Close","action":{"do":"close"}}]}

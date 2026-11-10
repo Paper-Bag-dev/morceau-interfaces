@@ -46,10 +46,7 @@ one big blocker. Several small cards spread into the free space (`--region auto`
       any number of them in place: `morc push a b c d` (same id = refreshed where it stands, so cards shrink away and the active one takes the room).
    3. When the interaction is over, set the importances back with `morc card` and `morc push` the same list. A card nobody touches for too long expires by
       its `ttl`; close the rest with `morc close <id>`.
-   4. The host also does the shrink-and-restore by itself when the screen is crowded. Crowded is NOT a card count: it is how much of the free room (the work area
-      minus the active window) our cards already cover, compared with the learned `crowd` limit in the annoyance vector (default 0.5). While you hover one card the
-      others shrink to `crowd_yield` (0.8 in `prefs/placement.json`, never below the zoom floor) and return when the pointer leaves. Teach it what you treat as
-      crowded: `morc annoy nudge crowd 0.8 --why "too crowded"` lowers the limit, `morc annoy nudge crowd 1.2 --why "fine"` raises it (per topic or global).
+   4. The host never shrinks other cards when you hover one (the crowd shrink was removed, user 11-11); you free room by closing cards.
    Compact by default with the detail behind it ("show more" via prefetch + `reveal`) is how a card is made expandable.
 6c. **Tier 1 means you must readjust the OLDER cards, not just the new one.** When the free sides are used up, re-pack what is already on screen first: merge
    same-kind cards, trim data, shrink to `min_importance`, move them (`morc card` + `morc push` the whole list), animated (rung 9). Only after that is
@@ -142,4 +139,8 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 
 **Rules that apply to every chip** (details in `../design.md` and `../learnings.md`): never clip, size within the container, text at least 15 px, explain each
 metric in a line, one card per kind of thing (do not stack unlike things in one card), short `ttl`, never cover your own cards.
+Every seed ships realistic sample `data` (labels, values, units), never zeros, blank strings or "A/B/C"; `--data` deep-merges over it, so
+`morc use <chip>` alone always shows a full card (user, 11-11).
+Buttons follow the accent; to colour one by meaning set `"tone": "green|yellow|blue|purple|red"` on it in the card JSON (theme-rules 5).
+Long text folds to a narrow 4-line box and grows mostly DOWN on hover (tokens compact-text-*, text-open-w), never wide.
 

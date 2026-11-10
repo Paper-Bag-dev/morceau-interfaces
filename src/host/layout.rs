@@ -23,11 +23,11 @@ impl Host {
                     .collect()
             })
             .unwrap_or_default();
-        winstyle::set_region(s.hwnd(), &rects);
+        window_style::set_region(s.hwnd(), &rects);
         // the plates' exact rounded rects (not the padded hit shapes): where the platform may put native glass
         if m["glass"].is_array() {
             // absent mid-morph: the page is streaming the glass frame by frame then
-            winstyle::set_glass(s.hwnd(), &px_rects(&m["glass"], scale));
+            window_style::set_glass(s.hwnd(), &px_rects(&m["glass"], scale));
         }
         s.inset = if rects.is_empty() {
             (0, 0, 0, 0)
@@ -111,7 +111,7 @@ impl Host {
                 let right = region_name.as_deref().map(|n| n.contains("left")).unwrap_or(false);
                 s.send(&json!({"t": "align", "right": right}));
             }
-            winstyle::show_topmost_noactivate(s.hwnd());
+            window_style::show_topmost_noactivate(s.hwnd());
             s.phase = Phase::Visible;
             s.phase_since = Instant::now();
             s.life.restart(s.opts.ttl, s.opts.sticky || s.opts.urgent, Instant::now());

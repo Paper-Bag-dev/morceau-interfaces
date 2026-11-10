@@ -1,0 +1,87 @@
+name: release
+# Push a tag v<version> (matching package.json) and this builds every platform, attaches the binaries to a GitHub release and
+# publishes the npm package with all of them inside (bin/native/<platform>/). The platform list is scripts/npm/platforms.js.
+# Needs one repository secret: NPM_TOKEN (an npm automation token for the `morceau` package).
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write   # npm provenance
+
+jobs:
+  build:
+    name: build ${{ matrix.key }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { key: windows-x64, os: windows-latest, target: x86_64-pc-windows-msvc, exe: morc.exe, asset: morc-windows-x64.exe }
+          - { key: macos-arm64, os: macos-latest, target: aarch64-apple-darwin, exe: morc, asset: morc-macos-arm64 }
+          - { key: macos-x64, os: macos-latest, target: x86_64-apple-darwin, exe: morc, asset: morc-macos-x64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+      - name: Build (no machine paths inside)
+        shell: bash
+        run: cargo build --release --target ${{ matrix.target }}
+        env:
+          RUSTFLAGS: --remap-path-prefix=${{ github.workspace }}=. -D warnings
+      - name: Test (native targets only)
+        if: matrix.key != 'macos-x64'
+        shell: bash
+        run: cargo test --release --target ${{ matrix.target }}
+      - name: Name the binary for the release
+        shell: bash
+        run: cp target/${{ matrix.target }}/release/${{ matrix.exe }} ${{ matrix.asset }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.key }}
+          path: ${{ matrix.asset }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: The tag matches package.json
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          v=$(node -p "require('./package.json').version")
+          [ "v$v" = "${GITHUB_REF_NAME}" ] || { echo "tag ${GITHUB_REF_NAME} but package.json is $v"; exit 1; }
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: GitHub release with every build
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: dist/*
+          generate_release_notes: true
+      - name: Put the builds into the package (bin/native/<platform>/)
+        run: |
+          node -e "
+            const fs=require('fs'),path=require('path');const {PLATFORMS}=require('./scripts/npm/platforms.js');
+            for (const p of PLATFORMS){const src=path.join('dist',p.asset);if(!fs.existsSync(src))throw new Error('missing '+src);
+              const d=path.join('bin','native',p.key);fs.mkdirSync(d,{recursive:true});fs.copyFileSync(src,path.join(d,p.exe));fs.chmodSync(path.join(d,p.exe),0o755);}
+          "
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+      - name: Publish to npm (skipped when this version is already published)
+        run: |
+          v=$(node -p "require('./package.json').version")
+          if npm view "morceau@$v" version >/dev/null 2>&1; then echo "morceau@$v is already on npm"; exit 0; fi
+          node scripts/npm/check-publish.js
+          npm publish --access public --provenance --ignore-scripts   # scripts ran above; prepare must not rebuild on Linux
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

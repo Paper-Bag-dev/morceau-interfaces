@@ -49,7 +49,7 @@ Show many small cards in the free space, not one big blocker. Dark stat tiles re
 ## 2. Reuse first (cost ladder, cheapest first)
 1. `morc use <name> --data @data.json` of an existing component (about 80 tokens; on Windows pass the data as a file: inline JSON loses its quotes). Look first: `morc list`, `cache/registry.md`.
 2. `morc compose` from fragments (`cache/fragments/`: hero-stat, trigger-stat, stat-pair, note-list, week-bars, line-trend, donut-split, clock-day,
-   gltf-model, credit-line, close-row). The structure is cached by hash; next time only the data changes. Build a new fragment when you build the same
+   gltf-model, credit-line). The structure is cached by hash; next time only the data changes. Build a new fragment when you build the same
    sub-tree twice.
    Never edit a CLI tool to vary a widget. Vary it with data: fragments take `{{params}}` (defaults in the fragment), recipes load files as `vars`
    (`{{sf.src}}`), and each push can override with `--set part.param=value` / `--data part.field=value`.

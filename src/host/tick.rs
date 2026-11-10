@@ -13,7 +13,7 @@ impl Host {
             .map(|s| s.key)
             .collect();
         if !ended.is_empty() {
-            winstyle::drag_cursor_off(); // onDragEnd: the user's own pointer comes back
+            window_style::drag_cursor_off(); // onDragEnd: the user's own pointer comes back
         }
         for k in ended {
             let Some(s) = self.surfaces.get_mut(&k) else { continue };

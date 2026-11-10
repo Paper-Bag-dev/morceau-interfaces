@@ -28,7 +28,8 @@ dragged, and then quietly fade away. The engine is a small Rust host; everything
 - **Agent integration**: Claude Code hooks and a skill, `AGENTS.md` / `CLAUDE.md` for any coding agent, and a generic system prompt (`docs/agent.md`).
 
 ## Requirements
-- Windows 10 or 11 (x64) with the **Microsoft Edge WebView2 Runtime** (preinstalled on Windows 11 and current Windows 10).
+- Windows 10 or 11 (x64) with the **Microsoft Edge WebView2 Runtime** (preinstalled on Windows 11 and current Windows 10), or
+  macOS (Apple silicon or Intel).
 - **Node 16+** only for the npm install path. **Python 3.8+ (`py` launcher)** for the extended commands (`compose`, `cache`, `init`, `place`, `wake`, ...).
 - To build from source: the Rust toolchain (https://rustup.rs) and the MSVC build tools.
 
@@ -40,6 +41,10 @@ morc init                 # creates your data folder, caches the shipped compone
 morc use ask-permission   # your first widget
 ```
 or without installing: `npx morceau use ask-permission`.
+
+**Choose the build:** the launcher runs this machine's build by default. `npx morceau setup` asks which one you want (Windows x64,
+macOS Apple silicon, macOS Intel) and remembers it; `--platform windows|mac` (or `MORC_PLATFORM`) picks one for a single run. A build
+that is not in the package is fetched once from the GitHub release of the same version.
 
 **From the git repository** (builds the engine for you; needs Rust)
 ```powershell
@@ -53,7 +58,9 @@ cd morceau-interfaces
 cargo build --release                 # target\release\morc.exe
 .\target\release\morc.exe init
 ```
-`build.cmd` builds and installs to `%LOCALAPPDATA%\morc\bin\morc.exe`. Put that folder on your PATH, or use the npm install.
+Windows: `scripts\windows\build.cmd` builds and installs to `%LOCALAPPDATA%\morc\bin\morc.exe`. macOS: `sh scripts/macos/build.sh` installs
+to `~/.local/bin/morc`. Put that folder on your PATH, or use the npm install. Releases: push a tag `v<version>` and CI
+(`.github/workflows/release.yml`) builds every platform, makes the GitHub release and publishes npm (`scripts/README.md`).
 
 ## Full setup, step by step
 1. **Install** as above, then run `morc status`. The first command starts the host (hidden, detached) in about 3 seconds. `morc stop` ends it.

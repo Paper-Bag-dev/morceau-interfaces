@@ -63,9 +63,9 @@ body { color: hsl(var(--ink)); cursor: default; }
 .panel { color: hsl(var(--foreground)); background: hsl(var(--card) / .94); border: 1px solid hsl(var(--border)); border-radius: var(--radius); padding: 10px 12px; box-shadow: 0 8px 24px rgb(0 0 0 / .4); }
 
 /* pin: far right, quiet, only on hover. Tilted 45deg so the point faces bottom-left; pinned = pushed straight in. */
-#pin { position: absolute; top: 5px; right: 44px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+#pin { position: absolute; top: var(--ctl-top, 6px); right: calc(var(--ctl-right, 10px) + var(--ctl-size, 26px) + var(--ctl-gap, 4px)); width: var(--ctl-size, 26px); height: var(--ctl-size, 26px); padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
   color: hsl(var(--accent, var(--ring))); background: hsl(var(--ink-shadow) / .0); opacity: 0; pointer-events: none; transition: opacity .2s, color .15s, transform .3s var(--spring), background .25s ease, box-shadow .25s ease; }
-#pin svg { width: 19px; height: 19px; transform: rotate(45deg); transition: transform .35s var(--spring), fill .2s; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
+#pin svg { width: var(--pin-icon, 16px); height: var(--pin-icon, 16px); transform: rotate(45deg); transition: transform .35s var(--spring), fill .2s; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
 #stage:is(:hover, .hov) #pin { opacity: .8; pointer-events: auto; }
 #pin:is(:hover, .hov) { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
 #pin:is(:hover, .hov) svg { transform: rotate(35deg); }
@@ -81,9 +81,9 @@ body { color: hsl(var(--ink)); cursor: default; }
 @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 
 /* dismiss (x) sits under the pin: same quiet look, hover only. Long-press the pin to pick the whole window up. */
-#dismiss { position: absolute; top: 36px; right: 8px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+#dismiss { position: absolute; top: calc(var(--ctl-top, 6px) + var(--ctl-size, 26px) + var(--ctl-gap, 4px)); right: var(--ctl-right, 10px); width: var(--ctl-size, 26px); height: var(--ctl-size, 26px); padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
   color: hsl(var(--accent, var(--ring))); background: transparent; opacity: 0; pointer-events: none; transition: opacity .2s, transform .3s var(--spring), background .25s ease, box-shadow .25s ease; }
-#dismiss svg { width: 16px; height: 16px; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
+#dismiss svg { width: var(--x-icon, 14px); height: var(--x-icon, 14px); filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
 #stage:is(:hover, .hov) #dismiss { opacity: .7; pointer-events: auto; }
 #dismiss:is(:hover, .hov) { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
 #pin.holding { transform: scale(1.25); opacity: 1 !important; background: hsl(var(--accent, var(--ring)) / .35); }

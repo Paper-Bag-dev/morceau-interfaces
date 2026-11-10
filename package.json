@@ -1,16 +1,32 @@
 {
   "name": "morceau",
-  "version": "0.1.4",
-  "description": "Morceau: ephemeral, agent-driven UI for Windows. Borderless, transparent, self-expiring windows (cards, charts, forms, 3D) that an AI agent shows through a CLI (morc).",
+  "version": "0.2.0",
+  "description": "Morceau: ephemeral, agent-driven UI for Windows and macOS. Borderless, transparent, self-expiring windows (cards, charts, forms, 3D) that an AI agent shows through a CLI (morc).",
   "license": "MIT",
   "author": "Paper-Bag-dev",
-  "repository": { "type": "git", "url": "git+https://github.com/Paper-Bag-dev/morceau-interfaces.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Paper-Bag-dev/morceau-interfaces.git"
+  },
   "homepage": "https://github.com/Paper-Bag-dev/morceau-interfaces#readme",
-  "bugs": { "url": "https://github.com/Paper-Bag-dev/morceau-interfaces/issues" },
-  "bin": { "morc": "bin/morc.js", "morceau": "bin/morc.js" },
-  "os": ["win32"],
-  "cpu": ["x64"],
-  "engines": { "node": ">=16" },
+  "bugs": {
+    "url": "https://github.com/Paper-Bag-dev/morceau-interfaces/issues"
+  },
+  "bin": {
+    "morc": "bin/morc.js",
+    "morceau": "bin/morc.js"
+  },
+  "os": [
+    "win32",
+    "darwin"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
   "files": [
     "bin/",
     "ui/",
@@ -30,8 +46,22 @@
     "README.md"
   ],
   "scripts": {
-    "prepare": "node scripts/build-from-source.js",
-    "prepublishOnly": "node scripts/check-publish.js"
+    "prepare": "node scripts/npm/build-from-source.js",
+    "prepublishOnly": "node scripts/npm/check-publish.js"
   },
-  "keywords": ["ui", "agent", "ai", "claude", "cli", "windows", "webview2", "overlay", "widgets", "ephemeral", "claude-code", "mcp"]
+  "keywords": [
+    "ui",
+    "agent",
+    "ai",
+    "claude",
+    "cli",
+    "windows",
+    "webview2",
+    "overlay",
+    "widgets",
+    "ephemeral",
+    "claude-code",
+    "mcp",
+    "macos"
+  ]
 }

@@ -1,9 +1,10 @@
 // Entry point. Registers the catalog, then answers the host.
 
 import { Renderer } from './render.js';
-import { send, measureSoon, dropped, setView, setViewSmooth, setLimits, limit, followGlass } from './bridge.js';
+import { send, measureSoon, dropped, setView, autoSize, setLimits, limit, followGlass } from './bridge.js';
 import { working } from './working.js';
-import { enter, arrive, leave, pulse, reduced, setReduced } from './motion.js';
+import { enter, arrive, rows, leave, pulse, reduced, setReduced } from './motion.js';
+import { autoTone } from './tones.js';
 import { pick as pickTheme, apply as applyTheme, adaptToBackdrop, setBoldness, setThemes } from './theme.js';
 
 // Everything visual and every min/max is DATA (ui/tokens.json, ui/themes.json, ui/limits.json + your prefs/ui.json), sent by the host on every card and again
@@ -60,8 +61,8 @@ window.morc = {
       case 'init':
         stage.classList.toggle('urgent', !!(m.opts && m.opts.urgent));
         stage.classList.toggle('pulse', !!(m.opts && m.opts.pulse));
-        stage.dataset.size = (m.opts && m.opts.size) || '';   // compact | medium | large (core/bridge.js COMPACT)
-        delete stage.dataset.tall;   // how much this card has to show is measured again for the new content   // motion only for importance high/critical; urgent alone is a still ring
+        stage.dataset.size = (m.opts && m.opts.size) || '';   // chip | compact | medium | large: scale factor and fold (core/bridge.js)
+        delete stage.dataset.tall;   // how much this card has to show is measured again for the new content
         if (m.view) {   // the annoyance vector + importance, resolved by the host
           applyUi(m.view.ui);   // first: the limits and colors the rest of this init uses
           setReduced(m.view.motion < 0.3);
@@ -77,6 +78,8 @@ window.morc = {
         // card-level alignment from the card's JSON ("align": "right"): titles, rows, text, charts and Close all start from the same edge
         stage.classList.toggle('align-right', /right/.test((m.opts && m.opts.align) || ''));
         r.init(m);
+        if (autoSize()) setView({});   // mostly text and no size named: a medium card
+        autoTone(root);                // filled buttons with no tone take the theme's tone cycle (core/tones.js)
         if (ready) root.classList.add('on');   // refresh of an on-screen surface: stay visible
         measureSoon();
         break;
@@ -90,12 +93,11 @@ window.morc = {
         stage.classList.toggle('align-right', !!m.right);
         measureSoon();
         break;
-      case 'view': setViewSmooth(m.view); break;   // the host re-sizes this card (crowded screen: another card is in use)
       case 'patch':
-        // test hook: `morc patch <id> /__hover true|false` plays the pointer entering/leaving the card (hover-grow) without touching the user's mouse
         // attention nudge: `morc patch <id> /__pulse true` plays the blue pulse on that card (the "look here" that costs less than opening something new)
-        if (m.data && '/__pulse' in m.data) { const w = working(root); pulse(root); setTimeout(() => w.done(), limit('pulse-ms', 1600)); break; }   // the blue system pulse, then one ring
+        // test hook: `morc patch <id> /__hover true|false` plays the pointer entering/leaving the card (key + detail) without the mouse
         if (m.data && '/__hover' in m.data) { stage.dispatchEvent(new PointerEvent(m.data['/__hover'] ? 'pointerenter' : 'pointerleave')); break; }
+        if (m.data && '/__pulse' in m.data) { const w = working(root); pulse(root); setTimeout(() => w.done(), limit('pulse-ms', 1600)); break; }   // the blue system pulse, then one ring
         r.patch(m); measureSoon(); break;
       case 'backdrop': lastRgb = m.rgb; adaptToBackdrop(stage, m.rgb); break;   // sampled just before the window appears
       case 'enter': {
@@ -119,6 +121,7 @@ window.morc = {
         // the card appears from nothing and springs up to size (the glass grows with it); its children follow in a short stagger
         followGlass(arrive(root, limit));
         kids.slice(0, 8).forEach((k, i) => enter(k, 40 + i * 35));
+        rows(root, limit);
         // a new card glows softly for a moment (limits arrive-pulse-ms; 0 = off), then stays still
         if (limit('arrive-pulse-ms', 0) > 0) { stage.classList.add('arrive'); setTimeout(() => stage.classList.remove('arrive'), limit('arrive-pulse-ms', 0)); }
         break;

@@ -84,18 +84,18 @@
     }
   ],
   "data": {
-    "title": "Working",
+    "title": "Today's goals",
     "a": {
-      "label": "",
-      "value": 0
+      "label": "Study",
+      "value": 60
     },
     "b": {
-      "label": "",
-      "value": 0
+      "label": "Gym",
+      "value": 100
     },
     "c": {
-      "label": "",
-      "value": 0
+      "label": "Reading",
+      "value": 25
     }
   }
 }

@@ -12,7 +12,7 @@ use crate::{
     protocol::{Opts, Request},
     server, sources,
     surface::{Move, Phase, Surface},
-    util, wake, winstyle,
+    util, wake, window_style,
 };
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -26,7 +26,6 @@ use tao::{
 
 mod uidata;
 mod view;
-mod crowd;
 mod ipc;
 mod layout;
 mod show;
@@ -92,9 +91,9 @@ pub fn run() -> ! {
         });
     }
     fgwatch::install(proxy.clone());
-    winstyle::watch_hover(proxy.clone());
+    window_style::watch_hover(proxy.clone());
     crate::hotkeys::spawn(proxy.clone());
-    winstyle::drag_cursor_off(); // in case a previous host died mid-carry with the move cursor installed
+    window_style::drag_cursor_off(); // in case a previous host died mid-carry with the move cursor installed
     cache::write_registry();
     util::log("host started");
 
@@ -105,7 +104,7 @@ pub fn run() -> ! {
         }
         host.tick(target);
         if host.quit {
-            winstyle::drag_cursor_off(); // never leave the move cursor behind
+            window_style::drag_cursor_off(); // never leave the move cursor behind
         }
         *flow = if host.quit { ControlFlow::Exit } else { host.next_flow() };
     })
@@ -304,7 +303,7 @@ impl Host {
                 self.by_id.remove(&s.id);
                 sources::drop_surface(&s.id);
             }
-            winstyle::hide(s.hwnd());
+            window_style::hide(s.hwnd());
         }
     }
 

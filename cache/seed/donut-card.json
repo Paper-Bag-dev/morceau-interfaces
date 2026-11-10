@@ -15,7 +15,7 @@
     "ttl": 90,
     "topic": "charts.donut",
     "importance": "0.7",
-    "size": "large"
+    "size": "medium"
   },
   "components": [
     {
@@ -41,12 +41,18 @@
     }
   ],
   "data": {
-    "title": "Share",
+    "title": "Where the day went",
     "values": [
-      1
+      180,
+      95,
+      60,
+      45
     ],
     "labels": [
-      "all"
+      "Work",
+      "Study",
+      "Gym",
+      "Video"
     ]
   }
 }

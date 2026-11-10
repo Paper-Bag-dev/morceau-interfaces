@@ -31,3 +31,6 @@ cards/
 # UI size tokens are design data, not secrets (the *token* rule above is for credentials)
 !ui/tokens/
 !ui/tokens/*.json
+# engine builds (assembled by CI or scripts/npm/build-from-source.js; never committed)
+bin/native/
+bin/morc.exe

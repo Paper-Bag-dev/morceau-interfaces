@@ -1,6 +1,6 @@
 //! One floating surface: a borderless transparent window + its webview + its lifetime state.
 
-use crate::{assets, ev::{Ev, Proxy}, placement::R, protocol::Opts, winstyle};
+use crate::{assets, ev::{Ev, Proxy}, placement::R, protocol::Opts, window_style};
 use self::lifetime::Life;
 use serde_json::Value;
 use std::time::Instant;
@@ -69,7 +69,7 @@ impl Surface {
             .with_inner_size(LogicalSize::new(10.0, 10.0));
         let builder = crate::platform::os::app::window_builder(builder);
         let window = builder.build(target).map_err(|e| e.to_string())?;
-        winstyle::overlay_styles(native_handle(&window));
+        window_style::overlay_styles(native_handle(&window));
         let wvb = crate::platform::os::app::webview_builder(WebViewBuilder::new());
         let webview = wvb
             .with_transparent(true)

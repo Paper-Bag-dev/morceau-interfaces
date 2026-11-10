@@ -41,7 +41,7 @@
       "labels": {
         "bind": "/pie/labels"
       },
-      "unit": "M",
+      "unit": "min",
       "height": 140
     },
     {
@@ -55,35 +55,41 @@
       "labels": {
         "bind": "/bars/labels"
       },
-      "unit": "M",
+      "unit": "min",
       "height": 130
     }
   ],
   "data": {
     "pie": {
-      "title": "Share",
+      "title": "Where the day went",
       "values": [
-        1
+        180,
+        95,
+        60,
+        45
       ],
       "labels": [
-        "all"
+        "Work",
+        "Study",
+        "Gym",
+        "Video"
       ]
     },
     "bars": {
-      "title": "Per day",
+      "title": "Focus per day",
       "values": [
-        0,
-        0,
-        0,
-        0,
-        0
+        30,
+        45,
+        20,
+        60,
+        95
       ],
       "labels": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e"
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri"
       ]
     }
   }

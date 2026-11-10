@@ -8,7 +8,7 @@
 //   collapse(): the same in reverse, started together with the shrink spring; the window only shrinks after both have settled.
 import { enter } from './motion.js';
 
-const LISTS = '.c-list, .c-pastes, .c-check, .c-asks';
+const LISTS = '.c-list, .c-pastes, .c-check, .c-asks, .c-text:not(.lg)';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function pinHeights(stage, ms) {

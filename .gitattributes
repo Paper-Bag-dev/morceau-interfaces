@@ -1,0 +1,2 @@
+*.sh text eol=lf
+bin/morc.js text eol=lf

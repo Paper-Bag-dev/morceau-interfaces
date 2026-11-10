@@ -54,8 +54,24 @@
     }
   ],
   "data": {
-    "title": "Paste these in order",
-    "body": "",
-    "items": []
+    "title": "Support bot: prompt v3",
+    "body": "Studio, Build tab",
+    "items": [
+      {
+        "title": "General instruction",
+        "text": "You are the support assistant for Acme. Answer in two short sentences, then offer one next step.",
+        "note": "replaces all"
+      },
+      {
+        "title": "Tool: order lookup",
+        "text": "Input: {\"order_id\": \"string\"}\nOutput: {\"status\": \"string\", \"eta\": \"date\"}",
+        "note": "add"
+      },
+      {
+        "title": "Fallback reply",
+        "text": "I could not find that order. Can you share the email you ordered with?",
+        "note": "replaces old"
+      }
+    ]
   }
 }

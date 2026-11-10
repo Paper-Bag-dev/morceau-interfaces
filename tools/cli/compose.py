@@ -6,7 +6,7 @@
 # recipe: {"name": "optional", "desc": "...", "topic": "stats.x", "opts": {"min": [w,h], "ttl": 20},
 #          "layout": {"type": "column", "gap": 6}                                  (default: a column of the parts, in order)
 #                  | {"type": "wing", "main": ["a"], "aside": ["b", "c"]},          (glanceable part beside, the rest tucked below)
-#          "parts": [{"id": "a", "frag": "stat-pair"}, {"id": "b", "frag": "note-list"}, {"id": "c", "frag": "close-row"}],
+#          "parts": [{"id": "a", "frag": "stat-pair"}, {"id": "b", "frag": "note-list"}],
 #          "data":  {"a": {"l1": "Screen today", "v1": 3.4, "u1": "h", ...}, "b": {"title": "...", "items": [...]}}}
 # Fragments live in cache/fragments/*.json; their data paths are written /@/field and become /<part id>/field.
 # The STRUCTURE (components + opts, never the data) is hashed: an identical structure is a cache hit (no save). Without "name" it is

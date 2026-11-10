@@ -22,11 +22,31 @@ const SPRING = simulate();
 
 /** Arrive: a card appears from nothing, scales up on a damped spring (a little overshoot, then it settles) and rests. The spring and the
  *  start size come from limits (arrive-from, arrive-stiffness, arrive-damping); returns the animation (its duration drives the glass). */
+// The growth follows the card's shape so it reads clearly (user, 11-11: big cards just appeared): a WIDE card (wider than `arrive-wide`
+// x its height) unfolds left to right, a LONG card (taller than `arrive-long` x its width) unrolls top to bottom, anything else grows
+// from `arrive-from` of its size around its centre. The unfolds also scale a little on the cross axis so they feel like growth, not a wipe.
 export function arrive(el, lim) {
   const from = lim('arrive-from', 0.08);
   const sp = simulate({ stiffness: lim('arrive-stiffness', 230), damping: lim('arrive-damping', 19) });
-  const kf = sp.values.map((p, i) => ({ opacity: Math.min(1, (i / sp.values.length) * 5), transform: `scale(${from + (1 - from) * p})`, transformOrigin: '50% 50%' }));
+  const r = el.getBoundingClientRect();
+  const wide = r.width > r.height * lim('arrive-wide', 1.6), long = r.height > r.width * lim('arrive-long', 1.15);
+  const n = sp.values.length;
+  const kf = sp.values.map((p, i) => {
+    const o = Math.min(1, (i / n) * 6), q = Math.max(0, p);   // q: no negative overshoot into an inside-out clip
+    if (wide) return { opacity: o, clipPath: `inset(0 ${Math.max(0, (1 - q) * 100)}% 0 0 round 16px)`, transform: `scaleY(${0.86 + 0.14 * p})`, transformOrigin: '0 50%' };
+    if (long) return { opacity: o, clipPath: `inset(0 0 ${Math.max(0, (1 - q) * 100)}% 0 round 16px)`, transform: `scaleX(${0.9 + 0.1 * p})`, transformOrigin: '50% 0' };
+    return { opacity: o, transform: `scale(${from + (1 - from) * p})`, transformOrigin: '50% 50%' };
+  });
   return el.animate(kf, { duration: sp.ms, easing: 'linear', fill: 'backwards' });
+}
+
+/** Rows of a list, checklist, paste set or ask set come in one after another once the card is open (`row-stagger-ms` apart, max 12). */
+export function rows(root, lim) {
+  const step = lim('row-stagger-ms', 45), start = lim('row-start-ms', 160);
+  const items = root.querySelectorAll(':is(.c-list, .c-check, .c-pastes, .c-asks) > *');
+  [...items].slice(0, 12).forEach((it, i) => it.animate(
+    [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
+    { duration: 260, delay: start + i * step, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' }));
 }
 
 /** Pop in: slide up a little, scale from .92, fade. `delay` staggers siblings. */
