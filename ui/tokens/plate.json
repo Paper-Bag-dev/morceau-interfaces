@@ -9,12 +9,12 @@
   "compact-radius": "30px",
   "compact-h": "190px",
   "compact-fade-ms": "220ms",
-  "compact-edge-a": "70%",
+  "compact-edge-a": "55%",
   "compact-fade": "64px",
   "compact-glow-r": "18px",
-  "compact-glow-a": "42%",
+  "compact-glow-a": "28%",
   "reveal-stagger-ms": "55",
   "compact-list-w": "220px",
   "edge-w": "1px",
-  "edge-a": "55%"
+  "edge-a": "28%"
 }

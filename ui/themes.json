@@ -66,7 +66,7 @@
   },
   "platforms": {
     "mac": {
-      "about": "macOS: the glass skin over native Liquid Glass (src/platform/macos/glass.rs) in the coral scheme: warm dark surfaces and tints, coral accent (user, 10 Nov night: copy the coral scheme, darker glints). Mostly dark: a dark page keeps dark surfaces here.",
+      "about": "macOS: the glass skin over native Liquid Glass (src/platform/macos/glass.rs) in the coral scheme: warm dark surfaces and tints, coral accent (user, 10 Nov night: copy the coral scheme, darker glints). Mostly dark: a dark page keeps dark surfaces here. The plate stays neutral dark (user: no orange plate); the coral is deeper on Mac (14 70% 54%) and only a faint trace reaches the plate edge (edge-a).",
       "default": "coral",
       "base": {
         "card": "20 9% 9%",
@@ -93,7 +93,8 @@
         }
       },
       "accents": {
-        "glacier": "208 52% 44%"
+        "glacier": "208 52% 44%",
+        "coral": "14 70% 54%"
       },
       "skin": "glass"
     }
@@ -103,13 +104,13 @@
     "glass": {
       "about": "Dark glass: a see-through tint with dark grain, glints and a soft light that follows the pointer (macOS: over native Liquid Glass), and dark lens pills inside (rows, badges, plain buttons: black rim, thin grey line, white text). Turn it on with `skin: \"glass\"` (top level, per platform, or in prefs/ui.json under themes). Sizes: ui/tokens/lens.json. Charts and graphs: one accent family (chart-hue-spread 24 deg, chart-light-spread 44 points) instead of a hue walk.",
       "base": {
-        "plate-a": "36 31 28 / .36",
-        "plate-b": "16 13 12 / .50",
+        "plate-a": "28 28 30 / .38",
+        "plate-b": "12 12 13 / .52",
         "plate-edge": "255 255 255 / .10",
-        "sheen": "255 228 210 / .045",
-        "glass-glow": "255 220 200 / .035",
+        "sheen": "230 230 235 / .04",
+        "glass-glow": "230 230 240 / .03",
         "glass-rim": "255 255 255 / .30",
-        "rim-accent": ".20",
+        "rim-accent": ".08",
         "lens-center": "6 8 12 / .05",
         "lens-edge": "0 0 0 / .58",
         "lens-rim": "0 0 0 / .62",
@@ -123,8 +124,8 @@
         "lens-glow-a": "32%",
         "chart-hue-spread": "24",
         "chart-light-spread": "44",
-        "lens-line": "206 196 188 / .16",
-        "lens-line-hover": "222 212 204 / .28"
+        "lens-line": "200 200 205 / .15",
+        "lens-line-hover": "215 215 220 / .26"
       },
       "chart-ink": {
         "dark": "245 240 236",
