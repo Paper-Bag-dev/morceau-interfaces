@@ -85,11 +85,11 @@ html[data-skin="glass"] .card-plate { border: var(--edge-w, 1px) solid color-mix
 #stage.hovered:not(.compact) :is(#pin, #dismiss) { opacity: 1; pointer-events: auto; background: rgb(var(--ghost-btn, 255 255 255 / .14)); color: hsl(0 0% 100%); }
 #stage.hovered:not(.compact) :is(#pin, #dismiss) svg { fill: currentColor; }
 @media (prefers-reduced-motion: reduce) { .card-plate, .card-plate::before, :is(.c-list, .c-pastes, .c-check), #pin, #dismiss { transition: none; } }
-/* glass skin: the lens lines and glow are mixed from the accent, so swapping the accent recolors everything */
+/* glass skin: the pills' inner line is a quiet neutral grey (user, 11-10: an accent line read too glowy); no outer glow on hover */
 html[data-skin="glass"] #stage {
-  --lens-line-c: color-mix(in oklab, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 55%, white) var(--lens-line-a, 38%), transparent);
-  --lens-line-hover-c: color-mix(in oklab, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 55%, white) var(--lens-line-hover-a, 62%), transparent);
-  --lens-glow-c: color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) var(--lens-glow-a, 32%), transparent); }
+  --lens-line-c: rgb(var(--lens-line, 190 196 206 / .16));
+  --lens-line-hover-c: rgb(var(--lens-line-hover, 205 211 221 / .28));
+  --lens-glow-c: transparent; }
 /* glass skin: checklist and paste rows are the same dark lens rows as list rows */
 html[data-skin="glass"] :is(.c-check .row, .c-pastes .paste) { background: rgb(var(--lens-center, 6 8 12 / .05)); border: 1px solid rgb(var(--lens-rim, 0 0 0 / .62));
   box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)); border-radius: var(--row-radius, 14px); }
