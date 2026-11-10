@@ -46,7 +46,8 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
     `components/plate/plate.css` (truncate to a few rows, a fading peek) and the selector list in `core/compact.js`. Opening and folding
     are mirrors (`compact.expand` / `compact.collapse`): nothing pops, nothing jumps.
 12. **Motion is a damped spring** (`limits.spring-*`) or a short ease, triggered by the user (hover, press, arrival). Never loop for
-    attention; no arrival glow (`arrive-pulse-ms` 0: the user found the orange glow annoying); cards just spring and fade in. Honor `prefers-reduced-motion`.
+    attention; the only unasked motion is the arrival: a spring + fade, and one soft accent glow OUTSIDE the
+    plate that only fades out (`arrive-*`). Never put an accent glow ON the glass (it colors the plate). Honor `prefers-reduced-motion`.
 13. **Native glass follows the plate.** The page reports each `.card-plate` rect (`layout.glass`) and streams it during a morph; do not
     animate the plate's outer size any other way.
 

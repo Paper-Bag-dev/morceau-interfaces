@@ -12,7 +12,7 @@
   "hold-ms-control": 220,
   "move-slop": 7,
   "compact": 0.85,
-  "arrive-pulse-ms": 0,
+  "arrive-pulse-ms": 950,
   "reveal-ms": 380,
   "spring-stiffness": 260,
   "spring-damping": 28,

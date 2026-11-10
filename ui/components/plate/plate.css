@@ -52,8 +52,9 @@ html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid rgb(var(
 
 @media (prefers-reduced-motion: reduce) { html[data-skin~="glass"] .card-plate { transition: none; } }
 /* arrival glow (core/main.js adds #stage.arrive for limits arrive-pulse-ms): two soft breaths of the accent around the plate, then still */
-@keyframes arrive-glow { 0%, 100% { filter: drop-shadow(0 0 0 hsl(var(--accent, var(--ring)) / 0)); } 50% { filter: drop-shadow(0 0 var(--arrive-glow-r, 6px) hsl(var(--accent, var(--ring)) / .45)); } }
-#stage.arrive .card-plate { animation: arrive-glow calc(var(--arrive-glow-ms, 1300) * 1ms) ease-in-out 2; }
+/* arrival: one soft glow OUTSIDE the plate (never on the glass) that only fades out, once */
+@keyframes arrive-glow { from { filter: drop-shadow(0 0 var(--arrive-glow-r, 6px) hsl(var(--accent, var(--ring)) / .32)); } to { filter: drop-shadow(0 0 0 hsl(var(--accent, var(--ring)) / 0)); } }
+#stage.arrive .card-plate { animation: arrive-glow calc(var(--arrive-glow-ms, 900) * 1ms) var(--ease-out) 1; }
 @media (prefers-reduced-motion: reduce) { #stage.arrive .card-plate { animation: none; } }
 /* card titles are centered by default (token title-align: left to undo) */
 .card-plate > .c-text.lg:first-child { text-align: var(--title-align, center); align-self: stretch; width: auto; }
@@ -67,8 +68,7 @@ html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid rgb(var(
 .card-plate::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--compact-dim, 0 0 0 / .42)); opacity: 0; pointer-events: none;
   transition: opacity var(--compact-fade-ms, 380ms) ease; }
 #stage.compact .card-plate::before { opacity: 1; }
-/* squeezed: the accent edge leaks inward as a soft glow; it fades out quickly (compact-fade-ms) with the dark layer and the edge */
-.card-plate::before { box-shadow: inset 0 0 var(--compact-glow-r, 18px) color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--compact-glow-a, 42%), transparent); }
+/* (no accent glow inside the plate: it colored the glass; user, 11-10) */
 #stage.compact .card-plate { border: var(--compact-border-w, 1.5px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--compact-edge-a, 70%), transparent); border-radius: var(--compact-radius, 30px); }
 @property --fade-stop { syntax: '<length>'; inherits: false; initial-value: 0px; }
 :is(.c-list, .c-pastes, .c-check) { max-height: var(--full-h, none); --fade-stop: 0px;

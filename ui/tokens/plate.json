@@ -1,7 +1,7 @@
 {
   "about": "card plate: the arrival glow, the card title alignment, and the compact look (rows shown, the fading peek, the accent edge and radius).",
   "arrive-glow-r": "6px",
-  "arrive-glow-ms": "1300",
+  "arrive-glow-ms": "900",
   "title-align": "center",
   "compact-rows": "2",
   "compact-peek": "28px",
@@ -11,8 +11,6 @@
   "compact-fade-ms": "220ms",
   "compact-edge-a": "55%",
   "compact-fade": "64px",
-  "compact-glow-r": "18px",
-  "compact-glow-a": "14%",
   "reveal-stagger-ms": "55",
   "compact-list-w": "220px",
   "edge-w": "1px",
