@@ -16,7 +16,7 @@ impl Host {
                 }
             }
             "layout" => self.layout(key, &m),
-            // the page moves the native glass ahead of a shrink, so glass and content ease down together (the window follows later)
+            // the page streams the plate's rect during a grow/shrink, so the native glass follows the spring frame by frame
             "glass" => {
                 if let Some(s) = self.surfaces.get(&key) {
                     winstyle::set_glass(s.hwnd(), &super::layout::px_rects(&m["glass"], s.window.scale_factor()));

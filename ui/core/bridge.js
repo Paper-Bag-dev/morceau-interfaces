@@ -1,3 +1,4 @@
+import { simulate } from './motion.js';
 // Page <-> host plumbing: messages, window shape, hover, hold-to-drag, pin, dismiss.
 
 // Minimum / maximum sizes and timings are DATA: ui/limits.json, sent by the host (overridable in prefs/ui.json). The numbers in lim(...) calls are only fallbacks.
@@ -56,6 +57,7 @@ stage.addEventListener('pointerenter', () => {
     fits = 0;
     const z1 = zoom, z2 = Math.min(lim('max-zoom', 2.2), zoom * k);
     setCompact(false);   // show everything that was tucked away (slides open)
+    morphing = true;     // the measure below sizes the window; the glass waits for the spring to drive it
     applyZoom(z2);
     measure();   // tell the host NOW: the window is already full size, then the card eases up to it from its old size
     morph(z1 / z2, 1);
@@ -70,7 +72,6 @@ stage.addEventListener('pointerleave', () => {
     const z = grownFrom; grownFrom = 0; lastShrinkAt = Date.now();
     fits = 0;
     // ease the card down inside the still-large window, then shrink the window and drop the transform
-    send({ t: 'glass', glass: glassRects(z / zoom) });   // the native glass eases down with the card instead of lagging behind it
     morph(1, z / zoom, () => { setCompact(COMPACT() < 0.99); applyZoom(z); measure(); measureSoon(); });
   }, 450);
 });
@@ -85,11 +86,24 @@ export function setViewSmooth(v) {
   else { setView(v); measure(); morph(z1 / zoom, 1); }
 }
 
+// a damped spring (limits spring-stiffness / spring-damping): settles with the barest overshoot, so growth feels physical, not linear
+let SPRING_K = null, morphing = false;
+function spring() {
+  const k = `${lim('spring-stiffness', 260)}|${lim('spring-damping', 28)}`;
+  if (!SPRING_K || SPRING_K.key !== k) SPRING_K = { key: k, ...simulate({ stiffness: lim('spring-stiffness', 260), damping: lim('spring-damping', 28) }) };
+  return SPRING_K;
+}
 function morph(from, to, done) {
   const surf = document.getElementById('surface');
   if (!surf || reduced) { if (done) done(); return; }
-  const a = surf.animate([{ transformOrigin: '0 0', transform: `scale(${from})` }, { transformOrigin: '0 0', transform: `scale(${to})` }], { duration: lim('morph-ms', 220), easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
-  a.onfinish = () => { a.cancel(); if (done) done(); };
+  const sp = spring();
+  const kf = sp.values.map((p) => ({ transformOrigin: '0 0', transform: `scale(${from + (to - from) * p})` }));
+  const a = surf.animate(kf, { duration: sp.ms, easing: 'linear', fill: 'forwards' });
+  morphing = true;
+  // the native glass (macOS) follows the spring: the plate's live rect every frame (getBoundingClientRect includes the transform)
+  const follow = () => { if (!morphing) return; send({ t: 'glass', glass: glassRects(1) }); requestAnimationFrame(follow); };
+  requestAnimationFrame(follow);
+  a.onfinish = () => { morphing = false; a.cancel(); if (done) done(); else measure(); };
 }
 
 // each card plate's exact rounded rect: where the host may put native glass (macOS); the page draws the tint, grain and sheen on top.
@@ -156,7 +170,7 @@ function measure() {
   }
   rects = rects.filter((r) => r[2] > 0 && r[3] > 0).map((r) => r.map((n) => Math.round(n)));
   const glass = glassRects(1);
-  const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, glass, settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
+  const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, ...(morphing ? {} : { glass }), settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
   const key = JSON.stringify(msg);
   if (key !== lastSent) { lastSent = key; send(msg); }
 }

@@ -25,7 +25,10 @@ impl Host {
             .unwrap_or_default();
         winstyle::set_region(s.hwnd(), &rects);
         // the plates' exact rounded rects (not the padded hit shapes): where the platform may put native glass
-        winstyle::set_glass(s.hwnd(), &px_rects(&m["glass"], scale));
+        if m["glass"].is_array() {
+            // absent mid-morph: the page is streaming the glass frame by frame then
+            winstyle::set_glass(s.hwnd(), &px_rects(&m["glass"], scale));
+        }
         s.inset = if rects.is_empty() {
             (0, 0, 0, 0)
         } else {
