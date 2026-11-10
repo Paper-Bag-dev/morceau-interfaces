@@ -33,7 +33,7 @@ export function setView(v) {
   // compact by default: a card shows at `compact` of its size until hovered (then it grows to full, below)
   applyZoom(Math.max(lim('min-zoom', 0.85), (view.scale || 1) * (grownFrom ? 1 : COMPACT())));
   // squeezed: lists show their first rows with the next one fading out, the plate gets a solid accent edge (plate.css #stage.compact)
-  stage.classList.toggle('compact', COMPACT() < 0.99 && !grownFrom);
+  setCompact(COMPACT() < 0.99 && !grownFrom);
   measureSoon();
 }
 
@@ -55,7 +55,7 @@ stage.addEventListener('pointerenter', () => {
     grownFrom = zoom;
     fits = 0;
     const z1 = zoom, z2 = Math.min(lim('max-zoom', 2.2), zoom * k);
-    stage.classList.remove('compact');   // show everything that was tucked away
+    setCompact(false);   // show everything that was tucked away (slides open)
     applyZoom(z2);
     measure();   // tell the host NOW: the window is already full size, then the card eases up to it from its old size
     morph(z1 / z2, 1);
@@ -70,7 +70,8 @@ stage.addEventListener('pointerleave', () => {
     const z = grownFrom; grownFrom = 0; lastShrinkAt = Date.now();
     fits = 0;
     // ease the card down inside the still-large window, then shrink the window and drop the transform
-    morph(1, z / zoom, () => { stage.classList.toggle('compact', COMPACT() < 0.99); applyZoom(z); measure(); measureSoon(); });
+    send({ t: 'glass', glass: glassRects(z / zoom) });   // the native glass eases down with the card instead of lagging behind it
+    morph(1, z / zoom, () => { setCompact(COMPACT() < 0.99); applyZoom(z); measure(); measureSoon(); });
   }, 450);
 });
 
@@ -90,6 +91,29 @@ function morph(from, to, done) {
   const a = surf.animate([{ transformOrigin: '0 0', transform: `scale(${from})` }, { transformOrigin: '0 0', transform: `scale(${to})` }], { duration: lim('morph-ms', 220), easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
   a.onfinish = () => { a.cancel(); if (done) done(); };
 }
+
+// each card plate's exact rounded rect: where the host may put native glass (macOS); the page draws the tint, grain and sheen on top.
+// f scales them from the top-left (the morph's origin), for moving the glass ahead of a shrink.
+function glassRects(f) {
+  const sr = stage.getBoundingClientRect();
+  return [...document.querySelectorAll('.card-plate')].map((el) => {
+    const r = el.getBoundingClientRect();
+    const br = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+    return [(r.left - sr.left) * f, (r.top - sr.top) * f, r.width * f, r.height * f, Math.min(br * zoom, Math.min(r.width, r.height) / 2) * f].map((n) => Math.round(n));
+  }).filter((r) => r[2] > 0 && r[3] > 0);
+}
+
+// compact <-> full. Going full: each tucked list gets its full height as a target, so it slides open (CSS transition) instead of popping.
+const REVEAL = () => lim('reveal-ms', 380);
+function setCompact(on) {
+  if (!on) {
+    for (const el of stage.querySelectorAll('.c-list, .c-pastes, .c-check')) { el.style.setProperty('--full-h', el.scrollHeight + 'px'); el.classList.add('revealing'); }
+    setTimeout(() => stage.querySelectorAll('.c-list, .c-pastes, .c-check').forEach((el) => { el.style.removeProperty('--full-h'); el.classList.remove('revealing'); }), REVEAL() + 80);
+  }
+  stage.classList.toggle('compact', on);
+}
+stage.addEventListener('pointerenter', () => stage.classList.add('hovered'));
+stage.addEventListener('pointerleave', () => stage.classList.remove('hovered'));
 
 function measure() {
   queued = false;
@@ -131,12 +155,7 @@ function measure() {
     rects.push([d.left - sr.left - 3, d.top - sr.top - 3, d.width + 6, d.height + 6, d.width / 2 + 3]);
   }
   rects = rects.filter((r) => r[2] > 0 && r[3] > 0).map((r) => r.map((n) => Math.round(n)));
-  // each card plate's exact rounded rect: where the host may put native glass (macOS); the page draws the tint, grain and sheen on top
-  const glass = [...document.querySelectorAll('.card-plate')].map((el) => {
-    const r = el.getBoundingClientRect();
-    const br = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
-    return [r.left - sr.left, r.top - sr.top, r.width, r.height, Math.min(br * zoom, Math.min(r.width, r.height) / 2)].map((n) => Math.round(n));
-  }).filter((r) => r[2] > 0 && r[3] > 0);
+  const glass = glassRects(1);
   const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, glass, settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
   const key = JSON.stringify(msg);
   if (key !== lastSent) { lastSent = key; send(msg); }

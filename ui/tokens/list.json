@@ -1,7 +1,7 @@
 {
   "about": "list rows (ui/components/list): sizes as CSS variables. Rows are one even pill each: title and sub line on one line apiece, cut with an ellipsis, full text in the tooltip.",
-  "list-min-w": "250px",
-  "list-max-w": "290px",
+  "list-min-w": "230px",
+  "list-max-w": "250px",
   "list-gap": "6px",
   "row-min-h": "44px",
   "row-pad-y": "7px",

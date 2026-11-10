@@ -12,6 +12,6 @@
    touch, brightens the light-blue line and lets a faint glow out (within the window margin). */
 html[data-skin="glass"] .c-list .item { background: rgb(var(--lens-center, 6 8 12 / .42));
   border-color: rgb(var(--lens-rim, 0 0 0 / .62));
-  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line, 170 176 186 / .30)), inset 0 1px 0 1px rgb(255 255 255 / .04), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .70)); }
+  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-c), inset 0 1px 0 1px rgb(255 255 255 / .04), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .70)); }
 html[data-skin="glass"] .c-list .item.act:hover { background: rgb(var(--lens-center, 6 8 12 / .30)) linear-gradient(rgb(255 255 255 / .05), rgb(255 255 255 / .05));
-  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line-hover, 185 218 250 / .55)), inset 0 1px 0 1px rgb(255 255 255 / .05), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .56)), 0 0 var(--lens-glow-r, 7px) rgb(var(--lens-glow, 140 190 245 / .24)); }
+  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-hover-c), inset 0 1px 0 1px rgb(255 255 255 / .05), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .56)), 0 0 var(--lens-glow-r, 7px) var(--lens-glow-c); }

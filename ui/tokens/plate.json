@@ -3,8 +3,11 @@
   "arrive-glow-r": "6px",
   "arrive-glow-ms": "1300",
   "title-align": "center",
-  "compact-rows": "3",
+  "compact-rows": "4",
   "compact-peek": "20px",
   "compact-border-w": "1.5px",
-  "compact-radius": "30px"
+  "compact-radius": "30px",
+  "compact-h": "190px",
+  "compact-fade-ms": "380ms",
+  "compact-edge-a": "70%"
 }

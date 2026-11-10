@@ -5,12 +5,13 @@
   "hover-grow": 1.25,
   "hover-small-w": 560,
   "hover-regrow-cooldown-ms": 4000,
-  "morph-ms": 220,
+  "morph-ms": 320,
   "pulse-ms": 1600,
   "hover-delay-ms": 220,
   "hold-ms": 100,
   "hold-ms-control": 220,
   "move-slop": 7,
-  "compact": 0.72,
-  "arrive-pulse-ms": 2600
+  "compact": 0.85,
+  "arrive-pulse-ms": 2600,
+  "reveal-ms": 380
 }

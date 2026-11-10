@@ -2,7 +2,7 @@
 // when the pointer leaves. Style only: nothing else reads these.
 // runs for every skin; only the glass skin's CSS draws the sheen, so elsewhere the variables are simply unused
 {
-  const rest = (el) => { el.style.setProperty('--mx', '28%'); el.style.setProperty('--my', '0%'); };
+  const rest = (el) => { el.style.setProperty('--mx', '28%'); el.style.setProperty('--my', '-80%'); };
   document.addEventListener('pointermove', (e) => {
     for (const el of document.querySelectorAll('.card-plate')) {
       const r = el.getBoundingClientRect();

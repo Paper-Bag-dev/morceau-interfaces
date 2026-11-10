@@ -1,5 +1,5 @@
 {
-  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes. `platforms.<os>` (mac, win) is laid over the rest on that system: its own default accent, accents, base and schemes. `skin` names a material set the CSS keys off (html[data-skin=...]): none = the default plates; `glass` = see-through tint, grain, glints and dark lens pills (on macOS over native Liquid Glass).",
+  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes. `platforms.<os>` (mac, win) is laid over the rest on that system: its own default accent, accents, base and schemes. `skin` names a material set the CSS keys off (html[data-skin=...]): none = the default plates; `glass` = see-through tint, grain, glints and dark lens pills (on macOS over native Liquid Glass). To swap the accent: set `default` (or platforms.<os>.default, or prefs/ui.json themes.default) to any name in `accents`, or add your own; every accent-colored thing (buttons, badges, the compact edge, the pin nub, the glass lens lines and glow) follows it.",
   "default": "coral",
   "accents": {
     "ocean": "199 89% 58%",
@@ -37,7 +37,9 @@
     "plate-a": "52 47 44 / .80",
     "plate-b": "33 29 27 / .86",
     "plate-edge": "255 255 255 / .08",
-    "sheen": "255 255 255 / 0"
+    "sheen": "255 255 255 / 0",
+    "compact-dim": "0 0 0 / .16",
+    "ghost-btn": "255 255 255 / .14"
   },
   "schemes": {
     "mid": {},
@@ -112,13 +114,13 @@
         "lens-edge": "0 0 0 / .58",
         "lens-rim": "0 0 0 / .62",
         "lens-vignette": "0 0 0 / .40",
-        "lens-line": "165 200 235 / .32",
-        "lens-line-hover": "185 218 250 / .55",
         "fill-ink": "220 30% 6%",
         "fill-lift": "0 0% 100% / .28",
         "fill-rim": "0 0 0 / .55",
-        "lens-glow": "140 190 245 / .24",
-        "fill-alpha": "100%"
+        "fill-alpha": "100%",
+        "lens-line-a": "38%",
+        "lens-line-hover-a": "62%",
+        "lens-glow-a": "32%"
       }
     }
   }

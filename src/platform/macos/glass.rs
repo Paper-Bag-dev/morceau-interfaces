@@ -44,6 +44,7 @@ pub fn set_glass(win: isize, rects: &[(i32, i32, i32, i32, i32)]) {
                 let _: () = msg_send![v, release];
             }
         }
+        let existing = list.len();
         for (i, &(l, t, r, b, rad)) in rects.iter().enumerate() {
             let (x, wd, ht) = (l as f64 / s, (r - l).max(0) as f64 / s, (b - t).max(0) as f64 / s);
             let y = if flipped { t as f64 / s } else { bounds.size.height - b as f64 / s };
@@ -59,7 +60,17 @@ pub fn set_glass(win: isize, rects: &[(i32, i32, i32, i32, i32)]) {
                 list.push(v as isize);
             }
             let v = list[i] as Id;
-            let _: () = msg_send![v, setFrame: frame];
+            if i < existing {
+                // ease to the new frame over about the page's morph time, so the glass grows and shrinks with the card instead of snapping
+                let ctx: Id = msg_send![class!(NSAnimationContext), currentContext];
+                let _: () = msg_send![class!(NSAnimationContext), beginGrouping];
+                let _: () = msg_send![ctx, setDuration: 0.30f64];
+                let anim: Id = msg_send![v, animator];
+                let _: () = msg_send![anim, setFrame: frame];
+                let _: () = msg_send![class!(NSAnimationContext), endGrouping];
+            } else {
+                let _: () = msg_send![v, setFrame: frame];
+            }
             round(v, radius);
         }
     }
