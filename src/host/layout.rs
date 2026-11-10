@@ -61,19 +61,33 @@ impl Host {
                 !placement::covers_foreground(&r) && !mine.iter().any(|w| r.l < w.r && w.l < r.r && r.t < w.b && w.t < r.b)
             });
             let explicit = s.opts.at.map(|[ax, ay]| placement::clamp_inside(&placement::R { l: ax, t: ay, r: ax + size.0, b: ay + size.1 }));
-            // Region placement (--region/--align/--dx/--dy, or anchor "auto"): the host divides the free space and puts the content in a region.
+            // Region placement: the host divides the free space and puts the content in a region, through the tier ladder (tier 0, tier 1,
+            // then the screen thirds, right third first). Every card goes this way unless it names an explicit bottom/corner anchor
+            // (prefs/placement.json "explicit_anchors"); only those, and cards nothing fits for, use the scored placement below.
             let mut region_name: Option<String> = None;
-            let by_region = (s.opts.region.is_some() || s.opts.align.is_some() || s.opts.anchor.as_deref() == Some("auto"))
+            let explicit_anchor = s.opts.anchor.as_deref().map(|a| crate::policy::load().explicit_anchors.iter().any(|e| e == a)).unwrap_or(false);
+            let by_region = (s.opts.region.is_some() || s.opts.align.is_some() || !explicit_anchor)
                 .then(|| regions::Spec { region: s.opts.region.clone(), align: s.opts.align.clone().unwrap_or_default(), dx: s.opts.dx.unwrap_or(0), dy: s.opts.dy.unwrap_or(0), sacrifice: prefs::get(&prefs::load(), &s.topic, "overlap") >= 0.2 || is_important(&s.opts) })
                 .and_then(|sp| regions::place_named(size, &sp, &kin.iter().chain(foreign.iter()).copied().collect::<Vec<_>>()))
                 .map(|((rx, ry), name)| {
                     region_name = Some(name);
                     placement::clamp_inside(&placement::R { l: rx, t: ry, r: rx + size.0, b: ry + size.1 })
                 });
-            let explicit = explicit.or(by_region);
+            // Order: --at, then a region the card NAMES, then the spot you carried this topic to, then the tier ladder for everything else.
+            let named = s.opts.region.is_some() || s.opts.align.is_some();
+            let (explicit, ladder) = if named { (explicit.or(by_region), None) } else { (explicit, by_region) };
+            if !named && remembered.is_some() {
+                region_name = None;   // a remembered spot is not a ladder region: keep the card's own alignment
+            }
             let (x, y) = match (explicit, remembered) {
                 (Some(p), _) => p,   // the agent did the math: --at X,Y wins
                 (None, Some((rx, ry))) => placement::clamp_inside(&placement::R { l: rx, t: ry, r: rx + size.0, b: ry + size.1 }),
+                (None, None) if ladder.is_some() => ladder.unwrap(),
+                // Nothing in the ladder fits: start from the right (docs/chips/INDEX.md, Tier 0), top-right of the work area, not the scorer's corner.
+                (None, None) if !explicit_anchor => {
+                    let (w, m) = (placement::foreground().work, crate::policy::load().margin);
+                    placement::clamp_inside(&placement::R { l: w.r - size.0 - m, t: w.t + m, r: w.r - m, b: w.t + m + size.1 })
+                }
                 (None, None) => placement::pick(size, s.opts.anchor.as_deref().unwrap_or("right"), scope_of(&s.topic), &kin, &foreign, ow, cohesion_for(s)),
             };
             s.window.set_outer_position(PhysicalPosition::new(x - il, y - it));

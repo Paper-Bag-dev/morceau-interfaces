@@ -44,8 +44,9 @@ pub(super) fn view_for(s: &Surface, opts: &Opts, prefs: &prefs::Prefs, topic: &s
     let work = placement::foreground().work;
     // Width the page should WRAP to (css px, unzoomed) so the window fits the gap beside the neighbour instead of forcing a slab.
     // Skipped for important/urgent surfaces and for working windows (graphs/3D ask for max_frac > 0.5).
-    // If the surface names a region (--region / anchor auto), size to THAT region, not to the gap beside the active window.
-    let reg = (opts.region.is_some() || opts.anchor.as_deref() == Some("auto"))
+    // Size to the region the tier ladder will pick (every card but explicit bottom/corner anchors, see layout.rs), not to the gap beside the active window.
+    let explicit_anchor = opts.anchor.as_deref().map(|a| policy::load().explicit_anchors.iter().any(|e| e == a)).unwrap_or(false);
+    let reg = (opts.region.is_some() || !explicit_anchor)
         .then(|| regions::size_for(opts.region.as_deref(), prefs::get(prefs, topic, "overlap") >= 0.2 || is_important(opts), opts.min.map(|[w, h]| ((w as f64 * sf) as i32, (h as f64 * sf) as i32)), widgets))
         .flatten();
     let room = reg.map(|(w, _)| w as f64).unwrap_or(placement::dock_room() as f64) / sf;

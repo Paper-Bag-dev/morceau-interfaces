@@ -61,6 +61,11 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
     depends on `plate` so the material always loads.
   - Placement: a maximised active window (no free side in either tier) now uses the screen thirds, the same rung as fullscreen, instead of the
     scored corner fallback (`placement/regions.rs`, `compute`).
+  - Every card goes through the tier ladder (tier 0, tier 1, then the thirds, right third first) unless its anchor is in
+    `prefs/placement.json` "explicit_anchors" (bottom/corner intents). Before, a card with the default `near_focus` anchor skipped the ladder
+    and used scored placement, which put cards bottom-left over a maximised window (`host/layout.rs`). The pre-measure wrap width follows the
+    same rule (`host/view.rs`), and when nothing in the ladder fits, a card starts top-right of the work area instead of the scorer's corner.
+    Precedence: `--at`, then a region the card names, then the spot the user carried that topic to, then the ladder.
   - When the background agent is off (`prefs/worker.json` "enabled": false), `morc hook` hands every click to the interactive session, including
     ones marked `bg:true` (`agent/inbox.rs`).
 - **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
