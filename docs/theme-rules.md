@@ -41,6 +41,12 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
     hover and then show every value.
 18. Skins are words: `glass`, or `glass flat` for the same glass without texture. Chart text uses the skin's `chart-ink` (light on glass).
 
+## Key + detail (the mentality, user 11-11)
+19. **Compact shows the KEY part; hovering reveals the DETAIL, growing the way the card is long.** Tall parts (lists, asks, steps) fold
+    downward; wide parts fold to the right (`.fold-x` with `--key-w`: a pie's legend slides out beside the ring). Every new component
+    names its key part (a chart module exports `keyWidth(s)`; a list's key is its first rows) and gets the fold, the damped spring and the
+    mirrored close for free (core/compact.js). Highlights on Yes / No are a darker rim of their own color.
+
 ## Behavior
 10. **Every hover rule is written `:is(:hover, .hov)`.** On macOS the page cannot see the pointer while our app is inactive; the host
     sends the pointer and the page marks what is under it `.hov`. A bare `:hover` silently does nothing there.

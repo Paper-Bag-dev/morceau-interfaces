@@ -37,7 +37,7 @@ export function setView(v) {
   const sizeK = stage.dataset.size === 'medium' ? lim('medium-scale', 1.12) : stage.dataset.size === 'large' ? lim('large-scale', 1.3) : 1;   // charts and graphs start big
   applyZoom(Math.max(lim('min-zoom', 0.85), (view.scale || 1) * sizeK * (grownFrom ? 1 : COMPACT())));
   // squeezed: lists show their first rows with the next one fading out, the plate gets a solid accent edge (plate.css #stage.compact)
-  setCompact(COMPACT() < 0.99 && !grownFrom);
+  setCompact(FOLDS() && !grownFrom);
   measureSoon();
 }
 
@@ -92,7 +92,7 @@ stage.addEventListener('pointerleave', () => {
     // the mirror of growing: the content folds (lists slide shut, width eases in, the edge thickens) WHILE the card springs down inside
     // the still-large window; only when both have settled does the zoom take over from the transform and the window shrink to fit, and
     // since the card already looks exactly like that, nothing jumps
-    const fold = COMPACT() < 0.99;
+    const fold = FOLDS();
     if (fold) compact.collapse(stage, REVEAL());
     stage.classList.remove('grown');
     const settle = () => { applyZoom(z); measure(); measureSoon(); };
@@ -147,6 +147,8 @@ function glassRects(f) {
 // compact <-> full: the content side lives in core/compact.js; this file owns the zoom and the window
 const REVEAL = () => lim('reveal-ms', 380);
 function setCompact(on) { compact.set(stage, on); }
+// should this card be folded right now? (squeezed lists and long cards, or anything with a key part and detail beside it)
+const FOLDS = () => COMPACT() < 0.99 || compact.folds(stage);
 stage.addEventListener('pointerenter', () => stage.classList.add('hovered'));
 stage.addEventListener('pointerleave', () => stage.classList.remove('hovered'));
 
@@ -196,7 +198,7 @@ function measure() {
     const h = stage.getBoundingClientRect().height / zoom;
     stage.dataset.tall = h > lim('compact-if-taller', 380) ? '1' : '0';
   }
-  if (!grownFrom && !morphing && stage.classList.contains('compact') !== (COMPACT() < 0.99)) { setView({}); return; }
+  if (!grownFrom && !morphing && stage.classList.contains('compact') !== FOLDS()) { setView({}); return; }
   const glass = glassRects(1);
   const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, ...(morphing ? {} : { glass }), settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
   const key = JSON.stringify(msg);

@@ -131,8 +131,18 @@ html[data-skin~="glass"] .c-check .row:nth-child(4n+3).done .box { background: h
 /* yes / no: a rich deep green and a deep coral-red from the theme (yes-fill, no-fill; user, 11-10: deeper green, not dimmed lime), black text (as specific as the flat-accent button rule, and later, so it wins) */
 html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--yes-fill, var(--pal-3-deep))); color: hsl(var(--fill-ink, 220 30% 6%)); }
 html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--no-fill, var(--pal-1-deep))); color: hsl(var(--fill-ink, 220 30% 6%)); border: 0; }
-/* yes / no stand out a little: a rim a shade lighter in their own color, a top highlight, a small shadow (still flat) */
-html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { border: 1px solid color-mix(in oklab, hsl(var(--yes-fill, 146 58% 40%)) 72%, white); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 3px rgb(0 0 0 / .35); }
-html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { border: 1px solid color-mix(in oklab, hsl(var(--no-fill, 9 62% 50%)) 72%, white); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 3px rgb(0 0 0 / .35); }
+/* yes / no stand out a little: a rim a shade DARKER in their own color (user, 11-11), a top highlight, a small shadow (still flat) */
+html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { border: 1px solid color-mix(in oklab, hsl(var(--yes-fill, 146 58% 40%)) 62%, black); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 3px rgb(0 0 0 / .35); }
+html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { border: 1px solid color-mix(in oklab, hsl(var(--no-fill, 9 62% 50%)) 62%, black); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 3px rgb(0 0 0 / .35); }
 /* long cards (asks): compact like lists until hovered */
 #stage.compact .c-asks { max-height: var(--compact-h, 190px); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
+/* sideways fold (.fold-x, key + detail): compact shows the key width (--key-w), opening slides the detail out to the right */
+.fold-x { max-width: var(--full-w, none); transition: max-width var(--reveal-ms, 380ms) var(--ease-out); }
+.fold-x.revealing { overflow: hidden; }
+#stage.compact .fold-x[data-key] { max-width: var(--key-w); overflow: hidden; }
+#stage.compact .c-chart:has(> .fold-x[data-key]) > .ttl { max-width: var(--key-w); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* a folded chart is a whole panel, not a cut one: the fold keeps the canvas's rounded corners, and the folded chart sits centered with its
+   title held to the ring's width */
+.fold-x[data-key] { border-radius: var(--chart-canvas-radius, 22px); overflow: hidden; }
+#stage.compact .c-chart:has(> .fold-x[data-key]) { align-items: center; align-self: center; min-width: 0; }   /* folded: no chart minimum, the card hugs the key part */
+#stage.compact .c-chart:has(> .fold-x[data-key]) > .ttl { text-align: center; align-self: center; }

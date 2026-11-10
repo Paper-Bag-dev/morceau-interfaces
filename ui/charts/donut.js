@@ -9,6 +9,12 @@ function geo(s) {
   return { cx: PAD + R, cy: s.H / 2, R, r: R * 0.62, lx: PAD + R * 2 + GAP };
 }
 
+// the key part: just the ring (what a compact card shows; the legend slides out on hover)
+export function keyWidth(s) {
+  const { cx, R } = geo(s);
+  return Math.ceil(cx + R + PAD);
+}
+
 // the width this chart needs so every legend label fits inside it, with padding all round
 export function width(s) {
   const { lx } = geo(s);

@@ -30,7 +30,12 @@ register('chart', (c, ctx) => {
   ttl.className = 'ttl';
   ctx.bind(c.title, (v) => { ttl.textContent = v ?? ''; });
   const cv = document.createElement('canvas');
-  el.append(ttl, cv);
+  // key + detail: the canvas sits in a sideways fold (.fold-x). A chart module that knows its key part (keyWidth(s): the donut's ring)
+  // lets a compact card show just that; hovering slides the rest (the legend) out to the right (core/compact.js, plate.css)
+  const fold = document.createElement('div');
+  fold.className = 'fold-x';
+  fold.append(cv);
+  el.append(ttl, fold);
 
   let kind = MODS[c.kind] ? c.kind : 'line';
   const s = { c, kind, W: 260, H: 90, values: [], target: [], labels: [], hover: -1, unit: c.unit || '', t: reduced ? 1 : 0 };
@@ -43,7 +48,12 @@ register('chart', (c, ctx) => {
     const need = MODS[kind] && MODS[kind].width ? MODS[kind].width(s) : 0;
     // a chart that knows its own width (donut: ring + legend) is exactly as wide as that, never padded out to a default;
     // the others keep the default width. The card hugs its content instead of leaving an empty white strip that the window can clip.
-    const w = need ? Math.max(c.width || 0, need) : (c.width || 280);
+    const full = need ? Math.max(c.width || 0, need) : (c.width || 280);
+    const key = MODS[kind] && MODS[kind].keyWidth ? MODS[kind].keyWidth(s) : 0;
+    if (key && key < full) { fold.style.setProperty('--key-w', key + 'px'); fold.dataset.key = ''; } else { delete fold.dataset.key; }
+    // folded (compact, not opening): the canvas really is only the key part, so the card hugs it and the detail is not drawn at all
+    const st = document.getElementById('stage');
+    const w = key && key < full && st.classList.contains('compact') && !st.dataset.opening ? key : full;
     if (w !== s.W) { s.W = w; cv.style.width = w + 'px'; }
   }
   sizeH();
