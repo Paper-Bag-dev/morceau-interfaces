@@ -2,18 +2,146 @@
   "t": "save",
   "name": "confirm-run",
   "desc": "Ask once, then run a prepared command straight from the button: no model wakes (zero tokens). Stage the command first with `morc stage <id> -- argv...`, then pass /title, /body, /run (the staged id), /yes, /no, /ctx. The command's output shows in the card; Not now writes {ctx, answer:no} to the inbox without waking anyone.",
-  "params": ["/title", "/body", "/run", "/yes", "/no", "/ctx"],
-  "opts": { "min": [280, 120], "sticky": true, "topic": "agent.run" },
-  "components": [
-    { "id": "root", "type": "column", "gap": 8, "children": ["t", "b", "row", "busy", "ok", "bad"] },
-    { "id": "t", "type": "text", "size": "lg", "bold": true, "text": "{/title}" },
-    { "id": "b", "type": "text", "tone": "muted", "text": "{/body}", "when": { "path": "/body", "truthy": true } },
-    { "id": "row", "type": "row", "children": ["y", "n"], "when": { "path": "/state", "eq": "" } },
-    { "id": "y", "type": "button", "variant": "good", "icon": "check", "label": "{/yes}", "action": [{ "do": "set", "path": "/state", "value": "running" }, { "do": "run", "id": "{/run}", "into": "/out", "then": { "/state": "done" }, "fail": { "/state": "failed" } }] },
-    { "id": "n", "type": "button", "variant": "bad", "icon": "x", "label": "{/no}", "action": [{ "do": "emit", "payload": { "ctx": "{/ctx}", "answer": "no" } }, { "do": "close" }] },
-    { "id": "busy", "type": "spinner", "label": "Running", "when": { "path": "/state", "eq": "running" } },
-    { "id": "ok", "type": "text", "text": "Done. {/out}", "when": { "path": "/state", "eq": "done" } },
-    { "id": "bad", "type": "text", "text": "That didn't work: {/out}", "when": { "path": "/state", "eq": "failed" } }
+  "params": [
+    "/title",
+    "/body",
+    "/run",
+    "/yes",
+    "/no",
+    "/ctx"
   ],
-  "data": { "title": "Run this?", "body": "", "run": "", "yes": "Run", "no": "Not now", "ctx": "", "state": "", "out": "" }
+  "opts": {
+    "min": [
+      280,
+      120
+    ],
+    "sticky": true,
+    "topic": "agent.run",
+    "size": "medium"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 8,
+      "children": [
+        "t",
+        "b",
+        "row",
+        "busy",
+        "ok",
+        "bad"
+      ]
+    },
+    {
+      "id": "t",
+      "type": "text",
+      "size": "lg",
+      "bold": true,
+      "text": "{/title}"
+    },
+    {
+      "id": "b",
+      "type": "text",
+      "tone": "muted",
+      "text": "{/body}",
+      "when": {
+        "path": "/body",
+        "truthy": true
+      }
+    },
+    {
+      "id": "row",
+      "type": "row",
+      "children": [
+        "y",
+        "n"
+      ],
+      "when": {
+        "path": "/state",
+        "eq": ""
+      }
+    },
+    {
+      "id": "y",
+      "type": "button",
+      "variant": "good",
+      "icon": "check",
+      "label": "{/yes}",
+      "action": [
+        {
+          "do": "set",
+          "path": "/state",
+          "value": "running"
+        },
+        {
+          "do": "run",
+          "id": "{/run}",
+          "into": "/out",
+          "then": {
+            "/state": "done"
+          },
+          "fail": {
+            "/state": "failed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "n",
+      "type": "button",
+      "variant": "bad",
+      "icon": "x",
+      "label": "{/no}",
+      "action": [
+        {
+          "do": "emit",
+          "payload": {
+            "ctx": "{/ctx}",
+            "answer": "no"
+          }
+        },
+        {
+          "do": "close"
+        }
+      ]
+    },
+    {
+      "id": "busy",
+      "type": "spinner",
+      "label": "Running",
+      "when": {
+        "path": "/state",
+        "eq": "running"
+      }
+    },
+    {
+      "id": "ok",
+      "type": "text",
+      "text": "Done. {/out}",
+      "when": {
+        "path": "/state",
+        "eq": "done"
+      }
+    },
+    {
+      "id": "bad",
+      "type": "text",
+      "text": "That didn't work: {/out}",
+      "when": {
+        "path": "/state",
+        "eq": "failed"
+      }
+    }
+  ],
+  "data": {
+    "title": "Run this?",
+    "body": "",
+    "run": "",
+    "yes": "Run",
+    "no": "Not now",
+    "ctx": "",
+    "state": "",
+    "out": ""
+  }
 }

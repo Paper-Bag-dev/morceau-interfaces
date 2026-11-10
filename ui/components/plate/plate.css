@@ -29,12 +29,12 @@
    --mx/--my are set by plate.js on pointer move and eased by @property: nothing moves on its own. Scheme choice is unchanged. */
 @property --mx { syntax: '<percentage>'; inherits: true; initial-value: 28%; }
 @property --my { syntax: '<percentage>'; inherits: true; initial-value: -80%; }   /* at rest the light sits above the card, off it */
-html[data-skin="glass"] {
+html[data-skin~="glass"] {
   --grain-dark: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .34 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  --specks: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='1' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 14 -11.4'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>");
+  --specks: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='1' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .66  0 0 0 0 .6  0 0 0 0 .56  0 0 0 10 -8.6'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>");
 }
-html.os-mac[data-skin="glass"] .card-plate { backdrop-filter: none; }  /* only where native glass sits under the page; elsewhere the glass skin keeps the CSS blur */
-html[data-skin="glass"] .card-plate { border: var(--edge-w, 1px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-a, 55%), transparent);   /* a thin accent edge stays when grown (the compact one thins down to it) */
+html.os-mac[data-skin~="glass"] .card-plate { backdrop-filter: none; }  /* only where native glass sits under the page; elsewhere the glass skin keeps the CSS blur */
+html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-a, 55%), transparent);   /* a thin accent edge stays when grown (the compact one thins down to it) */
   background:
     var(--grain-dark),
     var(--specks),
@@ -50,7 +50,7 @@ html[data-skin="glass"] .card-plate { border: var(--edge-w, 1px) solid color-mix
   box-shadow: inset 0 1px 0 rgb(var(--plate-edge, 255 255 255 / .08)), 0 8px 24px rgb(0 0 0 / .30);
   transition: --mx .7s var(--ease-out), --my .7s var(--ease-out), border-color .35s ease, border-width .4s var(--ease-out), border-radius .4s var(--ease-out); }   /* keep the plate's edge fade */
 
-@media (prefers-reduced-motion: reduce) { html[data-skin="glass"] .card-plate { transition: none; } }
+@media (prefers-reduced-motion: reduce) { html[data-skin~="glass"] .card-plate { transition: none; } }
 /* arrival glow (core/main.js adds #stage.arrive for limits arrive-pulse-ms): two soft breaths of the accent around the plate, then still */
 @keyframes arrive-glow { 0%, 100% { filter: drop-shadow(0 0 0 hsl(var(--accent, var(--ring)) / 0)); } 50% { filter: drop-shadow(0 0 var(--arrive-glow-r, 6px) hsl(var(--accent, var(--ring)) / .45)); } }
 #stage.arrive .card-plate { animation: arrive-glow calc(var(--arrive-glow-ms, 1300) * 1ms) ease-in-out 2; }
@@ -86,11 +86,16 @@ html[data-skin="glass"] .card-plate { border: var(--edge-w, 1px) solid color-mix
 #stage.hovered:not(.compact) :is(#pin, #dismiss) svg { fill: currentColor; }
 @media (prefers-reduced-motion: reduce) { .card-plate, .card-plate::before, :is(.c-list, .c-pastes, .c-check), #pin, #dismiss { transition: none; } }
 /* glass skin: the pills' inner line is a quiet neutral grey (user, 11-10: an accent line read too glowy); no outer glow on hover */
-html[data-skin="glass"] #stage {
-  --lens-line-c: rgb(var(--lens-line, 190 196 206 / .16));
-  --lens-line-hover-c: rgb(var(--lens-line-hover, 205 211 221 / .28));
+html[data-skin~="glass"] #stage {
+  --lens-line-c: rgb(var(--lens-line, 206 196 188 / .16));
+  --lens-line-hover-c: rgb(var(--lens-line-hover, 222 212 204 / .28));
   --lens-glow-c: transparent; }
 /* glass skin: checklist and paste rows are the same dark lens rows as list rows */
-html[data-skin="glass"] :is(.c-check .row, .c-pastes .paste) { background: rgb(var(--lens-center, 6 8 12 / .05)); border: 1px solid rgb(var(--lens-rim, 0 0 0 / .62));
+html[data-skin~="glass"] :is(.c-check .row, .c-pastes .paste) { background: rgb(var(--lens-center, 6 8 12 / .05)); border: 1px solid rgb(var(--lens-rim, 0 0 0 / .62));
   box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)); border-radius: var(--row-radius, 14px); }
-html[data-skin="glass"] :is(.c-check .row, .c-pastes .paste):is(:hover, .hov) { box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-hover-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)), 0 0 var(--lens-glow-r, 7px) var(--lens-glow-c); }
+html[data-skin~="glass"] :is(.c-check .row, .c-pastes .paste):is(:hover, .hov) { box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-hover-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)), 0 0 var(--lens-glow-r, 7px) var(--lens-glow-c); }
+/* a card ending in a lone button (Close, Done): centered under the content, not stuck in a corner */
+.card-plate > .row:last-child:has(> .btn:only-child) { justify-content: center; }
+/* skin word "flat" (e.g. skin "glass flat"): the same glass without texture: no grain, no glints, no pointer light */
+html[data-skin~="flat"] { --grain: none; --grain-dark: none; --specks: none; }
+html[data-skin~="flat"] .card-plate { --sheen: 0 0 0 / 0; --glass-glow: 0 0 0 / 0; }

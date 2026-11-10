@@ -2,13 +2,62 @@
   "t": "save",
   "name": "ask-many",
   "desc": "Several yes/no questions on one card, answered in any order, then one Send: a single wake {ctx, answers:{id: yes|no}}, so a batch of decisions costs the agent one turn. Pass /title, /body, /ctx and /items [{id, q, yes?, no?}].",
-  "params": ["/title", "/body", "/ctx", "/items"],
-  "opts": { "min": [320, 160], "sticky": true, "topic": "agent.ask" },
-  "components": [
-    { "id": "root", "type": "column", "gap": 8, "children": ["t", "b", "qs"] },
-    { "id": "t", "type": "text", "size": "lg", "bold": true, "text": "{/title}" },
-    { "id": "b", "type": "text", "tone": "muted", "text": "{/body}", "when": { "path": "/body", "truthy": true } },
-    { "id": "qs", "type": "asks", "items": { "bind": "/items" }, "ctx": "{/ctx}" }
+  "params": [
+    "/title",
+    "/body",
+    "/ctx",
+    "/items"
   ],
-  "data": { "title": "A few quick decisions", "body": "", "ctx": "", "items": [] }
+  "opts": {
+    "min": [
+      320,
+      160
+    ],
+    "sticky": true,
+    "topic": "agent.ask",
+    "size": "medium"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 8,
+      "children": [
+        "t",
+        "b",
+        "qs"
+      ]
+    },
+    {
+      "id": "t",
+      "type": "text",
+      "size": "lg",
+      "bold": true,
+      "text": "{/title}"
+    },
+    {
+      "id": "b",
+      "type": "text",
+      "tone": "muted",
+      "text": "{/body}",
+      "when": {
+        "path": "/body",
+        "truthy": true
+      }
+    },
+    {
+      "id": "qs",
+      "type": "asks",
+      "items": {
+        "bind": "/items"
+      },
+      "ctx": "{/ctx}"
+    }
+  ],
+  "data": {
+    "title": "A few quick decisions",
+    "body": "",
+    "ctx": "",
+    "items": []
+  }
 }

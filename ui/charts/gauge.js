@@ -2,12 +2,15 @@
 // and the color shifts good -> warn -> bad as it fills.
 import { easeOutBack, clamp01, label, fmt, ink } from './util.js';
 
-const TONES = ['142 60% 50%', '38 92% 55%', '0 80% 62%'];
+// good / warn / bad come from the theme (themes.json base good, warn, bad), so a gauge follows the skin like everything else
+const TONE_VARS = ['--good', '--warn', '--bad'], TONE_FALLBACK = ['142 60% 50%', '38 92% 55%', '0 80% 62%'];
+const tones = () => { const cs = getComputedStyle(document.getElementById('stage')); return TONE_VARS.map((v, i) => cs.getPropertyValue(v).trim() || TONE_FALLBACK[i]); };
 
 export function draw(g, s) {
   const max = s.c.max || 100, val = s.values[0] ?? 0, ratio = clamp01(val / max);
   const cx = s.W / 2, cy = s.H - 18, R = Math.min(s.W / 2 - 14, s.H - 30), a0 = Math.PI, a1 = Math.PI * 2;
   const shownRatio = ratio * clamp01(s.t);
+  const TONES = tones();
   const tone = ratio >= (s.c.dangerAt ?? 1) ? TONES[2] : ratio >= (s.c.warnAt ?? 0.8) ? TONES[1] : TONES[0];
 
   g.lineCap = 'round';

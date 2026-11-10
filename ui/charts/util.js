@@ -6,11 +6,22 @@ export function accent() {
   return { h, s, l };
 }
 
-/** i-th of n colors, walking around the hue wheel from the accent (so one theme gives a family, not a rainbow). */
+/** A number from the theme (a CSS variable on the card), or the fallback. */
+export function themeNum(name, fallback) {
+  const v = parseFloat(getComputedStyle(document.getElementById('stage')).getPropertyValue(name));
+  return Number.isFinite(v) ? v : fallback;
+}
+
+/** i-th of n colors: a family made from the accent. How far it walks round the hue wheel and how much it steps in lightness are theme data
+ *  (themes.json: chart-hue-spread in degrees, chart-light-spread in % points; the glass skin keeps one hue and steps lightness), so every
+ *  chart, graph and future component follows the theme and a new accent recolors them all. `spread` is only the fallback. */
 export function palette(i, n, alpha = 1, spread = 70) {
   const { h, s, l } = accent();
-  const hue = (h + (n > 1 ? (i / (n - 1)) * spread : 0) + 360) % 360;
-  return `hsl(${hue} ${s}% ${l}% / ${alpha})`;
+  const t = n > 1 ? i / (n - 1) : 0;
+  const hue = (h + t * themeNum('--chart-hue-spread', spread) + 360) % 360;
+  const ls = themeNum('--chart-light-spread', 0);
+  const light = Math.max(18, Math.min(86, l + (t - 0.5) * ls));
+  return `hsl(${hue} ${s}% ${light}% / ${alpha})`;
 }
 
 export const base = (alpha = 1) => { const { h, s, l } = accent(); return `hsl(${h} ${s}% ${l}% / ${alpha})`; };

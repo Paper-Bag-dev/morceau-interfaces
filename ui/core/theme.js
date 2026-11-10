@@ -38,11 +38,14 @@ export function setThemes(t) {
   // layers, later wins: the defaults, then the skin (a named material set), then this platform's own values
   const p = (t.platforms || {})[OS] || {};
   const skin = p.skin ?? t.skin;
-  const sk = (skin && (t.skins || {})[skin]) || {};
+  // a skin can be several words ("glass flat"): each named skin's data is laid on in that order
+  const sks = String(skin || '').split(/\s+/).filter(Boolean).map((w) => (t.skins || {})[w] || {});
+  const sk = { base: Object.assign({}, ...sks.map((x) => x.base || {})), 'chart-ink': Object.assign({}, ...sks.map((x) => x['chart-ink'] || {})) };
   const schemes = { ...(t.schemes || {}) };
-  for (const src of [sk.schemes, p.schemes]) for (const [k, v] of Object.entries(src || {})) schemes[k] = { ...(schemes[k] || {}), ...v };
+  for (const src of [...sks.map((x) => x.schemes), p.schemes]) for (const [k, v] of Object.entries(src || {})) schemes[k] = { ...(schemes[k] || {}), ...v };
   t = { ...t, skin, accents: { ...(t.accents || {}), ...(p.accents || {}) }, default: p.default || t.default,
-        base: { ...(t.base || {}), ...(sk.base || {}), ...(p.base || {}) }, schemes };
+        base: { ...(t.base || {}), ...(sk.base || {}), ...(p.base || {}) }, schemes,
+        'chart-ink': { ...(t['chart-ink'] || {}), ...sk['chart-ink'], ...(p['chart-ink'] || {}) } };
   // CSS keys off html[data-skin] (none = the default plates)
   if (skin) document.documentElement.dataset.skin = skin; else delete document.documentElement.dataset.skin;
   if (t.accents && Object.keys(t.accents).length) { THEMES = t.accents; NAMES = Object.keys(THEMES); }

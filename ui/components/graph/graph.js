@@ -1,6 +1,6 @@
 import { register } from '../../core/registry.js';
 import { reduced } from '../../core/motion.js';
-import { accent } from '../../charts/util.js';
+import { accent, themeNum } from '../../charts/util.js';
 import * as literacy from '../../core/literacy.js';
 import { working } from '../../core/working.js';
 import { EXPLAIN } from '../../charts/explain.js';
@@ -109,7 +109,7 @@ register('graph', (c, ctx) => {
     const { accent: ac, fg } = colorsNow();
     const groups = g.groups && g.groups.length ? g.groups : [...new Set(g.nodes.map((n) => n.group || 'nodes'))].map((id) => ({ id, label: id }));
     const gi = new Map(groups.map((x, i) => [x.id, i]));
-    const hue = (id) => ac.h + ((gi.get(id) ?? 0) / Math.max(1, groups.length - 1)) * 140;   // a family walking round from the accent
+    const hue = (id) => ac.h + ((gi.get(id) ?? 0) / Math.max(1, groups.length - 1)) * themeNum('--chart-hue-spread', 140);   // a family from the accent (theme: chart-hue-spread)
     const flow = g.flow || [], onflow = new Set(flow);
     const ids = new Set(g.nodes.map((n) => n.id));
     const pos = arrange(groups, g.nodes, flow, W, H);

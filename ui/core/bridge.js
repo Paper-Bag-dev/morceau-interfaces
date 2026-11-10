@@ -1,4 +1,5 @@
-import { simulate, enter } from './motion.js';
+import { simulate } from './motion.js';
+import * as compact from './compact.js';
 // Page <-> host plumbing: messages, window shape, hover, hold-to-drag, pin, dismiss.
 
 // Minimum / maximum sizes and timings are DATA: ui/limits.json, sent by the host (overridable in prefs/ui.json). The numbers in lim(...) calls are only fallbacks.
@@ -41,7 +42,18 @@ export function setView(v) {
 // ---------- hover-grow: a small 3D / chart / graph window gets a little bigger while the pointer is on it ----------
 let grownFrom = 0, growTimer = 0, shrinkTimer = 0, lastShrinkAt = 0;   // lastShrinkAt: after a shrink, no re-grow for a while (the pointer can sit between the small and the grown edge and make the card flap)
 const GROW = () => lim('hover-grow', 1.25), SMALL_W = () => lim('hover-small-w', 560);
-const COMPACT = () => Math.min(1, lim('compact', 1));   // < 1: every card is compact until hovered, and hover grows it to full size   // grows only when the window is narrower than SMALL_W (logical px); never past the screen cap
+// < 1: a LIST-LIKE card (rows to tuck away) starts compact and grows to full size on hover. Charts, graphs, stats and the rest keep their
+// size (their small state is already big) and just grow a little on hover, like before (user, 11-10).
+const LISTY = '.c-list, .c-pastes, .c-check', VISUAL = '.c-model, .c-graph, .c-chart canvas';
+// The chip can say what it is (opts.size, set on #stage as data-size by core/main.js): "compact" = a glance-and-go list (starts small),
+// "medium" = a working card you read or use (pastes, to-dos, asks: never squeezed), "large" = charts and graphs (big from the start).
+// No size: a plain list (.c-list) starts compact, everything else at full size.
+const COMPACT = () => {
+  const sz = stage.dataset.size;
+  if (sz === 'medium' || sz === 'large') return 1;
+  if (sz === 'compact' || (stage.querySelector('.c-list') && !stage.querySelector(VISUAL))) return Math.min(1, lim('compact', 1));
+  return 1;
+};   // grows only when the window is narrower than SMALL_W (logical px); never past the screen cap
 stage.addEventListener('pointerenter', () => {
   clearTimeout(shrinkTimer);
   const any = COMPACT() < 0.99;   // compact cards grow on hover whatever they hold; otherwise only 3D / graph / chart windows do
@@ -56,7 +68,7 @@ stage.addEventListener('pointerenter', () => {
     grownFrom = zoom;
     fits = 0;
     const z1 = zoom, z2 = Math.min(lim('max-zoom', 2.2), zoom * k);
-    setCompact(false);   // show everything that was tucked away (slides open)
+    compact.expand(stage, REVEAL());   // show everything that was tucked away (slides open)
     morphing = true;     // the measure below sizes the window; the glass waits for the spring to drive it
     applyZoom(z2);
     measure();   // tell the host NOW: the window is already full size, then the card eases up to it from its old size
@@ -71,9 +83,17 @@ stage.addEventListener('pointerleave', () => {
   shrinkTimer = setTimeout(() => {                   // linger a moment so the edge does not flicker
     const z = grownFrom; grownFrom = 0; lastShrinkAt = Date.now();
     fits = 0;
-    // ease the card down inside the still-large window, then shrink the window and drop the transform
-    morph(1, z / zoom, () => { setCompact(COMPACT() < 0.99); applyZoom(z); measure(); measureSoon(); });
-  }, 450);
+    // the mirror of growing: the content folds (lists slide shut, width eases in, the edge thickens) WHILE the card springs down inside
+    // the still-large window; only when both have settled does the zoom take over from the transform and the window shrink to fit, and
+    // since the card already looks exactly like that, nothing jumps
+    const fold = COMPACT() < 0.99;
+    if (fold) compact.collapse(stage, REVEAL());
+    const settle = () => { applyZoom(z); measure(); measureSoon(); };
+    let left = 2;
+    const both = () => { if (--left === 0) settle(); };
+    morph(1, z / zoom, both);
+    setTimeout(both, fold && !reduced ? REVEAL() + 40 : 0);
+  }, lim('shrink-delay-ms', 450));
 });
 
 // Smooth grow/shrink: scale the whole surface from one factor to another (top-left origin) so hover growth is an animation, not a jump.
@@ -117,20 +137,9 @@ function glassRects(f) {
   }).filter((r) => r[2] > 0 && r[3] > 0);
 }
 
-// compact <-> full. Going full: each tucked list gets its full height as a target, so it slides open (CSS transition) instead of popping.
+// compact <-> full: the content side lives in core/compact.js; this file owns the zoom and the window
 const REVEAL = () => lim('reveal-ms', 380);
-function setCompact(on) {
-  if (!on) {
-    for (const el of stage.querySelectorAll('.c-list, .c-pastes, .c-check')) { el.style.setProperty('--full-h', el.scrollHeight + 'px'); el.classList.add('revealing'); }
-    // the rows that were tucked away come in as the card opens downward: each scales up and fades in, top to bottom
-    if (!reduced) {
-      const cs = getComputedStyle(stage), shown = parseInt(cs.getPropertyValue('--compact-rows')) || 2, step = parseFloat(cs.getPropertyValue('--reveal-stagger-ms')) || 55;
-      stage.querySelectorAll('.c-list').forEach((l) => [...l.children].slice(shown).forEach((row, i) => enter(row, 60 + i * step)));
-    }
-    setTimeout(() => stage.querySelectorAll('.c-list, .c-pastes, .c-check').forEach((el) => { el.style.removeProperty('--full-h'); el.classList.remove('revealing'); }), REVEAL() + 80);
-  }
-  stage.classList.toggle('compact', on);
-}
+function setCompact(on) { compact.set(stage, on); }
 stage.addEventListener('pointerenter', () => stage.classList.add('hovered'));
 stage.addEventListener('pointerleave', () => stage.classList.remove('hovered'));
 
@@ -174,6 +183,8 @@ function measure() {
     rects.push([d.left - sr.left - 3, d.top - sr.top - 3, d.width + 6, d.height + 6, d.width / 2 + 3]);
   }
   rects = rects.filter((r) => r[2] > 0 && r[3] > 0).map((r) => r.map((n) => Math.round(n)));
+  // the first view can arrive before the content: once it is here, a card that should not be compact (or should) switches, no motion
+  if (!grownFrom && !morphing && stage.classList.contains('compact') !== (COMPACT() < 0.99)) { setView({}); return; }
   const glass = glassRects(1);
   const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, ...(morphing ? {} : { glass }), settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
   const key = JSON.stringify(msg);

@@ -1,0 +1,8 @@
+{
+  "about": "stat tiles (several stats in one row become an even hero grid).",
+  "stat-cols": "2",
+  "stat-tile-min-w": "118px",
+  "stat-gap": "8px",
+  "stat-tile-pad": "10px 12px",
+  "stat-hero-size": "34px"
+}

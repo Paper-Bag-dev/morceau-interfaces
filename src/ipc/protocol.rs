@@ -29,6 +29,10 @@ pub struct Opts {
     pub dy: Option<i32>,
     /// Engagement bucket, e.g. "stats.minutes". Defaults to the cached component name.
     pub topic: Option<String>,
+    /// What kind of card this is, for its size: "compact" (a glance-and-go list: starts small, opens on hover), "medium" (a working card:
+    /// never squeezed), "large" (charts and graphs: big from the start). Omitted: a plain list starts compact, everything else full.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub size: Option<String>,
     /// Color theme: a name (ocean, violet, rose, ...), "random", or omitted for topic-matched + daily drift.
     pub theme: Option<String>,
     /// low | normal | high | critical (or a number): scales the surface. Capped to 1/4 of the screen's usable area.

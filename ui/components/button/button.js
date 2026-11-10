@@ -29,7 +29,7 @@ register('button', (c, ctx) => {
   const lb = document.createElement('span');
   lb.className = 'lb';
   let labelText = '';
-  ctx.bind(c.label, (v) => { labelText = v ?? ''; lb.textContent = labelText; b.title = c.title || labelText;   // the label is cut to one line, so the full text is always in the tooltip });
+  ctx.bind(c.label, (v) => { labelText = v ?? ''; lb.textContent = labelText; b.title = c.title || labelText; });   // the label is cut to one line, so the full text is always in the tooltip
   if (!c.label) b.title = c.title || c.icon || '';
   b.setAttribute('aria-label', c.title || labelText || c.icon || 'button');
   if (ic) b.append(ic);

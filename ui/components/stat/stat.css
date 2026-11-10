@@ -9,3 +9,14 @@
 .stat .fill { position: absolute; left: 0; top: 4.5px; height: 2.5px; width: 100%; border-radius: 2px; transform-origin: left center; transform: scaleX(0); background: hsl(var(--accent, var(--ring))); transition: transform .8s var(--spring), background .3s; }
 .stat .dot { position: absolute; top: 1px; left: 0; width: 10px; height: 10px; border-radius: 50%; transform: translateX(-50%); background: hsl(var(--accent, var(--ring))); box-shadow: 0 0 0 2px rgb(var(--ink-shadow) / .55); transition: left .8s var(--spring), background .3s; }
 .stat.warn .fill, .stat.warn .dot { background: hsl(var(--warn)); } .stat.bad .fill, .stat.bad .dot { background: hsl(var(--bad)); }
+
+/* hero tiles: several stats side by side become an even grid (2 per row by default, token stat-cols), each centered: big numeral, small
+   muted unit beside it, a one-line caption under it. Theme rules: one line + tooltip, even shapes, sizes from tokens/stat.json. */
+.row:has(> .stat + .stat) { display: grid; grid-template-columns: repeat(var(--stat-cols, 2), minmax(var(--stat-tile-min-w, 118px), 1fr)); gap: var(--stat-gap, 8px); width: 100%; }
+.row:has(> .stat + .stat) > .stat { min-width: 0; align-items: center; text-align: center; padding: var(--stat-tile-pad, 10px 12px); }
+.row:has(> .stat + .stat) > .stat .row1 { justify-content: center; }
+.row:has(> .stat + .stat) > .stat .num { font-size: var(--stat-hero-size, 34px); }
+.row:has(> .stat + .stat) > .stat :is(.lbl, .unit) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+/* glass skin: each tile is a dark lens like the rows */
+html[data-skin~="glass"] .card-plate .row:has(> .stat + .stat) > .stat { background: rgb(var(--lens-center, 6 8 12 / .05)); border: 1px solid rgb(var(--lens-rim, 0 0 0 / .62)); border-radius: var(--row-radius, 14px);
+  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)); }

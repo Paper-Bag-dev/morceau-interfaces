@@ -1,5 +1,7 @@
 # UI chips: read this first
 
+**THEME RULES (11-10): every component follows [docs/theme-rules.md](../theme-rules.md) automatically: skin + data colors/sizes, one-line text with tooltips, `:is(:hover, .hov)`, compact-first with mirrored open/fold, spring motion, charts from `charts/util.js`. Read it before any component work.**
+
 A **chip** is a ready-made card: a JSON file (the layout, already built) plus a short md next to this index. You do not write component code.
 
 **STRICT RULE: no visual size is hardcoded in CSS or code.** Every size that is a choice (min widths, radii, type sizes, paddings, text floors) is a token in

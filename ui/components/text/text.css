@@ -17,4 +17,4 @@
 .c-kv .v, .badge, .c-text { font-variant-numeric: tabular-nums; }
 /* macOS dark glass: the accent (light blue there) carries the badge, so it reads at a glance on the dark tint */
 /* glass skin: badges are flat accent pills with black text (user, 11-10: flat, no gradient or grain) */
-html[data-skin="glass"] .badge { background: color-mix(in oklab, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 85%, white) var(--fill-alpha, 80%), transparent); color: hsl(var(--fill-ink, 220 30% 6%)); font-weight: 650; text-shadow: none; border-color: transparent; box-shadow: none; }
+html[data-skin~="glass"] .badge { background: color-mix(in oklab, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 85%, white) var(--fill-alpha, 80%), transparent); color: hsl(var(--fill-ink, 220 30% 6%)); font-weight: 650; text-shadow: none; border-color: transparent; box-shadow: none; }

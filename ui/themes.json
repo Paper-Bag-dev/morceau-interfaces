@@ -1,5 +1,5 @@
 {
-  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes. `platforms.<os>` (mac, win) is laid over the rest on that system: its own default accent, accents, base and schemes. `skin` names a material set the CSS keys off (html[data-skin=...]): none = the default plates; `glass` = see-through tint, grain, glints and dark lens pills (on macOS over native Liquid Glass). To swap the accent: set `default` (or platforms.<os>.default, or prefs/ui.json themes.default) to any name in `accents`, or add your own; every accent-colored thing (buttons, badges, the compact edge, the pin nub, the glass lens lines and glow) follows it.",
+  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes. `platforms.<os>` (mac, win) is laid over the rest on that system: its own default accent, accents, base and schemes. `skin` names a material set the CSS keys off (html[data-skin=...]): none = the default plates; `glass` = see-through tint, grain, glints and dark lens pills (on macOS over native Liquid Glass). To swap the accent: set `default` (or platforms.<os>.default, or prefs/ui.json themes.default) to any name in `accents`, or add your own; every accent-colored thing (buttons, badges, the compact edge, the pin nub, the glass lens lines and glow) follows it. `skin` can be several words, laid on in order: `\"glass\"` or `\"glass flat\"` (no texture).",
   "default": "coral",
   "accents": {
     "ocean": "199 89% 58%",
@@ -66,34 +66,34 @@
   },
   "platforms": {
     "mac": {
-      "about": "macOS: the glass skin over native Liquid Glass (src/platform/macos/glass.rs), cool dark surfaces, a deep steel-blue accent (user, 10 Nov: tired of the orange). Mostly dark: the backdrop sampling still picks the scheme, but a dark page keeps dark surfaces here.",
-      "default": "glacier",
+      "about": "macOS: the glass skin over native Liquid Glass (src/platform/macos/glass.rs) in the coral scheme: warm dark surfaces and tints, coral accent (user, 10 Nov night: copy the coral scheme, darker glints). Mostly dark: a dark page keeps dark surfaces here.",
+      "default": "coral",
       "base": {
-        "card": "220 14% 10%",
-        "muted": "220 10% 17%",
-        "muted-foreground": "220 10% 74%",
-        "border": "220 10% 24%",
-        "secondary": "220 10% 18%",
-        "primary-foreground": "220 16% 10%",
-        "ink-muted": "215 12% 84%"
+        "card": "20 9% 9%",
+        "muted": "20 6% 16%",
+        "muted-foreground": "20 6% 72%",
+        "border": "20 6% 22%",
+        "secondary": "20 6% 17%",
+        "primary-foreground": "20 12% 9%",
+        "ink-muted": "20 8% 82%"
       },
       "schemes": {
         "dark": {
-          "card": "220 14% 10%",
+          "card": "20 9% 9%",
           "foreground": "0 0% 98%",
-          "muted-foreground": "220 10% 74%",
-          "secondary": "220 10% 18%",
+          "muted-foreground": "20 6% 72%",
+          "secondary": "20 6% 17%",
           "secondary-foreground": "0 0% 98%",
-          "border": "220 10% 24%",
+          "border": "20 6% 22%",
           "primary": "0 0% 98%",
-          "primary-foreground": "220 16% 10%",
+          "primary-foreground": "20 12% 9%",
           "good": "142 60% 50%",
           "warn": "38 92% 55%",
           "bad": "0 80% 62%"
         }
       },
       "accents": {
-        "glacier": "206 58% 48%"
+        "glacier": "208 52% 44%"
       },
       "skin": "glass"
     }
@@ -101,13 +101,13 @@
   "skin": "",
   "skins": {
     "glass": {
-      "about": "Dark glass: a see-through tint with dark grain, glints and a soft light that follows the pointer (macOS: over native Liquid Glass), and dark lens pills inside (rows, badges, plain buttons: black rim, thin grey line, white text). Turn it on with `skin: \"glass\"` (top level, per platform, or in prefs/ui.json under themes). Sizes: ui/tokens/lens.json.",
+      "about": "Dark glass: a see-through tint with dark grain, glints and a soft light that follows the pointer (macOS: over native Liquid Glass), and dark lens pills inside (rows, badges, plain buttons: black rim, thin grey line, white text). Turn it on with `skin: \"glass\"` (top level, per platform, or in prefs/ui.json under themes). Sizes: ui/tokens/lens.json. Charts and graphs: one accent family (chart-hue-spread 24 deg, chart-light-spread 44 points) instead of a hue walk.",
       "base": {
-        "plate-a": "28 32 42 / .24",
-        "plate-b": "12 14 20 / .36",
+        "plate-a": "36 31 28 / .36",
+        "plate-b": "16 13 12 / .50",
         "plate-edge": "255 255 255 / .10",
-        "sheen": "220 236 255 / .10",
-        "glass-glow": "190 215 255 / .085",
+        "sheen": "255 228 210 / .045",
+        "glass-glow": "255 220 200 / .035",
         "glass-rim": "255 255 255 / .30",
         "rim-accent": ".20",
         "lens-center": "6 8 12 / .05",
@@ -120,8 +120,20 @@
         "fill-alpha": "100%",
         "lens-line-a": "38%",
         "lens-line-hover-a": "62%",
-        "lens-glow-a": "32%"
+        "lens-glow-a": "32%",
+        "chart-hue-spread": "24",
+        "chart-light-spread": "44",
+        "lens-line": "206 196 188 / .16",
+        "lens-line-hover": "222 212 204 / .28"
+      },
+      "chart-ink": {
+        "dark": "245 240 236",
+        "other": "245 240 236"
       }
+    },
+    "flat": {
+      "about": "A variant word for the glass skin: `skin: \"glass flat\"` keeps the glass and drops the texture (grain, glints, pointer light). CSS: html[data-skin~=\"flat\"].",
+      "base": {}
     }
   }
 }
