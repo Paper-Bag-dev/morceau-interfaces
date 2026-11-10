@@ -16,4 +16,8 @@
 /* figures that can change never jitter */
 .c-kv .v, .badge, .c-text { font-variant-numeric: tabular-nums; }
 /* macOS dark glass: the accent (light blue there) carries the badge, so it reads at a glance on the dark tint */
-html[data-skin="glass"] .badge { color: hsl(0 0% 98%); border-color: rgb(var(--lens-rim, 0 0 0 / .62)); background: rgb(var(--lens-center, 6 8 12 / .42)); box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line, 170 176 186 / .30)), inset 0 0 var(--lens-shadow-small, 8px 1px) rgb(var(--lens-edge, 0 0 0 / .70)); }
+/* glass skin: badges are filled accent pills, grainy with glints that slide with the pointer, black text */
+html[data-skin="glass"] .badge { background: var(--grain), var(--specks), linear-gradient(180deg, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 72%, white), hsl(var(--accent, 206 58% 48%)));
+  background-blend-mode: soft-light, screen, normal; background-position: 0 0, calc(var(--mx, 28%) * .5) calc(var(--my, 0%) * .5), 0 0;
+  color: hsl(var(--fill-ink, 220 30% 6%)); font-weight: 650; text-shadow: none; border-color: rgb(var(--fill-rim, 0 0 0 / .55));
+  box-shadow: inset 0 1px 0 hsl(var(--fill-lift, 0 0% 100% / .28)), inset 0 -1px 0 rgb(0 0 0 / .18); }

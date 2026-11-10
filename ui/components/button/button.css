@@ -26,7 +26,10 @@
 .btn.on { background: hsl(var(--accent, var(--ring)) / .26); box-shadow: inset 0 0 0 1.5px hsl(var(--accent, var(--ring))); }
 .btn.swatch.on { box-shadow: 0 0 0 2px hsl(var(--card)), 0 0 0 4px hsl(var(--accent, var(--ring))); background: var(--sw); }
 .btn .lb { min-width: 0; overflow: hidden; text-overflow: ellipsis; }   /* sizes: ui/tokens/button.json */
-/* glass skin: plain buttons are the same dark lens pills as list rows (black rim, thin grey line, white text); filled variants keep their fill */
-html[data-skin="glass"] .btn:not(.good):not(.primary):not(.destructive):not(.swatch):not(.on) { color: hsl(0 0% 98%); background: rgb(var(--lens-center, 6 8 12 / .42)); border-color: rgb(var(--lens-rim, 0 0 0 / .62));
-  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line, 170 176 186 / .30)), inset 0 0 var(--lens-shadow-small, 8px 1px) rgb(var(--lens-edge, 0 0 0 / .70)); }
-html[data-skin="glass"] .btn:not(.good):not(.primary):not(.destructive):not(.swatch):not(.on):hover { box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line-hover, 200 206 216 / .45)), inset 0 0 var(--lens-shadow-small, 8px 1px) rgb(var(--lens-edge, 0 0 0 / .70)); filter: none; }
+/* glass skin: buttons are filled accent pills like the badges: grainy, glints that slide with the pointer, black text, a dark rim.
+   Hover brightens the fill a touch; the ripple and shine stay. Toggles and swatches keep their own look. */
+html[data-skin="glass"] .btn:not(.swatch):not(.on):not(.destructive) { background: var(--grain), var(--specks), linear-gradient(180deg, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 72%, white), hsl(var(--accent, 206 58% 48%)));
+  background-blend-mode: soft-light, screen, normal; background-position: 0 0, calc(var(--mx, 28%) * .5) calc(var(--my, 0%) * .5), 0 0;
+  color: hsl(var(--fill-ink, 220 30% 6%)); font-weight: 650; text-shadow: none; border-color: rgb(var(--fill-rim, 0 0 0 / .55));
+  box-shadow: inset 0 1px 0 hsl(var(--fill-lift, 0 0% 100% / .28)), inset 0 -1px 0 rgb(0 0 0 / .18); }
+html[data-skin="glass"] .btn:not(.swatch):not(.on):not(.destructive):hover { filter: brightness(1.08) saturate(1.05); }

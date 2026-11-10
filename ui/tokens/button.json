@@ -3,8 +3,8 @@
   "btn-min-h": "26px",
   "btn-pad-y": "4px",
   "btn-pad-x": "14px",
-  "btn-max-w": "220px",
+  "btn-max-w": "150px",
   "badge-min-h": "24px",
   "badge-pad-y": "2px",
-  "badge-pad-x": "12px"
+  "badge-pad-x": "11px"
 }
