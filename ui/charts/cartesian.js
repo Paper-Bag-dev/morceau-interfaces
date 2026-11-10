@@ -1,5 +1,5 @@
 ﻿// line / area / spark / bar: trends and comparisons over an ordered axis.
-import { base, easeOutBack, easeOutCubic, stagger, label, fmt, ink, measure } from './util.js';
+import { base, palette, easeOutBack, easeOutCubic, stagger, label, fmt, ink, measure } from './util.js';
 
 const PAD = 10;
 
@@ -51,12 +51,17 @@ export function draw(g, s) {
     if (pts.length > 1) {
       g.beginPath(); g.moveTo(...pts[0]);
       for (let i = 1; i < pts.length; i++) { const [px, py] = pts[i - 1], [cx, cy] = pts[i], mx = (px + cx) / 2; g.bezierCurveTo(mx, py, mx, cy, cx, cy); } // smooth
-      g.strokeStyle = base(1); g.lineWidth = kind === 'spark' ? 1.8 : 2.4; g.lineJoin = 'round'; g.lineCap = 'round';
+      // the line runs through the theme palette left to right (sparklines stay one color)
+      const run = (a) => { const lg = g.createLinearGradient(PAD, 0, W - PAD, 0); for (let k = 0; k <= 4; k++) lg.addColorStop(k / 4, palette(k, 5, a)); return lg; };
+      g.strokeStyle = kind === 'spark' ? base(1) : run(1); g.lineWidth = kind === 'spark' ? 1.8 : 2.4; g.lineJoin = 'round'; g.lineCap = 'round';
       g.shadowColor = base(0.55); g.shadowBlur = 10; g.stroke(); g.shadowBlur = 0;
       if (kind !== 'spark') {
-        const grad = g.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, base(kind === 'area' ? 0.45 : 0.22)); grad.addColorStop(1, 'rgba(0,0,0,0)');
-        g.lineTo(pts[pts.length - 1][0], H - PAD); g.lineTo(pts[0][0], H - PAD); g.closePath(); g.fillStyle = grad; g.fill();
+        g.lineTo(pts[pts.length - 1][0], H - PAD); g.lineTo(pts[0][0], H - PAD); g.closePath();
+        g.save(); g.clip();
+        g.fillStyle = run(kind === 'area' ? 0.45 : 0.24); g.fillRect(0, 0, W, H);                     // the palette under the line ...
+        const fade = g.createLinearGradient(0, 0, 0, H); fade.addColorStop(0, 'rgba(0,0,0,0)'); fade.addColorStop(1, 'rgba(0,0,0,1)');
+        g.globalCompositeOperation = 'destination-out'; g.fillStyle = fade; g.fillRect(0, 0, W, H);   // ... fading out toward the bottom
+        g.restore();
       }
       const [lx, ly] = pts[pts.length - 1];                      // a glowing head on the moving end
       g.beginPath(); g.arc(lx, ly, 3.2, 0, 7); g.fillStyle = ink(1); g.fill();

@@ -1,0 +1,66 @@
+{
+  "t": "save",
+  "name": "line-chart",
+  "desc": "Any short series as a line (the stroke and the fill run through the theme palette). Pass /title, /values, /labels, /unit. Bars: week-chart.",
+  "params": [
+    "/title",
+    "/values",
+    "/labels",
+    "/unit"
+  ],
+  "opts": {
+    "min": [
+      260,
+      150
+    ],
+    "ttl": 25,
+    "topic": "charts.line",
+    "importance": "0.7",
+    "size": "large"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 6,
+      "children": [
+        "c"
+      ]
+    },
+    {
+      "id": "c",
+      "type": "chart",
+      "kind": "line",
+      "title": "{/title}",
+      "data": {
+        "bind": "/values"
+      },
+      "labels": {
+        "bind": "/labels"
+      },
+      "height": 110,
+      "unit": "{/unit}"
+    }
+  ],
+  "data": {
+    "title": "Last 7 days",
+    "values": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "labels": [
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S",
+      "S"
+    ]
+  }
+}

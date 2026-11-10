@@ -129,6 +129,7 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 | `todo-list` | a TICKABLE to-do list (component `checklist`): count, hairline fill, round checkboxes, due rings; ticks write JSON and tick Todoist | title, items [{id,text,sub,badge,done}], `sources` for live state | [todo-list.md](todo-list.md) |
 | `status-row` | a thin row for the strip above/below: one spinner + up to two live progress bars, no buttons | s, a, b | [status-row.md](status-row.md) |
 | `stat-card-min` | one big number with a label and unit | h.label, h.value, h.unit | (data only: `{"h": {"label": "New today", "value": 4.4, "unit": "M"}}`) |
+| `line-chart` | a short series as a line (palette gradient stroke and fill) | title, values, labels, unit | [line-chart.md](line-chart.md) |
 | `week-chart` | any 7-point bar or line chart | title, values, labels, unit | [week-chart.md](week-chart.md) |
 | `ask-permission` | an urgent yes/no for the user | title, body, yes, no, ctx | [ask-permission.md](ask-permission.md) |
 | `confirm-run` | ask once, then the button runs a staged command itself (no model wakes) | title, body, run (staged id), yes, no, ctx | [confirm-run.md](confirm-run.md) |

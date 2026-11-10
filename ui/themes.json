@@ -103,7 +103,7 @@
   "skin": "",
   "skins": {
     "glass": {
-      "about": "Dark glass: a see-through tint with dark grain, glints and a soft light that follows the pointer (macOS: over native Liquid Glass), and dark lens pills inside (rows, badges, plain buttons: black rim, thin grey line, white text). Turn it on with `skin: \"glass\"` (top level, per platform, or in prefs/ui.json under themes). Sizes: ui/tokens/lens.json. Charts and graphs: one accent family (chart-hue-spread 24 deg, chart-light-spread 44 points) instead of a hue walk.",
+      "about": "Dark glass: a see-through tint with dark grain, glints and a soft light that follows the pointer (macOS: over native Liquid Glass), and dark lens pills inside (rows, badges, plain buttons: black rim, thin grey line, white text). Turn it on with `skin: \"glass\"` (top level, per platform, or in prefs/ui.json under themes). Sizes: ui/tokens/lens.json. Charts and graphs: a palette walking 200 deg from the accent (pie slices, line gradient), lightness steady (user, 11-10: more colors in pie and line charts).",
       "base": {
         "plate-a": "28 28 30 / .38",
         "plate-b": "12 12 13 / .52",
@@ -123,8 +123,8 @@
         "lens-line-a": "38%",
         "lens-line-hover-a": "62%",
         "lens-glow-a": "32%",
-        "chart-hue-spread": "24",
-        "chart-light-spread": "44",
+        "chart-hue-spread": "200",
+        "chart-light-spread": "14",
         "lens-line": "200 200 205 / .15",
         "lens-line-hover": "215 215 220 / .26"
       },

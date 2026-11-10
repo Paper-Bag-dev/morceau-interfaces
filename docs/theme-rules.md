@@ -15,7 +15,8 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
    grey inner line, white text, no accent line, no glow). Buttons and badges are FLAT accent fills with black text (`fill-ink`). Corners are
    modest radii (`row-radius`, `btn-radius`, `badge-radius`) plus `corner-shape: squircle`.
 6. **Charts and graphs** take colors from `charts/util.js` (`palette`, `base`, `accent`, `ink`, `themeNum`): one family from the accent,
-   spread set by the theme (`chart-hue-spread`, `chart-light-spread`). Status colors come from `--good`, `--warn`, `--bad`. Never pick a
+   spread set by the theme (`chart-hue-spread`, `chart-light-spread`; the glass skin walks 200 deg so pies and lines are colorful, bars keep the
+   accent). Line charts run their stroke and fill through the palette. Status colors come from `--good`, `--warn`, `--bad`. Never pick a
    color in chart code.
 
 ## Text and sizing
