@@ -125,7 +125,13 @@ function measure() {
     rects.push([d.left - sr.left - 3, d.top - sr.top - 3, d.width + 6, d.height + 6, d.width / 2 + 3]);
   }
   rects = rects.filter((r) => r[2] > 0 && r[3] > 0).map((r) => r.map((n) => Math.round(n)));
-  const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
+  // each card plate's exact rounded rect: where the host may put native glass (macOS); the page draws the tint, grain and sheen on top
+  const glass = [...document.querySelectorAll('.card-plate')].map((el) => {
+    const r = el.getBoundingClientRect();
+    const br = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+    return [r.left - sr.left, r.top - sr.top, r.width, r.height, Math.min(br * zoom, Math.min(r.width, r.height) / 2)].map((n) => Math.round(n));
+  }).filter((r) => r[2] > 0 && r[3] > 0);
+  const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, glass, settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done
   const key = JSON.stringify(msg);
   if (key !== lastSent) { lastSent = key; send(msg); }
 }

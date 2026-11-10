@@ -81,7 +81,7 @@ pub(super) fn view_for(s: &Surface, opts: &Opts, prefs: &prefs::Prefs, topic: &s
         "maxw": maxw,
         "ui": ui_bundle(),
         "maxh": work.h() as f64 / sf * opts.max_frac.unwrap_or(0.5).clamp(0.3, 0.92),
-        "theme_default": prefs.theme.clone().unwrap_or_else(|| "coral".into()),
+        "theme_default": prefs.theme.clone().unwrap_or_default(),   // unset: the page uses themes.json's default (per platform)
         "debug": std::env::var("MORC_DEBUG").is_ok(),
         "motion": prefs::get(prefs, topic, "motion"),
         "boldness": prefs::get(prefs, topic, "boldness"),

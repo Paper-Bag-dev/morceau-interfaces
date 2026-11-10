@@ -29,8 +29,22 @@ let NAMES = Object.keys(THEMES);
 let CFG = { schemes: {}, 'chart-ink': { dark: '20 20 28', other: '255 255 255' } };
 let schemeKeys = [];
 
+// Which system the page runs on: `platforms.<os>` in ui/themes.json is laid over the rest there, and CSS can read html.os-<os>.
+export const OS = /Mac/i.test(navigator.platform || navigator.userAgent) ? 'mac' : 'win';
+document.documentElement.classList.add('os-' + OS);
+
 export function setThemes(t) {
   if (!t || typeof t !== 'object') return;
+  // layers, later wins: the defaults, then the skin (a named material set), then this platform's own values
+  const p = (t.platforms || {})[OS] || {};
+  const skin = p.skin ?? t.skin;
+  const sk = (skin && (t.skins || {})[skin]) || {};
+  const schemes = { ...(t.schemes || {}) };
+  for (const src of [sk.schemes, p.schemes]) for (const [k, v] of Object.entries(src || {})) schemes[k] = { ...(schemes[k] || {}), ...v };
+  t = { ...t, skin, accents: { ...(t.accents || {}), ...(p.accents || {}) }, default: p.default || t.default,
+        base: { ...(t.base || {}), ...(sk.base || {}), ...(p.base || {}) }, schemes };
+  // CSS keys off html[data-skin] (none = the default plates)
+  if (skin) document.documentElement.dataset.skin = skin; else delete document.documentElement.dataset.skin;
   if (t.accents && Object.keys(t.accents).length) { THEMES = t.accents; NAMES = Object.keys(THEMES); }
   if (t.default) DEFAULT_THEME = t.default;
   CFG = { ...CFG, ...t };

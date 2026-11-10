@@ -1,16 +1,12 @@
 {
-    "name":  "plate",
-    "description":  "The shared frosted-glass material (grain + dark gradient + blur) that text, stat, progress, kv and chart titles sit on. Style only.",
-    "types":  [
-
-              ],
-    "js":  null,
-    "css":  "plate.css",
-    "deps":  [
-
-             ],
-    "tokens":  [
-                   "plate-radius",
-                   "plate-padding"
-               ]
+    "name": "plate",
+    "description": "The shared frosted-glass material (grain + dark gradient + blur; on macOS a see-through tint over native Liquid Glass with a light that follows the pointer). Text, stat, progress, kv and chart titles sit on it.",
+    "types": [],
+    "js": "plate.js",
+    "css": "plate.css",
+    "deps": [],
+    "tokens": [
+        "plate-radius",
+        "plate-padding"
+    ]
 }

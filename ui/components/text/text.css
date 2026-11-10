@@ -9,9 +9,11 @@
 
 .c-kv { display: flex; justify-content: space-between; gap: 18px; min-width: 190px; width: auto; align-self: stretch; }
 
-.badge { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: hsl(var(--foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--accent, var(--border)) / .45); }
+.badge { display: inline-flex; align-items: center; justify-content: center; min-height: var(--badge-min-h, 24px); padding: var(--badge-pad-y, 2px) var(--badge-pad-x, 12px); white-space: nowrap; border-radius: 999px; font-size: 11px; font-weight: 600; color: hsl(var(--foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--accent, var(--border)) / .45); }
 .badge.tone-good { background: hsl(var(--good) / .18); border-color: hsl(var(--good) / .5); color: hsl(var(--good)); }
 .badge.tone-warn { background: hsl(var(--warn) / .18); border-color: hsl(var(--warn) / .5); color: hsl(var(--warn)); }
 .badge.tone-bad  { background: hsl(var(--bad) / .18);  border-color: hsl(var(--bad) / .5);  color: hsl(var(--bad)); }
 /* figures that can change never jitter */
 .c-kv .v, .badge, .c-text { font-variant-numeric: tabular-nums; }
+/* macOS dark glass: the accent (light blue there) carries the badge, so it reads at a glance on the dark tint */
+html[data-skin="glass"] .badge { color: hsl(0 0% 98%); border-color: rgb(var(--lens-rim, 0 0 0 / .62)); background: rgb(var(--lens-center, 6 8 12 / .42)); box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line, 170 176 186 / .30)), inset 0 0 var(--lens-shadow-small, 8px 1px) rgb(var(--lens-edge, 0 0 0 / .70)); }

@@ -2,7 +2,7 @@ import { register } from '../../core/registry.js';
 import { enter, reduced } from '../../core/motion.js';
 import { rippleAt } from '../../core/ripple.js';
 
-// {type:"list", items:{bind:"/todos"}, max:6}   item: {text, sub?, badge?, action?}
+// {type:"list", items:{bind:"/todos"}, max:6}   item: {text, sub?, badge?, tip?, action?}   sizes: ui/tokens/list.json
 register('list', (c, ctx) => {
   const el = document.createElement('div');
   el.className = 'c-list';
@@ -14,8 +14,11 @@ register('list', (c, ctx) => {
       row.className = 'item' + (it.action ? ' act' : '');
       row.dataset.hit = '';
       const left = document.createElement('div');
-      left.textContent = it.text ?? '';
+      left.className = 'txt';
+      const ttl = document.createElement('div'); ttl.className = 'ttl'; ttl.textContent = it.text ?? ''; left.append(ttl);
       if (it.sub) { const s = document.createElement('div'); s.className = 'sub'; s.textContent = it.sub; left.append(s); }
+      // each line is cut to one line with an ellipsis, so the full text is always in the tooltip (item.tip overrides it)
+      row.title = it.tip ?? [it.text, it.sub].filter(Boolean).join('\n');
       row.append(left);
       if (it.badge) { const b = document.createElement('span'); b.className = 'badge'; b.textContent = it.badge; row.append(b); }
       if (it.action) row.addEventListener('click', (e) => { rippleAt(row, e); ctx.act(it.action); });

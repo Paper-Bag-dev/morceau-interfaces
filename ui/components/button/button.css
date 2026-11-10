@@ -1,5 +1,5 @@
 /* button: real backgrounds for interactive bits, icon-only and yes/no semantics (read the answer by shape and color), swatches and pressed toggles, ripple + shine. */
-.btn { position: relative; overflow: hidden; font: inherit; font-weight: 600; font-size: 11.5px; color: hsl(var(--secondary-foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); border-radius: 999px; padding: 4px 12px; cursor: pointer;
+.btn { position: relative; overflow: hidden; font: inherit; font-weight: 600; font-size: 11.5px; color: hsl(var(--secondary-foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); border-radius: 999px; padding: var(--btn-pad-y, 4px) var(--btn-pad-x, 14px); min-height: var(--btn-min-h, 26px); max-width: var(--btn-max-w, 220px); white-space: nowrap; cursor: pointer;
   transition: transform .22s var(--spring), background .15s, box-shadow .2s; box-shadow: 0 2px 8px rgb(0 0 0 / .3);
   display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
 .btn:hover { transform: translateY(-1px) scale(1.035); box-shadow: 0 2px 6px hsl(var(--accent, var(--ring)) / .4), 0 1px 4px rgb(0 0 0 / .3); filter: brightness(1.06); }   /* shadows stay inside the 8px window margin, or they clip on light cards */
@@ -25,3 +25,8 @@
 .btn.swatch:hover { filter: brightness(1.12); }
 .btn.on { background: hsl(var(--accent, var(--ring)) / .26); box-shadow: inset 0 0 0 1.5px hsl(var(--accent, var(--ring))); }
 .btn.swatch.on { box-shadow: 0 0 0 2px hsl(var(--card)), 0 0 0 4px hsl(var(--accent, var(--ring))); background: var(--sw); }
+.btn .lb { min-width: 0; overflow: hidden; text-overflow: ellipsis; }   /* sizes: ui/tokens/button.json */
+/* glass skin: plain buttons are the same dark lens pills as list rows (black rim, thin grey line, white text); filled variants keep their fill */
+html[data-skin="glass"] .btn:not(.good):not(.primary):not(.destructive):not(.swatch):not(.on) { color: hsl(0 0% 98%); background: rgb(var(--lens-center, 6 8 12 / .42)); border-color: rgb(var(--lens-rim, 0 0 0 / .62));
+  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line, 170 176 186 / .30)), inset 0 0 var(--lens-shadow-small, 8px 1px) rgb(var(--lens-edge, 0 0 0 / .70)); }
+html[data-skin="glass"] .btn:not(.good):not(.primary):not(.destructive):not(.swatch):not(.on):hover { box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line-hover, 200 206 216 / .45)), inset 0 0 var(--lens-shadow-small, 8px 1px) rgb(var(--lens-edge, 0 0 0 / .70)); filter: none; }

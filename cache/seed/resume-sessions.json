@@ -1,0 +1,15 @@
+{
+  "t": "save",
+  "name": "resume-sessions",
+  "desc": "One-click resume of earlier Claude Code sessions: a title, then one row per session (title, project and age as the sub line, a badge); a click runs that row's staged action (it opens the session in a new terminal window) and closes the card. Stage one action per row first (`morc stage resume-<id> -- ...`), then pass /title, /body and /items [{text, sub, badge, action}]. One item = the lazy single-session card.",
+  "params": ["/title", "/body", "/items"],
+  "opts": { "min": [300, 100], "sticky": true, "topic": "sessions.resume" },
+  "components": [
+    { "id": "root", "type": "column", "gap": 8, "children": ["t", "b", "list", "out"] },
+    { "id": "t", "type": "text", "size": "lg", "bold": true, "text": "{/title}" },
+    { "id": "b", "type": "text", "tone": "muted", "text": "{/body}", "when": { "path": "/body", "truthy": true } },
+    { "id": "list", "type": "list", "items": { "bind": "/items" }, "max": 8 },
+    { "id": "out", "type": "text", "tone": "muted", "text": "{/out}", "when": { "path": "/out", "truthy": true } }
+  ],
+  "data": { "title": "Pick up a session", "body": "", "items": [], "out": "" }
+}

@@ -1,5 +1,17 @@
 /* list: rows of text, optionally clickable. */
-.c-list { display: flex; flex-direction: column; gap: 4px; min-width: 240px; }
-.c-list .item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 11px; font-size: 11.5px; border-radius: 18px; color: hsl(var(--foreground)); background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border) / .8); transition: transform .2s var(--spring), background .15s; font-variant-numeric: tabular-nums; }
+.c-list { display: flex; flex-direction: column; gap: var(--list-gap, 6px); min-width: var(--list-min-w, 320px); max-width: var(--list-max-w, 420px); }
+/* every row is the same even pill: a minimum height, the same padding, one line for the title and one for the sub line (ellipsis, full text in the tooltip) */
+.c-list .item { display: flex; align-items: center; justify-content: space-between; gap: var(--row-gap, 14px); min-height: var(--row-min-h, 42px); padding: var(--row-pad-y, 6px) var(--row-pad-x, 16px); font-size: var(--row-title-size, 12.5px); border-radius: var(--row-radius, 999px); color: hsl(var(--foreground)); background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border) / .8); transition: transform .2s var(--spring), background .15s; font-variant-numeric: tabular-nums; }
 .c-list .item.act { position: relative; overflow: hidden; cursor: pointer; } .c-list .item.act:hover { transform: translateX(3px); background: hsl(var(--secondary)); }
-.c-list .sub { color: hsl(var(--muted-foreground)); font-size: 12px; }
+.c-list .txt { flex: 1 1 auto; min-width: 0; }
+.c-list .ttl, .c-list .sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-list .sub { color: hsl(var(--muted-foreground)); font-size: var(--row-sub-size, 11.5px); }
+.c-list .badge { flex: none; }
+/* macOS: each row is a dark pill-shaped lens on the glass plate: a dark fill, deeper toward the edges (an inset shadow, so it follows the
+   pill's shape), a black outer rim with a thin grey line just inside it (the glass skin; colors: themes.json lens-*, sizes: ui/tokens/lens.json). Hover lifts the middle a
+   touch and brightens the grey line. */
+html[data-skin="glass"] .c-list .item { background: rgb(var(--lens-center, 6 8 12 / .42));
+  border-color: rgb(var(--lens-rim, 0 0 0 / .62));
+  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line, 170 176 186 / .30)), inset 0 1px 0 1px rgb(255 255 255 / .04), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .70)); }
+html[data-skin="glass"] .c-list .item.act:hover { background: rgb(var(--lens-center, 6 8 12 / .42)) linear-gradient(rgb(255 255 255 / .05), rgb(255 255 255 / .05));
+  box-shadow: inset 0 0 0 var(--lens-line-w, 1px) rgb(var(--lens-line-hover, 200 206 216 / .45)), inset 0 1px 0 1px rgb(255 255 255 / .05), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .70)); }

@@ -6,6 +6,7 @@ pub mod backdrop;
 pub mod clock;
 pub mod desktop;
 pub mod foreground_watch;
+pub mod glass;
 pub mod hotkeys;
 pub mod process;
 pub mod sys;

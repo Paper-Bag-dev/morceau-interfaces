@@ -1,15 +1,24 @@
 {
-    "name":  "list",
-    "description":  "Rows of text, optionally clickable.",
-    "types":  [
-                  "list"
-              ],
-    "js":  "list.js",
-    "css":  "list.css",
-    "deps":  [
-
-             ],
-    "tokens":  [
-
-               ]
+    "name": "list",
+    "description": "Rows of text, optionally clickable.",
+    "types": [
+        "list"
+    ],
+    "js": "list.js",
+    "css": "list.css",
+    "deps": [],
+    "tokens": [
+        "lens-line-w",
+        "lens-shadow",
+        "list-gap",
+        "list-max-w",
+        "list-min-w",
+        "row-gap",
+        "row-min-h",
+        "row-pad-x",
+        "row-pad-y",
+        "row-radius",
+        "row-sub-size",
+        "row-title-size"
+    ]
 }

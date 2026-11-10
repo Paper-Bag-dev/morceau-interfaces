@@ -131,6 +131,7 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 | `confirm-run` | ask once, then the button runs a staged command itself (no model wakes) | title, body, run (staged id), yes, no, ctx | [confirm-run.md](confirm-run.md) |
 | `ask-many` | several yes/no questions on one card, one Send, one wake | title, body, ctx, items [{id, q}] | [ask-many.md](ask-many.md) |
 | `paste-blocks` | paste blocks to hand over in order, each with a Copy button | title, body, items [{title, text, note}] | [paste-blocks.md](paste-blocks.md) |
+| `resume-sessions` | one-click resume of earlier Claude Code sessions (opens each in a new terminal window); one row = the lazy single-session card | title, body, items [{text, sub, badge, action}] | [resume-sessions.md](resume-sessions.md) |
 | `graph-view` | a node-link graph (code, goals, flows) | title, graph | [graph-view.md](graph-view.md) |
 | `bike-viewer` | the interactive 3D bike demo | title, paint, spin, explode | [bike-viewer.md](bike-viewer.md) |
 | `skeleton-card` | an empty shimmering placeholder popup, shown under the id the real card will use | none | [skeleton-card.md](skeleton-card.md) |

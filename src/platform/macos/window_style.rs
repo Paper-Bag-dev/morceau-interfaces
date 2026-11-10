@@ -114,6 +114,11 @@ pub fn set_region(win: isize, rects: &[(i32, i32, i32, i32, i32)]) {
     }
 }
 
+/// Native glass under each plate (rects like set_region's, one per plate): see glass.rs.
+pub fn set_glass(win: isize, rects: &[(i32, i32, i32, i32, i32)]) {
+    super::glass::set_glass(win, rects);
+}
+
 /// Should the window take the mouse at this point (physical px relative to its top-left), given its content rects?
 fn wants_mouse(x: f64, y: f64, rects: &[(i32, i32, i32, i32, i32)]) -> bool {
     // Inside any piece, with rounded corners: a point in a corner square must also be within `radius` of that corner's circle centre.

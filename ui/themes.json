@@ -1,5 +1,5 @@
 {
-  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes.",
+  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes. `platforms.<os>` (mac, win) is laid over the rest on that system: its own default accent, accents, base and schemes. `skin` names a material set the CSS keys off (html[data-skin=...]): none = the default plates; `glass` = see-through tint, grain, glints and dark lens pills (on macOS over native Liquid Glass).",
   "default": "coral",
   "accents": {
     "ocean": "199 89% 58%",
@@ -11,7 +11,8 @@
     "lime": "84 70% 52%",
     "sky": "217 91% 66%",
     "fuchsia": "292 80% 68%",
-    "teal": "174 72% 48%"
+    "teal": "174 72% 48%",
+    "glacier": "199 92% 74%"
   },
   "base": {
     "background": "240 10% 3.9%",
@@ -32,7 +33,11 @@
     "sys": "212 92% 62%",
     "ink": "0 0% 98%",
     "ink-muted": "20 8% 82%",
-    "ink-shadow": "0 0 0"
+    "ink-shadow": "0 0 0",
+    "plate-a": "52 47 44 / .80",
+    "plate-b": "33 29 27 / .86",
+    "plate-edge": "255 255 255 / .08",
+    "sheen": "255 255 255 / 0"
   },
   "schemes": {
     "mid": {},
@@ -49,7 +54,67 @@
       "warn": "32 92% 38%",
       "bad": "0 75% 44%"
     },
-    "light": { "ink-stroke": "3.4px" }
+    "light": {
+      "ink-stroke": "3.4px"
+    }
   },
-  "chart-ink": { "dark": "20 20 28", "other": "255 255 255" }
+  "chart-ink": {
+    "dark": "20 20 28",
+    "other": "255 255 255"
+  },
+  "platforms": {
+    "mac": {
+      "about": "macOS: the glass skin over native Liquid Glass (src/platform/macos/glass.rs), cool dark surfaces, a deep steel-blue accent (user, 10 Nov: tired of the orange). Mostly dark: the backdrop sampling still picks the scheme, but a dark page keeps dark surfaces here.",
+      "default": "glacier",
+      "base": {
+        "card": "220 14% 10%",
+        "muted": "220 10% 17%",
+        "muted-foreground": "220 10% 74%",
+        "border": "220 10% 24%",
+        "secondary": "220 10% 18%",
+        "primary-foreground": "220 16% 10%",
+        "ink-muted": "215 12% 84%"
+      },
+      "schemes": {
+        "dark": {
+          "card": "220 14% 10%",
+          "foreground": "0 0% 98%",
+          "muted-foreground": "220 10% 74%",
+          "secondary": "220 10% 18%",
+          "secondary-foreground": "0 0% 98%",
+          "border": "220 10% 24%",
+          "primary": "0 0% 98%",
+          "primary-foreground": "220 16% 10%",
+          "good": "142 60% 50%",
+          "warn": "38 92% 55%",
+          "bad": "0 80% 62%"
+        }
+      },
+      "accents": {
+        "glacier": "206 58% 48%"
+      },
+      "skin": "glass"
+    }
+  },
+  "skin": "",
+  "skins": {
+    "glass": {
+      "about": "Dark glass: a see-through tint with dark grain, glints and a soft light that follows the pointer (macOS: over native Liquid Glass), and dark lens pills inside (rows, badges, plain buttons: black rim, thin grey line, white text). Turn it on with `skin: \"glass\"` (top level, per platform, or in prefs/ui.json under themes). Sizes: ui/tokens/lens.json.",
+      "base": {
+        "plate-a": "28 32 42 / .50",
+        "plate-b": "12 14 20 / .64",
+        "plate-edge": "255 255 255 / .10",
+        "sheen": "220 236 255 / .10",
+        "glass-glow": "190 215 255 / .085",
+        "glass-rim": "255 255 255 / .30",
+        "rim-accent": ".20",
+        "lens-center": "6 8 12 / .42",
+        "lens-edge": "0 0 0 / .70",
+        "lens-rim": "0 0 0 / .62",
+        "lens-vignette": "0 0 0 / .40",
+        "lens-line": "170 176 186 / .30",
+        "lens-line-hover": "200 206 216 / .45"
+      }
+    }
+  }
 }

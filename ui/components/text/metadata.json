@@ -1,20 +1,25 @@
 {
-    "name":  "text",
-    "description":  "Text, key-value rows and badges.",
-    "types":  [
-                  "text",
-                  "badge",
-                  "kv"
-              ],
-    "js":  "text.js",
-    "css":  "text.css",
-    "deps":  [
-                 "plate"
-             ],
-    "tokens":  [
-                   "text-size",
-                   "text-size-lg",
-                   "text-size-xl",
-                   "text-radius"
-               ]
+    "name": "text",
+    "description": "Text, key-value rows and badges.",
+    "types": [
+        "text",
+        "badge",
+        "kv"
+    ],
+    "js": "text.js",
+    "css": "text.css",
+    "deps": [
+        "plate"
+    ],
+    "tokens": [
+        "badge-min-h",
+        "badge-pad-x",
+        "badge-pad-y",
+        "lens-line-w",
+        "lens-shadow-small",
+        "text-radius",
+        "text-size",
+        "text-size-lg",
+        "text-size-xl"
+    ]
 }

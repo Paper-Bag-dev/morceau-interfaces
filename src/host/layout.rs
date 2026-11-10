@@ -24,6 +24,19 @@ impl Host {
             })
             .unwrap_or_default();
         winstyle::set_region(s.hwnd(), &rects);
+        // the plates' exact rounded rects (not the padded hit shapes): where the platform may put native glass
+        let glass: Vec<(i32, i32, i32, i32, i32)> = m["glass"]
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(|r| {
+                        let v: Vec<f64> = r.as_array()?.iter().filter_map(|x| x.as_f64()).collect();
+                        (v.len() == 5).then(|| ((v[0] * scale) as i32, (v[1] * scale) as i32, ((v[0] + v[2]) * scale) as i32, ((v[1] + v[3]) * scale) as i32, (v[4] * scale) as i32))
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+        winstyle::set_glass(s.hwnd(), &glass);
         s.inset = if rects.is_empty() {
             (0, 0, 0, 0)
         } else {

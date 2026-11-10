@@ -28,3 +28,6 @@ cards/
 
 # code-graph index (built locally by code-graph-mcp; read by tools/graph_export.py)
 .code-graph/
+# UI size tokens are design data, not secrets (the *token* rule above is for credentials)
+!ui/tokens/
+!ui/tokens/*.json

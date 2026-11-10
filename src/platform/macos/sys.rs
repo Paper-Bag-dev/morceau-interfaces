@@ -238,3 +238,61 @@ pub fn left_button_down() -> bool {
 pub fn beep() {
     unsafe { NSBeep() }
 }
+
+// ---------- screen pixels (backdrop sampling): needs the Screen Recording permission, checked first, never prompted here ----------
+#[link(name = "CoreGraphics", kind = "framework")]
+extern "C" {
+    fn CGPreflightScreenCaptureAccess() -> bool;
+    fn CGGetDisplaysWithPoint(point: CGPoint, max: u32, displays: *mut u32, count: *mut u32) -> i32;
+    fn CGDisplayBounds(display: u32) -> CGRect;
+    // Marked obsolete in the macOS 15 headers but still exported and working on macOS 26 (checked 10 Nov 2026). If it ever returns
+    // null, sampling just stops and cards keep their default scheme; ScreenCaptureKit is the replacement.
+    fn CGDisplayCreateImageForRect(display: u32, rect: CGRect) -> *mut c_void;
+    fn CGColorSpaceCreateDeviceRGB() -> *mut c_void;
+    fn CGColorSpaceRelease(space: *mut c_void);
+    fn CGBitmapContextCreate(data: *mut c_void, w: usize, h: usize, bpc: usize, bpr: usize, space: *mut c_void, info: u32) -> *mut c_void;
+    fn CGContextDrawImage(ctx: *mut c_void, rect: CGRect, image: *mut c_void);
+    fn CGContextRelease(ctx: *mut c_void);
+    fn CGImageRelease(image: *mut c_void);
+}
+
+/// Average color of a screen rectangle (global points, top-left origin), from a 16x16 downsample kept in memory only.
+/// None without the Screen Recording permission: without it macOS returns just the wallpaper, which would pick the wrong scheme.
+pub fn screen_average_rgb(x: f64, y: f64, w: f64, h: f64) -> Option<[u8; 3]> {
+    const N: usize = 16;
+    unsafe {
+        if w < 2.0 || h < 2.0 || !CGPreflightScreenCaptureAccess() {
+            return None;
+        }
+        let (mut id, mut n) = (0u32, 0u32);
+        if CGGetDisplaysWithPoint(CGPoint { x: x + w / 2.0, y: y + h / 2.0 }, 1, &mut id, &mut n) != 0 || n == 0 {
+            return None;
+        }
+        let db = CGDisplayBounds(id);
+        let local = CGRect { origin: CGPoint { x: x - db.origin.x, y: y - db.origin.y }, size: CGSize { width: w, height: h } };
+        let img = CGDisplayCreateImageForRect(id, local);
+        if img.is_null() {
+            return None;
+        }
+        let mut px = vec![0u8; N * N * 4];
+        let space = CGColorSpaceCreateDeviceRGB();
+        const PREMULTIPLIED_LAST: u32 = 1; // RGBA, alpha last
+        let ctx = CGBitmapContextCreate(px.as_mut_ptr() as *mut c_void, N, N, 8, N * 4, space, PREMULTIPLIED_LAST);
+        let mut out = None;
+        if !ctx.is_null() {
+            CGContextDrawImage(ctx, CGRect { origin: CGPoint { x: 0.0, y: 0.0 }, size: CGSize { width: N as f64, height: N as f64 } }, img);
+            let (mut r, mut g, mut b) = (0u32, 0u32, 0u32);
+            for p in px.chunks_exact(4) {
+                r += p[0] as u32;
+                g += p[1] as u32;
+                b += p[2] as u32;
+            }
+            let k = (N * N) as u32;
+            out = Some([(r / k) as u8, (g / k) as u8, (b / k) as u8]);
+            CGContextRelease(ctx);
+        }
+        CGColorSpaceRelease(space);
+        CGImageRelease(img);
+        out
+    }
+}
