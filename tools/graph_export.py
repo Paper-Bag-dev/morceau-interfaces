@@ -126,7 +126,14 @@ def main():
     if a.root and not a.root.endswith("/"):
         a.root += "/"
 
-    c = sqlite3.connect("file:" + find_db().replace("\\", "/") + "?mode=ro", uri=True)
+    uri = "file:" + find_db().replace("\\", "/")
+    try:
+        c = sqlite3.connect(uri + "?mode=ro", uri=True)
+        c.execute("select 1 from files limit 1")
+    except sqlite3.OperationalError:
+        # a WAL-mode index whose -shm/-wal side files do not exist cannot be opened read-only (it may not create them):
+        # read the file as it is instead. Still never writes.
+        c = sqlite3.connect(uri + "?mode=ro&immutable=1", uri=True)
     nodes, edges = symbol_graph(c, a) if a.symbol else file_graph(c, a)
 
     flow = []

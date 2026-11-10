@@ -59,6 +59,7 @@ window.morc = {
     switch (m.t) {
       case 'init':
         stage.classList.toggle('urgent', !!(m.opts && m.opts.urgent));
+        stage.classList.toggle('pulse', !!(m.opts && m.opts.pulse));   // motion only for importance high/critical; urgent alone is a still ring
         if (m.view) {   // the annoyance vector + importance, resolved by the host
           applyUi(m.view.ui);   // first: the limits and colors the rest of this init uses
           setReduced(m.view.motion < 0.3);

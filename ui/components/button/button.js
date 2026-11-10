@@ -35,8 +35,8 @@ register('button', (c, ctx) => {
   if (ic) b.append(ic);
   if (showLabel && c.label) b.append(lb);
 
-  // Non-user-triggered motion is spent sparingly: the shimmer sweep only plays on an URGENT ask's affirmative button.
-  if ((c.variant === 'primary' || c.variant === 'good') && !reduced && document.getElementById('stage').classList.contains('urgent')) {
+  // Non-user-triggered motion is spent sparingly: the shimmer sweep only plays on an IMPORTANT ask's affirmative button (opts.importance high/critical).
+  if ((c.variant === 'primary' || c.variant === 'good') && !reduced && document.getElementById('stage').classList.contains('pulse')) {
     const s = document.createElement('span');
     s.className = 'shine';
     b.append(s);

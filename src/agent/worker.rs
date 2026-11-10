@@ -153,11 +153,9 @@ pub fn idle_seconds() -> u64 {
     }
 }
 
-/// macOS: seconds since the last keyboard or mouse input anywhere (CoreGraphics event source; no permission needed).
+// macOS: platform/macos/sys.rs
 #[cfg(target_os = "macos")]
-pub fn idle_seconds() -> u64 {
-    crate::platform::macos::sys::idle_seconds()
-}
+pub use crate::platform::macos::sys::idle_seconds;
 
 fn activity_file() -> PathBuf {
     paths::runtime_dir().join("activity.jsonl")

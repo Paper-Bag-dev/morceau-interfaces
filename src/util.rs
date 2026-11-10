@@ -48,11 +48,9 @@ pub fn hidden(cmd: &mut std::process::Command) -> &mut std::process::Command {
     cmd.creation_flags(0x0800_0000) // CREATE_NO_WINDOW
 }
 
-/// macOS: a child process never opens a console window, so there is nothing to hide.
-#[cfg(not(windows))]
-pub fn hidden(cmd: &mut std::process::Command) -> &mut std::process::Command {
-    cmd
-}
+// macOS: platform/macos/process.rs
+#[cfg(target_os = "macos")]
+pub use crate::platform::macos::process::hidden;
 
 /// The Python launcher the CLI plugins and `morc graph` run with: the `py` launcher on Windows, `python3` elsewhere.
 pub const PYTHON: &str = if cfg!(windows) { "py" } else { "python3" };
@@ -83,40 +81,6 @@ pub fn local_minutes() -> u32 {
     t.wHour as u32 * 60 + t.wMinute as u32
 }
 
-/// macOS: current local minutes since midnight.
-#[cfg(not(windows))]
-pub fn local_minutes() -> u32 {
-    let (_, _, _, h, m) = local_time();
-    h * 60 + m
-}
-
-/// macOS: local wall-clock time (year, month, day, hour, minute) from the C library, so no date crate is needed.
-#[cfg(not(windows))]
-pub fn local_time() -> (i32, u32, u32, u32, u32) {
-    #[repr(C)]
-    struct Tm {
-        sec: i32,
-        min: i32,
-        hour: i32,
-        mday: i32,
-        mon: i32,
-        year: i32,
-        wday: i32,
-        yday: i32,
-        isdst: i32,
-        gmtoff: std::ffi::c_long,
-        zone: *const std::ffi::c_char,
-    }
-    extern "C" {
-        fn time(t: *mut i64) -> i64;
-        fn localtime_r(t: *const i64, out: *mut Tm) -> *mut Tm;
-    }
-    unsafe {
-        let now = time(std::ptr::null_mut());
-        let mut tm: Tm = std::mem::zeroed();
-        if localtime_r(&now, &mut tm).is_null() {
-            return (1970, 1, 1, 0, 0);
-        }
-        (tm.year + 1900, (tm.mon + 1) as u32, tm.mday as u32, tm.hour as u32, tm.min as u32)
-    }
-}
+// macOS: platform/macos/clock.rs
+#[cfg(target_os = "macos")]
+pub use crate::platform::macos::clock::local_minutes;

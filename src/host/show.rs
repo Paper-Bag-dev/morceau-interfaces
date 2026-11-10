@@ -47,7 +47,7 @@ impl Host {
         let may_beep = pv("sound") > 0.5;
 
         let mut payload = json!({"t": "init", "id": id, "components": components, "data": if data.is_null() { json!({}) } else { data },
-                             "opts": {"urgent": opts.urgent, "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme, "align": opts.align}, "literacy": literacy::snapshot()});
+                             "opts": {"urgent": opts.urgent, "pulse": matches!(opts.importance.as_deref(), Some("high") | Some("critical")), "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme, "align": opts.align}, "literacy": literacy::snapshot()});
         payload["sources"] = srcs.clone(); // kept in last_init so a summoned or restored card is bound to its live data again
         self.parked.retain(|p| p.id != id);
         sources::register(&id, &srcs);

@@ -72,8 +72,9 @@ body { color: hsl(var(--ink)); cursor: default; }
 #stage.pinned #pin { opacity: .95; color: hsl(var(--accent, var(--ring))); pointer-events: auto; }
 #stage.pinned #pin svg { transform: rotate(0deg); fill: hsl(var(--accent, var(--ring)) / .4); }
 
-/* urgent: the whole shape gets a slow ring */
-#stage.urgent::before { content: ""; position: absolute; inset: 6px; border-radius: 28px; box-shadow: 0 0 0 1.5px hsl(var(--ring) / .7), 0 0 22px hsl(var(--ring) / .25); animation: ring 1.8s ease-in-out infinite; pointer-events: none; }
+/* urgent: the whole shape gets a ring; it pulses only when the card is also important (opts.importance high/critical) */
+#stage.urgent::before { content: ""; position: absolute; inset: 6px; border-radius: 28px; box-shadow: 0 0 0 1.5px hsl(var(--ring) / .7), 0 0 22px hsl(var(--ring) / .25); pointer-events: none; }
+#stage.urgent.pulse::before { animation: ring 1.8s ease-in-out infinite; }   /* the pulse: only for importance high/critical */
 @keyframes ring { 50% { box-shadow: 0 0 0 2.5px hsl(var(--ring) / 1), 0 0 30px hsl(var(--ring) / .45); } }
 #stage.dragging { cursor: grabbing; }
 #stage.dragging .btn { pointer-events: none; }

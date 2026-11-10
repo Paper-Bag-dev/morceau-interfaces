@@ -11,8 +11,6 @@ use tao::{
 };
 #[cfg(windows)]
 use tao::platform::windows::{WindowBuilderExtWindows, WindowExtWindows};
-#[cfg(target_os = "macos")]
-use tao::platform::macos::{WindowBuilderExtMacOS, WindowExtMacOS};
 use wry::{WebView, WebViewBuilder};
 #[cfg(windows)]
 use wry::WebViewBuilderExtWindows;
@@ -20,20 +18,19 @@ use wry::WebViewBuilderExtWindows;
 #[cfg(windows)]
 const DEFAULT_WV_ARGS: &str = "--use-angle=swiftshader --enable-unsafe-swiftshader";
 
-/// The page every surface loads. wry serves a custom protocol as http://<name>.localhost/ on Windows (WebView2) and as <name>://localhost/
-/// on macOS (WKWebView); assets::handle only reads the path, so both work.
+/// The page every surface loads: wry serves a custom protocol as http://<name>.localhost/ with WebView2.
 #[cfg(windows)]
 const START_URL: &str = "http://morc.localhost/index.html";
-#[cfg(not(windows))]
-const START_URL: &str = "morc://localhost/index.html";
 
-/// The native handle the platform layer works with: the HWND on Windows, the NSWindow pointer on macOS.
+/// The native handle the platform layer works with: the HWND.
+#[cfg(windows)]
 fn native_handle(window: &Window) -> isize {
-    #[cfg(windows)]
-    return window.hwnd();
-    #[cfg(target_os = "macos")]
-    return window.ns_window() as isize;
+    window.hwnd()
 }
+
+// macOS: platform/macos/app.rs
+#[cfg(target_os = "macos")]
+use crate::platform::macos::app::{native_handle, START_URL};
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum Phase {
@@ -94,9 +91,8 @@ impl Surface {
             .with_skip_taskbar(true)
             .with_no_redirection_bitmap(true) // no default GDI surface behind the transparent page (suspected source of the pale top band)
             .with_undecorated_shadow(false);
-        // macOS: no system shadow (the page draws its own edge); Dock and Cmd-Tab hiding come from the Accessory policy in host/mod.rs.
         #[cfg(target_os = "macos")]
-        let builder = builder.with_has_shadow(false);
+        let builder = crate::platform::macos::app::window_builder(builder);
         let window = builder.build(target).map_err(|e| e.to_string())?;
         winstyle::overlay_styles(native_handle(&window));
         #[allow(unused_mut)]

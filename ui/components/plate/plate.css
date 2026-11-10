@@ -18,4 +18,5 @@
 #stage:has(.c-model) .card-plate { backdrop-filter: none; }
 /* An urgent card on a plate: the ring hugs the plate instead of the whole window, so there is no gap between them. */
 #stage.urgent:has(.card-plate)::before { content: none; }
-#stage.urgent .card-plate { box-shadow: 0 0 0 1.5px hsl(var(--ring) / .7), 0 0 22px hsl(var(--ring) / .25); animation: ring 1.8s ease-in-out infinite; }
+#stage.urgent .card-plate { box-shadow: 0 0 0 1.5px hsl(var(--ring) / .7), 0 0 22px hsl(var(--ring) / .25); }
+#stage.urgent.pulse .card-plate { animation: ring 1.8s ease-in-out infinite; }

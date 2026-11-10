@@ -40,13 +40,8 @@ pub(super) fn ensure_host() -> Result<(), String> {
         use std::os::windows::process::CommandExt;
         cmd.creation_flags(0x0800_0008); // CREATE_NO_WINDOW | DETACHED_PROCESS
     }
-    // macOS: its own process group, so closing the terminal (SIGHUP to the foreground group) or Ctrl+C does not take the host down.
-    // Unix children only inherit descriptors without close-on-exec, and Rust opens everything close-on-exec, so no handle dance is needed.
-    #[cfg(unix)]
-    {
-        use std::os::unix::process::CommandExt;
-        cmd.process_group(0);
-    }
+    #[cfg(target_os = "macos")]
+    crate::platform::macos::process::detach(&mut cmd);
     cmd.spawn().map_err(|e| e.to_string())?;
     let t0 = Instant::now();
     while t0.elapsed() < Duration::from_secs(6) {

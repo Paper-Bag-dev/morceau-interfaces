@@ -82,6 +82,13 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
   `Life::hold` from `host/tick.rs`), so nothing expires unseen or is logged as ignored; `placement::foreground()` / `windows()` are
   150 ms snapshots over the OS calls (`*_now`), dropped on every active-window change (`placement::invalidate`); the unused
   `regions::place` and `ORDER` are gone. macOS: the click-through timer and the foreground poll idle when no card is up.
+- **Platform code stays out of shared files (user rule):** shared code is general. All macOS logic lives in `src/platform/macos/`
+  (`app` event loop + window builder + handle + page URL, `clock`, `process` hidden/detach/open/copy/runtime folder, `desktop`, `sys`,
+  `window_style`, `hotkeys`, `foreground_watch`, `backdrop`); a shared file only names it with one `#[cfg(target_os = "macos")]` `use` or
+  call. Never put macOS logic inline in a shared file; add a function in the right platform module instead. (Windows code is still inline
+  under `cfg(windows)` in some shared files; moving it to `src/platform/windows/` is a later, separate change.)
+- **Motion only when important:** `urgent` gives a still ring and parks an ignored card; the pulse (ring animation + button shimmer) needs
+  `importance` high or critical too (host sends `opts.pulse`). Routine cards (`confirm-run`, `ask-many`) are sticky, not urgent.
 - **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
   target. A cfg mistake only shows up when that target is compiled.
 
