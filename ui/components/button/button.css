@@ -28,5 +28,5 @@
 .btn .lb { min-width: 0; overflow: hidden; text-overflow: ellipsis; }   /* sizes: ui/tokens/button.json */
 /* glass skin: buttons are flat accent pills with black text, like the badges (user, 11-10: flat, no gradient or grain).
    Hover brightens the color a touch; the ripple stays. Toggles, swatches and destructive keep their own look. */
-html[data-skin="glass"] .btn:not(.swatch):not(.on):not(.destructive) { background: color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 85%, white); color: hsl(var(--fill-ink, 220 30% 6%)); font-weight: 650; text-shadow: none; border-color: transparent; box-shadow: none; }
+html[data-skin="glass"] .btn:not(.swatch):not(.on):not(.destructive) { background: color-mix(in oklab, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 85%, white) var(--fill-alpha, 80%), transparent); color: hsl(var(--fill-ink, 220 30% 6%)); font-weight: 650; text-shadow: none; border-color: transparent; box-shadow: none; }
 html[data-skin="glass"] .btn:not(.swatch):not(.on):not(.destructive):hover { filter: brightness(1.08); box-shadow: none; }
