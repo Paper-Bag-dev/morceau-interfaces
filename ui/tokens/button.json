@@ -1,10 +1,12 @@
 {
-  "about": "buttons and badges: even padding and one line; a label that does not fit ends in an ellipsis and shows in full as a tooltip.",
+  "about": "buttons and badges: even padding and one line; a label that does not fit ends in an ellipsis and shows in full as a tooltip. Corners are squircles (a modest radius + corner-shape: squircle where supported), not full pills.",
   "btn-min-h": "26px",
   "btn-pad-y": "4px",
   "btn-pad-x": "14px",
   "btn-max-w": "150px",
   "badge-min-h": "24px",
   "badge-pad-y": "2px",
-  "badge-pad-x": "11px"
+  "badge-pad-x": "11px",
+  "btn-radius": "10px",
+  "badge-radius": "9px"
 }

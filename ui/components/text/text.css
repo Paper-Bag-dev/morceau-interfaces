@@ -9,7 +9,7 @@
 
 .c-kv { display: flex; justify-content: space-between; gap: 18px; min-width: 190px; width: auto; align-self: stretch; }
 
-.badge { display: inline-flex; align-items: center; justify-content: center; min-height: var(--badge-min-h, 24px); padding: var(--badge-pad-y, 2px) var(--badge-pad-x, 12px); white-space: nowrap; border-radius: 999px; font-size: 11px; font-weight: 600; color: hsl(var(--foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--accent, var(--border)) / .45); }
+.badge { display: inline-flex; align-items: center; justify-content: center; min-height: var(--badge-min-h, 24px); padding: var(--badge-pad-y, 2px) var(--badge-pad-x, 12px); white-space: nowrap; border-radius: var(--badge-radius, 9px); corner-shape: squircle; font-size: 11px; font-weight: 600; color: hsl(var(--foreground)); background: hsl(var(--secondary)); border: 1px solid hsl(var(--accent, var(--border)) / .45); }
 .badge.tone-good { background: hsl(var(--good) / .18); border-color: hsl(var(--good) / .5); color: hsl(var(--good)); }
 .badge.tone-warn { background: hsl(var(--warn) / .18); border-color: hsl(var(--warn) / .5); color: hsl(var(--warn)); }
 .badge.tone-bad  { background: hsl(var(--bad) / .18);  border-color: hsl(var(--bad) / .5);  color: hsl(var(--bad)); }

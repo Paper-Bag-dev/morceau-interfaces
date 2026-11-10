@@ -7,7 +7,7 @@
   "row-pad-y": "7px",
   "row-pad-x": "14px",
   "row-gap": "10px",
-  "row-radius": "999px",
+  "row-radius": "14px",
   "row-title-size": "12.5px",
   "row-sub-size": "11.5px"
 }
