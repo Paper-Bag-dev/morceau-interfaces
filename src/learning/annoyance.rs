@@ -94,10 +94,16 @@ fn save(p: &Prefs) -> Result<(), String> {
 }
 
 fn log(who: &str, what: &str, why: &str) {
+    #[cfg(windows)]
     let day = {
         use windows::Win32::System::SystemInformation::GetLocalTime;
         let t = unsafe { GetLocalTime() };
         format!("{:04}-{:02}-{:02} {:02}:{:02}", t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute)
+    };
+    #[cfg(not(windows))]
+    let day = {
+        let (y, mo, d, h, mi) = crate::util::local_time();
+        format!("{y:04}-{mo:02}-{d:02} {h:02}:{mi:02}")
     };
     let p = file().with_file_name("annoyance_log.md");
     if let Ok(mut f) = fs::OpenOptions::new().create(true).append(true).open(p) {

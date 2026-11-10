@@ -1,15 +1,23 @@
-//! What the desktop looks like right now (Windows API): the visible windows, the monitors, the active window and whether it is fullscreen, its exe and title.
+//! What the desktop looks like right now (Windows API; the macOS versions are in `mod mac` at the bottom): the visible windows, the monitors, the active window and whether it is fullscreen, its exe and title.
 
+#[cfg(windows)]
 use std::ffi::c_void;
+#[cfg(windows)]
 use windows::core::BOOL;
+#[cfg(windows)]
 use windows::Win32::Foundation::{HWND, LPARAM, RECT};
+#[cfg(windows)]
 use windows::Win32::Graphics::Dwm::{DwmGetWindowAttribute, DWMWA_CLOAKED, DWMWA_EXTENDED_FRAME_BOUNDS};
+#[cfg(windows)]
 use windows::Win32::Graphics::Gdi::*;
+#[cfg(windows)]
 use windows::Win32::System::Threading::GetCurrentProcessId;
+#[cfg(windows)]
 use windows::Win32::UI::WindowsAndMessaging::*;
 
 use super::R;
 
+#[cfg(windows)]
 fn hwnd_rect(hwnd: HWND) -> Option<R> {
     let mut r = RECT::default();
     unsafe {
@@ -20,6 +28,7 @@ fn hwnd_rect(hwnd: HWND) -> Option<R> {
     Some(R::from(r))
 }
 
+#[cfg(windows)]
 fn is_cloaked(hwnd: HWND) -> bool {
     let mut c: u32 = 0;
     unsafe {
@@ -27,6 +36,7 @@ fn is_cloaked(hwnd: HWND) -> bool {
     }
 }
 
+#[cfg(windows)]
 unsafe extern "system" fn collect(hwnd: HWND, lp: LPARAM) -> BOOL {
     let out = &mut *(lp.0 as *mut Vec<R>);
     if !IsWindowVisible(hwnd).as_bool() || IsIconic(hwnd).as_bool() || is_cloaked(hwnd) {
@@ -51,6 +61,7 @@ unsafe extern "system" fn collect(hwnd: HWND, lp: LPARAM) -> BOOL {
     BOOL(1)
 }
 
+#[cfg(windows)]
 unsafe extern "system" fn collect_monitors(mon: HMONITOR, _: HDC, _: *mut RECT, lp: LPARAM) -> BOOL {
     let out = &mut *(lp.0 as *mut Vec<(HMONITOR, R)>);
     let mut mi = MONITORINFO { cbSize: std::mem::size_of::<MONITORINFO>() as u32, ..Default::default() };
@@ -66,6 +77,7 @@ pub struct Foreground {
     pub fullscreen: bool,
 }
 
+#[cfg(windows)]
 /// The active window and the work area of the monitor it is on (primary if none).
 pub fn foreground() -> Foreground {
     unsafe {
@@ -104,6 +116,7 @@ pub fn foreground() -> Foreground {
     }
 }
 
+#[cfg(windows)]
 /// Every visible, non-minimised top-level window except ours and the shell (physical px).
 pub fn windows() -> Vec<R> {
     let mut wins: Vec<R> = vec![];
@@ -131,6 +144,7 @@ pub fn dock_room() -> i32 {
     }
 }
 
+#[cfg(windows)]
 /// Work area of the monitor that contains this point (primary if none).
 pub fn work_at(x: i32, y: i32) -> R {
     unsafe {
@@ -149,6 +163,7 @@ pub fn clamp_inside(r: &R) -> (i32, i32) {
     (x, y)
 }
 
+#[cfg(windows)]
 /// Executable name (lowercase) of the active window's process, e.g. "chrome.exe".
 pub fn fg_exe() -> Option<String> {
     use windows::core::PWSTR;
@@ -174,6 +189,7 @@ pub fn fg_exe() -> Option<String> {
     }
 }
 
+#[cfg(windows)]
 /// Title of the active window (what you are looking at), if it has one.
 pub fn fg_title() -> Option<String> {
     unsafe {
@@ -191,3 +207,89 @@ pub fn fg_title() -> Option<String> {
 pub fn covers_foreground(r: &R) -> bool {
     foreground().rect.map(|f| r.overlap(&f) > 0).unwrap_or(false)
 }
+
+/// macOS: the same functions, from the window server (CGWindowList) and AppKit (NSScreen, NSWorkspace). No permission is needed except for
+/// window titles (`fg_title`), which macOS only shows to apps with Screen Recording; without it the title is None.
+#[cfg(target_os = "macos")]
+mod mac {
+    use super::{Foreground, R};
+    use crate::platform::macos::sys::{self, CGRect};
+
+    /// Points (top-left origin) to physical pixels.
+    fn px(r: &CGRect, s: f64) -> R {
+        R {
+            l: (r.origin.x * s).round() as i32,
+            t: (r.origin.y * s).round() as i32,
+            r: ((r.origin.x + r.size.width) * s).round() as i32,
+            b: ((r.origin.y + r.size.height) * s).round() as i32,
+        }
+    }
+
+    fn contains(r: &R, x: i32, y: i32) -> bool {
+        x >= r.l && x < r.r && y >= r.t && y < r.b
+    }
+
+    const FALLBACK: R = R { l: 0, t: 0, r: 1920, b: 1080 };
+
+    /// The active window (the front-most normal window of the front-most app) and the work area of its display.
+    pub fn foreground() -> Foreground {
+        let s = sys::scale();
+        let screens = sys::screens();
+        let me = std::process::id() as i32;
+        // Our own card can be "active" while you type in a field; Finder with no window open is the desktop. Neither is something to avoid.
+        let fg_pid = sys::frontmost_pid().filter(|p| *p != me);
+        let wins = sys::window_list();
+        let fg_rect = fg_pid.and_then(|p| wins.iter().find(|w| w.pid == p && w.layer == 0 && w.alpha > 0.0)).map(|w| px(&w.bounds, s));
+        let mon = match fg_rect {
+            Some(r) => screens.iter().max_by_key(|m| px(&m.frame, s).overlap(&r)),
+            None => screens.first(),
+        };
+        let work = mon.map(|m| px(&m.visible, s)).unwrap_or(FALLBACK);
+        // Fullscreen = the active window covers its entire display (menu bar included): a full-screen app, a game or a video.
+        let fullscreen = match (fg_rect, mon) {
+            (Some(r), Some(m)) => {
+                let m = px(&m.frame, s);
+                r.l <= m.l && r.t <= m.t && r.r >= m.r && r.b >= m.b && r.area() > 0
+            }
+            _ => false,
+        };
+        Foreground { rect: fg_rect, work, fullscreen }
+    }
+
+    /// Every visible normal window except ours (physical px). Menu bar, Dock and other system layers are left out by `layer == 0`.
+    pub fn windows() -> Vec<R> {
+        let s = sys::scale();
+        let me = std::process::id() as i32;
+        sys::window_list()
+            .iter()
+            .filter(|w| w.layer == 0 && w.pid != me && w.alpha > 0.0)
+            .map(|w| px(&w.bounds, s))
+            .filter(|r| r.w() > 80 && r.h() > 40)
+            .collect()
+    }
+
+    /// Work area of the display that contains this point (primary if none).
+    pub fn work_at(x: i32, y: i32) -> R {
+        let s = sys::scale();
+        let screens = sys::screens();
+        screens
+            .iter()
+            .find(|m| contains(&px(&m.frame, s), x, y))
+            .or(screens.first())
+            .map(|m| px(&m.visible, s))
+            .unwrap_or(FALLBACK)
+    }
+
+    /// Executable name (lowercase) of the active app, e.g. "google chrome".
+    pub fn fg_exe() -> Option<String> {
+        sys::frontmost_exe()
+    }
+
+    /// Title of the active window, if macOS lets us see it (Screen Recording permission).
+    pub fn fg_title() -> Option<String> {
+        let pid = sys::frontmost_pid()?;
+        sys::window_list().into_iter().find(|w| w.pid == pid && w.layer == 0).and_then(|w| w.name)
+    }
+}
+#[cfg(target_os = "macos")]
+pub use mac::*;

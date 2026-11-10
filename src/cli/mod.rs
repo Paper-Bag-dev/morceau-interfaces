@@ -166,8 +166,8 @@ pub fn run(args: Vec<String>) -> i32 {
                     if a == "--ttl" || a == "--id" { it.next(); continue; }
                     args.push(a.clone());
                 }
-                let out = crate::util::hidden(std::process::Command::new("py").args(&args).current_dir(paths::home_dir()).stdout(std::process::Stdio::piped()).stderr(std::process::Stdio::piped()))
-                    .output().map_err(|e| format!("py: {e}"))?;
+                let out = crate::util::hidden(std::process::Command::new(crate::util::PYTHON).args(&args).current_dir(paths::home_dir()).stdout(std::process::Stdio::piped()).stderr(std::process::Stdio::piped()))
+                    .output().map_err(|e| format!("{}: {e}", crate::util::PYTHON))?;
                 if !out.status.success() {
                     return Err(format!("graph_export failed: {}", String::from_utf8_lossy(&out.stderr).trim()));
                 }

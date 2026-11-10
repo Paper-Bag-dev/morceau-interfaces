@@ -1,5 +1,6 @@
 //! Where things live. Three places: the INSTALL (app_dir), YOUR DATA (home_dir) and per-machine RUNTIME state (runtime_dir).
-//! The install is read-only shipped content; your data survives upgrades; runtime state (token, logs, cursors) is under %LOCALAPPDATA%\morc.
+//! The install is read-only shipped content; your data survives upgrades; runtime state (token, logs, cursors) is under %LOCALAPPDATA%\morc
+//! on Windows and ~/Library/Application Support/morc on macOS.
 
 use std::path::PathBuf;
 
@@ -53,8 +54,11 @@ pub fn home_dir() -> PathBuf {
 }
 
 pub fn runtime_dir() -> PathBuf {
-    let base = std::env::var("LOCALAPPDATA").unwrap_or_else(|_| ".".into());
-    let d = PathBuf::from(base).join("morc");
+    #[cfg(windows)]
+    let base = PathBuf::from(std::env::var("LOCALAPPDATA").unwrap_or_else(|_| ".".into()));
+    #[cfg(not(windows))]
+    let base = std::env::var("HOME").map(|h| PathBuf::from(h).join("Library").join("Application Support")).unwrap_or_else(|_| PathBuf::from("."));
+    let d = base.join("morc");
     let _ = std::fs::create_dir_all(&d);
     d
 }

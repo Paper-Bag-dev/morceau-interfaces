@@ -11,7 +11,7 @@ Each component is one folder with its code, its styles and its metadata. A compo
 | `checklist` | A tickable to-do list: a count and hairline progress up top, round checkboxes, clock-time badges, a coral ring on what is due. A tick answers at once, then runs the allowlisted tick-<id> action that stores the state as JSON. | checklist | plate | `checklist.js`, `checklist.css`, `metadata.json` | check-min-w, check-size, check-count-size, check-text-size, check-row-pad |
 | `graph` | A node-link graph on Cytoscape. | graph | plate | `graph.js`, `graph.css`, `metadata.json` | - |
 | `input` | A text field. | input | - | `input.js`, `input.css`, `metadata.json` | - |
-| `layout` | Flex layout: columns, rows, panels, spacer, divider, wing; right-aligned cards and the leftward flow. | column, row, panel, spacer, divider, wing | - | `layout.js`, `layout.css`, `metadata.json` | - |
+| `layout` | Flex layout: columns, rows, panels, spacer, divider, wing; right-aligned cards and the leftward flow. | column, row, panel, spacer, divider, wing | plate | `layout.js`, `layout.css`, `metadata.json` | - |
 | `list` | Rows of text, optionally clickable. | list | - | `list.js`, `list.css`, `metadata.json` | - |
 | `progress` | A labelled progress bar (percent). | progress | plate | `progress.js`, `progress.css`, `metadata.json` | - |
 | `skeleton` | Shimmering placeholder shapes. | skeleton | - | `skeleton.js`, `skeleton.css`, `metadata.json` | - |

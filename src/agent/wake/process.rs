@@ -117,7 +117,8 @@ fn launch(w: &worker::Worker) -> std::io::Result<std::process::Child> {
     let allow = "Bash(morc:*)".to_string();
     let allow_ps = "PowerShell(morc:*)".to_string(); // the agent may reach for either shell; both are limited to the morc CLI
     let exe_dir = std::path::Path::new(&exe).parent().map(|p| p.display().to_string()).unwrap_or_default();
-    let child_path = format!("{exe_dir};{}", std::env::var("PATH").unwrap_or_default());
+    let sep = if cfg!(windows) { ';' } else { ':' }; // PATH separator: ';' on Windows, ':' on macOS
+    let child_path = format!("{exe_dir}{sep}{}", std::env::var("PATH").unwrap_or_default());
     // max_turns 0 (the default) = no turn cap: the agent works until it is done. A positive number caps it.
     let turns = w.max_turns.to_string();
     let mut cmd = Command::new("claude");

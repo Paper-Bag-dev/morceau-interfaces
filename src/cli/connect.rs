@@ -17,11 +17,11 @@ pub(super) fn ensure_host() -> Result<(), String> {
     if TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::PORT).parse().unwrap(), Duration::from_millis(200)).is_ok() && paths::token_file().exists() {
         return Ok(());
     }
-    use std::os::windows::process::CommandExt;
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     // The detached host must not inherit the pipes this CLI was started with. Windows gives a child EVERY inheritable handle of its parent,
     // not just the std ones we null below, so a shell, a script or an agent capturing this CLI's output would wait for the host to exit
     // (it never does) and the first command would appear to hang for minutes. Mark our own std handles non-inheritable before spawning.
+    #[cfg(windows)]
     unsafe {
         use windows::Win32::Foundation::{SetHandleInformation, HANDLE_FLAGS, HANDLE_FLAG_INHERIT};
         use windows::Win32::System::Console::{GetStdHandle, STD_ERROR_HANDLE, STD_INPUT_HANDLE, STD_OUTPUT_HANDLE};
@@ -33,14 +33,21 @@ pub(super) fn ensure_host() -> Result<(), String> {
             }
         }
     }
-    std::process::Command::new(exe)
-        .arg("host")
-        .creation_flags(0x0800_0008) // CREATE_NO_WINDOW | DETACHED_PROCESS
-        .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
-        .spawn()
-        .map_err(|e| e.to_string())?;
+    let mut cmd = std::process::Command::new(exe);
+    cmd.arg("host").stdin(std::process::Stdio::null()).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null());
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(0x0800_0008); // CREATE_NO_WINDOW | DETACHED_PROCESS
+    }
+    // macOS: its own process group, so closing the terminal (SIGHUP to the foreground group) or Ctrl+C does not take the host down.
+    // Unix children only inherit descriptors without close-on-exec, and Rust opens everything close-on-exec, so no handle dance is needed.
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        cmd.process_group(0);
+    }
+    cmd.spawn().map_err(|e| e.to_string())?;
     let t0 = Instant::now();
     while t0.elapsed() < Duration::from_secs(6) {
         if TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::PORT).parse().unwrap(), Duration::from_millis(200)).is_ok() && paths::token_file().exists() {

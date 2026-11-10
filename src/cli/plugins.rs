@@ -12,7 +12,7 @@ pub(super) fn external(cmd: &str) -> Option<std::path::PathBuf> {
 
 pub(super) fn run_external(p: &std::path::Path, args: &[String]) -> i32 {
     let mut c = match p.extension().and_then(|e| e.to_str()) {
-        Some("py") => { let mut c = std::process::Command::new("py"); c.arg(p); c }
+        Some("py") => { let mut c = std::process::Command::new(crate::util::PYTHON); c.arg(p); c }
         Some("ps1") => { let mut c = std::process::Command::new("powershell"); c.args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]).arg(p); c }
         _ => { let mut c = std::process::Command::new("cmd"); c.arg("/c").arg(p); c }
     };

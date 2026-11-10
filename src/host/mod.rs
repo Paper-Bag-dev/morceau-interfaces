@@ -68,7 +68,17 @@ pub fn run() -> ! {
     let token = format!("{:016x}{:016x}", rand_u64(), rand_u64());
     let _ = std::fs::write(paths::token_file(), &token);
 
-    let event_loop = EventLoopBuilder::<Ev>::with_user_event().build();
+    #[allow(unused_mut)]
+    let mut event_loop = EventLoopBuilder::<Ev>::with_user_event().build();
+    // macOS: an accessory app has no Dock icon and is not in Cmd-Tab, like the tool windows on Windows.
+    #[cfg(target_os = "macos")]
+    {
+        use tao::platform::macos::{ActivationPolicy, EventLoopExtMacOS};
+        event_loop.set_activation_policy(ActivationPolicy::Accessory);
+        // tao activates the app at launch by default, which takes focus from the window you are in; then the "active window" is ours and
+        // placement has nothing to sit beside.
+        event_loop.set_activate_ignoring_other_apps(false);
+    }
     let proxy = event_loop.create_proxy();
     server::spawn(listener, token, proxy.clone());
     sources::spawn(proxy.clone());
@@ -379,15 +389,27 @@ impl Host {
     }
 }
 
+#[cfg(windows)]
 fn left_button_down() -> bool {
     use windows::Win32::UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_LBUTTON};
     unsafe { (GetAsyncKeyState(VK_LBUTTON.0 as i32) as u16 & 0x8000) != 0 }
 }
 
+#[cfg(windows)]
 fn beep() {
     unsafe {
         let _ = windows::Win32::System::Diagnostics::Debug::MessageBeep(windows::Win32::UI::WindowsAndMessaging::MESSAGEBOX_STYLE(0x40));
     }
+}
+
+#[cfg(target_os = "macos")]
+fn left_button_down() -> bool {
+    crate::platform::macos::sys::left_button_down()
+}
+
+#[cfg(target_os = "macos")]
+fn beep() {
+    crate::platform::macos::sys::beep()
 }
 
 impl Host {

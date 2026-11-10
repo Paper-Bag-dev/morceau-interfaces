@@ -10,7 +10,7 @@
 //! Free space in each = the cell minus what is occupied:
 //!   tier 0: every visible window + my widgets   (gaps between windows, between a window and the monitor edge)
 //!   tier 1: only the active window + my widgets (non-active windows are sacrificed: a widget may sit on top of them)
-//! With no usable active window (fullscreen, desktop) the screen is split into thirds: right | mid | left (tier 0 only).
+//! With no usable active window (fullscreen, desktop, or one maximised so no side is free) the screen is split into thirds: right | mid | left (tier 0 only).
 //! Default fill order: right, then down (below), then left, then the corners. If nothing fits, the caller falls back to the
 //! scoring placement in placement.rs (least overlap).
 //!
@@ -125,7 +125,9 @@ pub fn compute(widgets: &[R]) -> (Vec<Region>, &'static str, Option<R>) {
         }
     };
     match active {
-        Some(a) => {
+        // A maximised active window leaves no free side in either tier: fall through to the screen thirds (the same rung as fullscreen)
+        // instead of the scored corner fallback.
+        Some(a) if cells(&a, &work).iter().any(|(_, cell)| free_rects(cell, &[a]).iter().any(|r| r.w() >= MIN_W && r.h() >= MIN_H)) => {
             let wins = placement::windows();
             let tier0: Vec<R> = wins.iter().chain(std::iter::once(&a)).chain(widgets.iter()).copied().collect();
             let tier1: Vec<R> = std::iter::once(a).chain(widgets.iter().copied()).collect();
@@ -137,7 +139,7 @@ pub fn compute(widgets: &[R]) -> (Vec<Region>, &'static str, Option<R>) {
             }
             (out, "around-active", Some(a))
         }
-        None => {
+        _ => {
             let third = work.w() / 3;
             let parts = [("right", R { l: work.r - third, t: work.t, r: work.r, b: work.b }), ("mid", R { l: work.l + third, t: work.t, r: work.r - third, b: work.b }), ("left", R { l: work.l, t: work.t, r: work.l + third, b: work.b })];
             for (name, reg) in parts {

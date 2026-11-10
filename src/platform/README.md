@@ -1,6 +1,7 @@
-# src/platform: the Windows-specific parts
+# src/platform: the operating-system specific parts
 
-Everything that talks to the operating system directly lives here, so a macOS port replaces this folder (see BACKLOG.md).
+Everything that talks to the operating system directly lives here. The files in this folder are the Windows versions (`#[cfg(windows)]`); `macos/`
+has the same modules with the same function signatures for macOS, and `mod.rs` picks one set per OS. See "macOS port" in AGENTS.md.
 
 | file | responsibility |
 |---|---|
@@ -9,4 +10,4 @@ Everything that talks to the operating system directly lives here, so a macOS po
 | `hotkeys.rs` | global hotkeys: dismiss all, summon |
 | `foreground_watch.rs` | notice when the active window changes |
 
-`placement/desktop.rs` also uses the Windows API (windows, monitors, the active window); it belongs here in a port.
+`placement/desktop.rs` also uses the OS (windows, monitors, the active window): the Windows API in the top half, `mod mac` (using `macos/sys.rs`) at the bottom.

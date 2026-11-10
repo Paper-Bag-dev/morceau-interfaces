@@ -18,11 +18,53 @@ Three folders at runtime (see `src/paths.rs`): the install (`MORC_APP`), the use
 runtime state (`%LOCALAPPDATA%\morc`). Never put user data in the install; never write secrets anywhere tracked.
 
 ## Build, test, run
-- Build: `cargo build --release` (binary `target/release/morc.exe`). **`cargo test` does NOT rebuild the exe**; always `cargo build --release` after a change
+- Build: `cargo build --release` (binary `target/release/morc.exe`; `target/release/morc` on macOS). **`cargo test` does NOT rebuild the exe**; always `cargo build --release` after a change
   and restart the host (`morc stop`) so a stale exe or stale UI JS is not what you test.
 - Tests: `cargo test --release` (lifetime, lint). UI files are plain ES modules: check each with `node --check <file>`.
 - Run: `morc use ask-permission` (cold start spawns the host detached; the first call can take a while). `MORC_DEBUG=1` adds placement/layout logging to `host.log`.
 - A UI change needs a restart of the host (the warm spare page caches JS). Verify visually: take a screenshot (process must be DPI-aware or it crops).
+
+## macOS port (two platforms, one tree)
+Windows and macOS are both maintained from the same source; nothing Windows-only was removed. Read this before touching `src/`.
+- **How the split works.** Windows code stays where it was, behind `#[cfg(windows)]`. The macOS code sits right beside it behind
+  `#[cfg(target_os = "macos")]` (or `#[cfg(not(windows))]` for plain Unix things like paths and the clock). Cargo has the `windows` crate under
+  `[target.'cfg(windows)'.dependencies]` and the macOS crates (`objc2`, `global-hotkey`) under a macOS target section.
+- **Where the macOS code is.**
+  - `src/platform/macos/`: the same four modules as `src/platform/` (`window_style`, `backdrop`, `hotkeys`, `foreground_watch`) with the same function
+    signatures, plus `sys.rs` (every raw AppKit / CoreGraphics / libdispatch call in one place). `platform/mod.rs` picks one set per OS, so `main.rs` and
+    the host are unchanged.
+  - Shared files that got a macOS branch beside the Windows one: `placement/desktop.rs` (`mod mac` at the bottom), `placement/rect.rs`,
+    `surface/mod.rs` (window builder, start URL, native handle), `host/mod.rs` (Accessory activation policy, mouse button, beep), `agent/worker.rs`
+    (idle time), `agent/wake/process.rs` (PATH separator), `cli/connect.rs` (detached host start), `cli/plugins.rs` and `cli/mod.rs` (`util::PYTHON`),
+    `data/paths.rs` (runtime folder), `learning/annoyance.rs` and `util.rs` (local time), `tools/cli/_home.py` and `tools/cli/tracker.py` (paths, exe name).
+- **What differs on macOS.**
+  - Runtime folder: `~/Library/Application Support/morc` (Windows: `%LOCALAPPDATA%\morc`). The binary is `morc`, not `morc.exe`. Python is `python3`.
+  - Page URL: `morc://localhost/index.html` (WKWebView) instead of `http://morc.localhost/index.html` (WebView2). `assets::handle` only reads the path.
+  - Handles: `Surface::hwnd()` keeps its name but returns the NSWindow pointer on macOS; the platform functions take it as `isize` on both systems.
+  - Click-through: macOS has no window regions. `window_style::set_region` stores each card's content rects, and a 40 ms timer on the main thread flips
+    `ignoresMouseEvents` depending on whether the pointer is over content (`wants_mouse`). AppKit calls must run on the main thread (`sys::on_main`).
+  - Placement reads the window server (`CGWindowListCopyWindowInfo`, safe on any thread) and `NSScreen` (main thread). Points are converted to physical
+    pixels with the primary display's scale factor, the same space tao's `outer_position` uses. Mixed-DPI multi-monitor setups are approximate.
+  - The active-window watch polls the window server every 400 ms (Windows uses an event hook).
+  - No permission prompts by design. Not available until we ask for Screen Recording: backdrop sampling (`backdrop::average_rgb` returns None, so cards
+    keep their own scheme) and window titles (`fg_title` returns None, so the chore agent's activity log has app names only).
+  - No system-wide move cursor while carrying a card (`drag_cursor_on/off` are no-ops). WKWebView uses the GPU, so `MORC_WV_ARGS` is Windows-only.
+  - Hotkeys: Ctrl+Option+X and Ctrl+Option+Space through `global-hotkey`. The second clashes with macOS "next input source" when several keyboard
+    layouts are on; the CLI (`morc summon`) always works.
+- **Known gaps (see BACKLOG.md):**
+  - Clicking a card activates morc (a plain NSWindow cannot be a non-activating panel). Fixing it means turning the window into an NSPanel.
+  - The npm launcher (`bin/morc.js`), `build.cmd`, `scripts/release-build.ps1` and CI are still Windows-only. On a Mac, build with `cargo build --release`
+    and run `target/release/morc`.
+- **Also changed on this branch (both platforms):**
+  - Every card sits on ONE plate by default: `ui/core/render.js` gives a layout root (column, row, panel) the `.card-plate` class, styled in
+    `ui/components/plate/plate.css`; pieces inside go flat, and an urgent ring hugs the plate. `"plate": false` on the root opts out. `layout` now
+    depends on `plate` so the material always loads.
+  - Placement: a maximised active window (no free side in either tier) now uses the screen thirds, the same rung as fullscreen, instead of the
+    scored corner fallback (`placement/regions.rs`, `compute`).
+  - When the background agent is off (`prefs/worker.json` "enabled": false), `morc hook` hands every click to the interactive session, including
+    ones marked `bg:true` (`agent/inbox.rs`).
+- **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
+  target. A cfg mistake only shows up when that target is compiled.
 
 ## Rules of the house
 - **Show on screen first (hard rule).** Whenever the user asks to be shown something (list, status, report, plan, progress), first check whether it can go on their screen through the `morc` CLI and do that. Terminal text only if morc is unavailable or the host defers, and say why. Text may accompany a card, never replace it.

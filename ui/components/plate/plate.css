@@ -10,3 +10,12 @@
 .stat .unit, .stat .lbl, .c-kv .k, .c-prog .lbl, .tone-muted { color: rgb(255 255 255 / .68); }
 /* A WebGL canvas plus backdrop-filter blur on a transparent window is a GPU-process reset waiting to happen; surfaces with a 3D model use plain plates. */
 #stage:has(.c-model) .plate, #stage:has(.c-model) .c-text, #stage:has(.c-model) .c-kv, #stage:has(.c-model) .stat, #stage:has(.c-model) .c-prog, #stage:has(.c-model) .c-chart .ttl { backdrop-filter: none; }
+/* A whole card on one plate: the root of every card by default (core/render.js adds .card-plate; "plate": false on the root opts out).
+   The pieces inside go flat so plates never stack. */
+.card-plate { background: var(--grain), var(--plate); background-blend-mode: soft-light, normal; backdrop-filter: blur(10px) saturate(1.1);
+  border: 1px solid rgb(255 255 255 / .08); border-radius: var(--card-plate-radius, 22px); padding: var(--card-plate-padding, 12px 14px); box-shadow: 0 5px 16px rgb(0 0 0 / .30); color: hsl(0 0% 97%); }
+.card-plate :is(.c-text, .c-kv, .stat, .c-prog, .c-chart .ttl, .plate) { background: none; border-color: transparent; box-shadow: none; backdrop-filter: none; padding-left: 0; padding-right: 0; }
+#stage:has(.c-model) .card-plate { backdrop-filter: none; }
+/* An urgent card on a plate: the ring hugs the plate instead of the whole window, so there is no gap between them. */
+#stage.urgent:has(.card-plate)::before { content: none; }
+#stage.urgent .card-plate { box-shadow: 0 0 0 1.5px hsl(var(--ring) / .7), 0 0 22px hsl(var(--ring) / .25); animation: ring 1.8s ease-in-out infinite; }

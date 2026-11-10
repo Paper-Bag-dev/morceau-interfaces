@@ -75,7 +75,12 @@ export class Renderer {
     this.unsubs.forEach((u) => u());
     this.unsubs = [];
     const rootId = this.comps.has('root') ? 'root' : [...this.comps.keys()][0];
-    this.root.replaceChildren(rootId ? this.node(rootId) : document.createElement('div'));
+    const rootEl = rootId ? this.node(rootId) : document.createElement('div');
+    // Every card sits on ONE plate by default (the frosted material of ui/components/plate), so its pieces never float loose on a busy page.
+    // Only a layout root gets it (a lone text or stat already is a plate); "plate": false on the root opts out.
+    const rc = rootId && this.comps.get(rootId);
+    if (rc && rc.plate !== false && ['column', 'row', 'panel'].includes(rc.type)) { rootEl.classList.add('card-plate'); rootEl.dataset.hit = ''; }
+    this.root.replaceChildren(rootEl);
   }
 
   node(id) {

@@ -7,12 +7,33 @@ use std::time::Instant;
 use tao::{
     dpi::LogicalSize,
     event_loop::EventLoopWindowTarget,
-    platform::windows::{WindowBuilderExtWindows, WindowExtWindows},
     window::{Window, WindowBuilder},
 };
-use wry::{WebView, WebViewBuilder, WebViewBuilderExtWindows};
+#[cfg(windows)]
+use tao::platform::windows::{WindowBuilderExtWindows, WindowExtWindows};
+#[cfg(target_os = "macos")]
+use tao::platform::macos::{WindowBuilderExtMacOS, WindowExtMacOS};
+use wry::{WebView, WebViewBuilder};
+#[cfg(windows)]
+use wry::WebViewBuilderExtWindows;
 
+#[cfg(windows)]
 const DEFAULT_WV_ARGS: &str = "--use-angle=swiftshader --enable-unsafe-swiftshader";
+
+/// The page every surface loads. wry serves a custom protocol as http://<name>.localhost/ on Windows (WebView2) and as <name>://localhost/
+/// on macOS (WKWebView); assets::handle only reads the path, so both work.
+#[cfg(windows)]
+const START_URL: &str = "http://morc.localhost/index.html";
+#[cfg(not(windows))]
+const START_URL: &str = "morc://localhost/index.html";
+
+/// The native handle the platform layer works with: the HWND on Windows, the NSWindow pointer on macOS.
+fn native_handle(window: &Window) -> isize {
+    #[cfg(windows)]
+    return window.hwnd();
+    #[cfg(target_os = "macos")]
+    return window.ns_window() as isize;
+}
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum Phase {
@@ -59,7 +80,7 @@ pub struct Surface {
 
 impl Surface {
     pub fn create(target: &EventLoopWindowTarget<Ev>, key: u64, proxy: Proxy) -> Result<Surface, String> {
-        let window = WindowBuilder::new()
+        let builder = WindowBuilder::new()
             .with_title("")
             .with_decorations(false)
             .with_transparent(true)
@@ -67,24 +88,33 @@ impl Surface {
             .with_resizable(false)
             .with_visible(false)
             .with_focused(false)
+            .with_inner_size(LogicalSize::new(10.0, 10.0));
+        #[cfg(windows)]
+        let builder = builder
             .with_skip_taskbar(true)
             .with_no_redirection_bitmap(true) // no default GDI surface behind the transparent page (suspected source of the pale top band)
-            .with_undecorated_shadow(false)
-            .with_inner_size(LogicalSize::new(10.0, 10.0))
-            .build(target)
-            .map_err(|e| e.to_string())?;
-        winstyle::overlay_styles(window.hwnd());
+            .with_undecorated_shadow(false);
+        // macOS: no system shadow (the page draws its own edge); Dock and Cmd-Tab hiding come from the Accessory policy in host/mod.rs.
+        #[cfg(target_os = "macos")]
+        let builder = builder.with_has_shadow(false);
+        let window = builder.build(target).map_err(|e| e.to_string())?;
+        winstyle::overlay_styles(native_handle(&window));
+        #[allow(unused_mut)]
         let mut wvb = WebViewBuilder::new();
         // Graphics backend. Hardware WebGL gets its context reset within 20-70 s on this machine (Intel Iris Xe + a transparent window),
         // leaving a dead canvas; Google's SwiftShader (software) is stable and plenty for these scenes. WebView2 allows ONE configuration per
         // browser process, so this is host-wide. MORC_WV_ARGS=gpu keeps hardware; any other value is passed through as extra browser flags.
-        let extra = match std::env::var("MORC_WV_ARGS").ok().as_deref() {
-            Some("gpu") => None,
-            Some(a) => Some(a.to_string()),
-            None => Some(DEFAULT_WV_ARGS.to_string()),
-        };
-        if let Some(extra) = extra {
-            wvb = wvb.with_additional_browser_args(format!("--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection {extra}"));   // wry's own default flag is kept
+        // macOS: WKWebView has no browser flags and uses the GPU; MORC_WV_ARGS is ignored there.
+        #[cfg(windows)]
+        {
+            let extra = match std::env::var("MORC_WV_ARGS").ok().as_deref() {
+                Some("gpu") => None,
+                Some(a) => Some(a.to_string()),
+                None => Some(DEFAULT_WV_ARGS.to_string()),
+            };
+            if let Some(extra) = extra {
+                wvb = wvb.with_additional_browser_args(format!("--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection {extra}"));   // wry's own default flag is kept
+            }
         }
         let webview = wvb
             .with_transparent(true)
@@ -94,7 +124,7 @@ impl Surface {
             .with_ipc_handler(move |req| {
                 let _ = proxy.send_event(Ev::Ipc(key, req.body().clone()));
             })
-            .with_url("http://morc.localhost/index.html")
+            .with_url(START_URL)
             .build(&window)
             .map_err(|e| e.to_string())?;
         let now = Instant::now();
@@ -121,8 +151,9 @@ impl Surface {
         })
     }
 
+    /// The native window handle for the platform layer (HWND on Windows, NSWindow pointer on macOS); the name is kept from Windows.
     pub fn hwnd(&self) -> isize {
-        self.window.hwnd()
+        native_handle(&self.window)
     }
 
     /// Send a message to the page.

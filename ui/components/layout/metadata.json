@@ -12,7 +12,7 @@
     "js":  "layout.js",
     "css":  "layout.css",
     "deps":  [
-
+                 "plate"
              ],
     "tokens":  [
 

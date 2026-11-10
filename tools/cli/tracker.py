@@ -18,7 +18,8 @@ import re
 import subprocess
 import sys
 
-A2 = os.environ.get("MORC_BIN") or os.path.expandvars(r"%LOCALAPPDATA%\morc\bin\morc.exe")
+A2 = os.environ.get("MORC_BIN") or (os.path.expandvars(r"%LOCALAPPDATA%\morc\bin\morc.exe") if os.name == "nt"
+                                    else os.path.expanduser("~/Library/Application Support/morc/bin/morc"))
 HOME = pathlib.Path(os.environ.get("MORC_HOME") or pathlib.Path(__file__).resolve().parents[2])
 SEED = HOME / "cache" / "seed" / "stat-strip.json"
 CELLS = "abcd"

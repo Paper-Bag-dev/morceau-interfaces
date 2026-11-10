@@ -99,6 +99,7 @@ pub fn load() -> Worker {
 }
 
 /// Seconds since the last keyboard or mouse input anywhere in Windows.
+#[cfg(windows)]
 pub fn idle_seconds() -> u64 {
     use windows::Win32::System::SystemInformation::GetTickCount;
     use windows::Win32::UI::Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO};
@@ -112,6 +113,12 @@ pub fn idle_seconds() -> u64 {
     }
 }
 
+/// macOS: seconds since the last keyboard or mouse input anywhere (CoreGraphics event source; no permission needed).
+#[cfg(target_os = "macos")]
+pub fn idle_seconds() -> u64 {
+    crate::platform::macos::sys::idle_seconds()
+}
+
 fn activity_file() -> PathBuf {
     paths::runtime_dir().join("activity.jsonl")
 }
@@ -123,7 +130,7 @@ pub fn note_foreground() {
         return;
     }
     let exe = placement::fg_exe().unwrap_or_default();
-    if exe.is_empty() || exe == "morc.exe" {
+    if exe.is_empty() || exe == "morc.exe" || exe == "morc" {
         return;
     }
     let raw = placement::fg_title().unwrap_or_default();

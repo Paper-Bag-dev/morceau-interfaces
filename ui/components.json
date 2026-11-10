@@ -111,7 +111,9 @@
     "divider",
     "wing"
    ],
-   "deps": [],
+   "deps": [
+    "plate"
+   ],
    "tokens": [],
    "description": "Flex layout: columns, rows, panels, spacer, divider, wing; right-aligned cards and the leftward flow."
   },

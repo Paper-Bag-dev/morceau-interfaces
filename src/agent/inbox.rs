@@ -56,8 +56,10 @@ pub fn hook_json(event_name: &str) -> String {
         "[morc] {} UI interaction(s) from the user's screen while you were away. Act on them as the screen agent (docs: morc/docs/agent.md):",
         ev.len()
     )];
-    // a click marked bg:true is already being handled by the background agent: tell the session, do not hand it over as work
-    let (bg, mine): (Vec<&Value>, Vec<&Value>) = ev.iter().partition(|e| e["payload"]["bg"].as_bool().unwrap_or(false));
+    // a click marked bg:true is already being handled by the background agent: tell the session, do not hand it over as work.
+    // With the background agent off (prefs/worker.json "enabled": false) nobody else will act on it, so every event is the session's.
+    let agent_on = crate::worker::load().enabled;
+    let (bg, mine): (Vec<&Value>, Vec<&Value>) = ev.iter().partition(|e| agent_on && e["payload"]["bg"].as_bool().unwrap_or(false));
     for e in mine.iter().take(20) {
         lines.push(format!("- {}", e));
     }

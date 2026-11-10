@@ -14,7 +14,8 @@ wry = "0.57"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
-[dependencies.windows]
+# Windows only: the Win32 API behind src/platform/ and the cfg(windows) blocks elsewhere.
+[target.'cfg(windows)'.dependencies.windows]
 version = "0.62"
 features = [
   "Win32_Foundation",
@@ -28,6 +29,12 @@ features = [
   "Win32_UI_Input_KeyboardAndMouse",
   "Win32_System_Diagnostics_Debug",
 ]
+
+# macOS only (see "macOS port" in AGENTS.md). objc2 talks to AppKit (NSWindow, NSScreen, NSWorkspace); CoreGraphics and libdispatch are
+# called through small extern blocks in src/platform/macos/sys.rs.
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+global-hotkey = "0.7"
 
 [profile.release]
 opt-level = "s"
