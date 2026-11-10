@@ -23,3 +23,8 @@ pub fn window_builder(builder: WindowBuilder) -> WindowBuilder {
 pub fn native_handle(window: &Window) -> isize {
     window.ns_window() as isize
 }
+
+/// Nothing to add: WKWebView has no browser flags and uses the GPU (MORC_WV_ARGS is Windows-only).
+pub fn webview_builder(wvb: wry::WebViewBuilder) -> wry::WebViewBuilder {
+    wvb
+}

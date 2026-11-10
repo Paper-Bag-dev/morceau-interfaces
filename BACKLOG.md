@@ -3,7 +3,7 @@
 ## Next
 - [ ] **macOS build, published as one version with Windows** (to use it at work). Status: the engine code is ported (branch `mac-port`; see "macOS port" in
   AGENTS.md). Windows code is untouched behind `#[cfg(windows)]`. Still open on macOS: a first build and run on a Mac; clicks activate morc (needs an
-  NSPanel); backdrop sampling and window titles (need Screen Recording); a system-wide move cursor; npm launcher, build scripts and CI for macOS;
+  NSPanel); backdrop sampling and window titles (need Screen Recording); a system-wide move cursor; npm launcher and build scripts for macOS (CI now builds and tests both systems);
   signing and notarisation. Original scope, honestly:
   - The UI (`ui/`), the CLI plugins (`tools/cli`), the protocol and the cache are platform-neutral. The Windows-specific part is the Rust platform layer:
     window shaping (`SetWindowRgn`), no-activate/tool-window styles and DWM (`platform/window_style.rs`), the active-window watcher (`platform/foreground_watch.rs`, `placement/desktop.rs`),

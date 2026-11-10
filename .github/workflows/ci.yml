@@ -3,31 +3,61 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # The engine on both supported systems: a cfg slip on one of them fails here, not on someone's machine.
   build:
-    runs-on: windows-latest
+    name: build and test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Build
+      - name: Build (warnings are errors)
         run: cargo build --release
+        env:
+          RUSTFLAGS: -D warnings
       - name: Test
         run: cargo test --release
+        env:
+          RUSTFLAGS: -D warnings
+
+  # Fast checks that need no Rust build.
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - name: Check the UI modules parse
-        shell: bash
         run: |
           fail=0
           for f in $(git ls-files 'ui/**/*.js' | grep -v '^ui/vendor/'); do node --check "$f" || fail=1; done
           exit $fail
-      - name: Check the CLI plugins parse
-        shell: bash
+      - name: Check the CLI plugins and tools parse
         run: |
           fail=0
-          for f in tools/cli/*.py tools/*.py; do python -c "import ast,sys;ast.parse(open('$f',encoding='utf-8').read())" || fail=1; done
+          for f in tools/cli/*.py tools/*.py; do python3 -c "import ast,sys;ast.parse(open('$f',encoding='utf-8').read())" || fail=1; done
           exit $fail
+      - name: Check the shipped JSON (seeds, recipes, fragments, component metadata)
+        run: |
+          fail=0
+          for f in $(git ls-files 'cache/**/*.json' 'ui/components/*/metadata.json' 'ui/*.json'); do python3 -m json.tool "$f" >/dev/null || { echo "bad JSON: $f"; fail=1; }; done
+          exit $fail
+      - name: Platform code stays in src/platform (shared Rust never names an OS)
+        run: |
+          if git grep -n -E 'cfg\((not\()?(windows|unix)|target_os|platform::(macos|windows)::' -- 'src/**/*.rs' ':!src/platform/**'; then
+            echo "OS-specific code outside src/platform: put it in src/platform/<os>/ and call it through crate::platform::os (AGENTS.md)"; exit 1
+          fi
       - name: Guard against secrets and personal data in tracked files
-        shell: bash
         run: |
           if git ls-files | grep -E '(^|/)\.env$'; then echo "a .env is tracked"; exit 1; fi
           if git grep -I -n -E 'SKETCHFAB_TOKEN=[A-Za-z0-9]{8,}'; then echo "a token is committed"; exit 1; fi
+          if git grep -I -n -E '/Users/[A-Za-z]|C:\\\\Users\\\\[A-Za-z]' -- . ':!*.lock'; then echo "a local machine path is committed"; exit 1; fi

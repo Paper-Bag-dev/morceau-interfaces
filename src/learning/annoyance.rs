@@ -94,14 +94,7 @@ fn save(p: &Prefs) -> Result<(), String> {
 }
 
 fn log(who: &str, what: &str, why: &str) {
-    #[cfg(windows)]
-    let day = {
-        use windows::Win32::System::SystemInformation::GetLocalTime;
-        let t = unsafe { GetLocalTime() };
-        format!("{:04}-{:02}-{:02} {:02}:{:02}", t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute)
-    };
-    #[cfg(target_os = "macos")]
-    let day = crate::platform::macos::clock::stamp();
+    let day = crate::platform::os::clock::stamp();
     let p = file().with_file_name("annoyance_log.md");
     if let Ok(mut f) = fs::OpenOptions::new().create(true).append(true).open(p) {
         let _ = writeln!(f, "- {day} [{who}] {what}{}", if why.is_empty() { String::new() } else { format!(" — {why}") });

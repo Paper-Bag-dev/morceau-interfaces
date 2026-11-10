@@ -1,13 +1,20 @@
 # src/platform: the operating-system specific parts
 
-Everything that talks to the operating system directly lives here. The files in this folder are the Windows versions (`#[cfg(windows)]`); `macos/`
-has the same modules with the same function signatures for macOS, and `mod.rs` picks one set per OS. See "macOS port" in AGENTS.md.
+Shared code never names an OS. Each platform folder exports the SAME modules with the SAME functions, and `mod.rs` picks one as
+`crate::platform::os`. A new platform is a new folder with these modules; no shared file changes.
 
-| file | responsibility |
+| module | responsibility |
 |---|---|
-| `window_style.rs` | window shape (hit regions), no-activate, topmost, the move cursor |
-| `backdrop.rs` | sample the average color behind a window so the card can pick contrasting colors |
-| `hotkeys.rs` | global hotkeys: dismiss all, summon |
-| `foreground_watch.rs` | notice when the active window changes |
+| `app` | event-loop setup, window and webview builder extras, the native window handle, the page URL |
+| `window_style` | overlay styles, show without focus, hide, the content shape (click-through), the move cursor |
+| `desktop` | the windows, monitors, the active window, its app and title (`placement/desktop.rs` re-exports and snapshots them) |
+| `backdrop` | the average colour behind a card (macOS: none, needs Screen Recording) |
+| `hotkeys` | dismiss all, summon |
+| `foreground_watch` | notice when the active window changes |
+| `process` | hidden spawns, detaching the host, open a link or file, host-side copy, the runtime folder |
+| `clock` | local time |
+| `sys` | idle time, the mouse button, the beep (macOS: also the raw AppKit / CoreGraphics calls) |
 
-`placement/desktop.rs` also uses the OS (windows, monitors, the active window): the Windows API in the top half, `mod mac` (using `macos/sys.rs`) at the bottom.
+`windows/` uses the `windows` crate; `macos/` uses objc2 and small extern blocks (see `macos/README.md`). A function with nothing to do on
+one OS is a documented no-op there (e.g. `app::configure_event_loop` on Windows, `process::copy_text` on Windows, `app::webview_builder` on macOS).
+CI enforces the split ("Platform code stays in src/platform").

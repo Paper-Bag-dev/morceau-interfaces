@@ -9,28 +9,9 @@ use tao::{
     event_loop::EventLoopWindowTarget,
     window::{Window, WindowBuilder},
 };
-#[cfg(windows)]
-use tao::platform::windows::{WindowBuilderExtWindows, WindowExtWindows};
 use wry::{WebView, WebViewBuilder};
-#[cfg(windows)]
-use wry::WebViewBuilderExtWindows;
 
-#[cfg(windows)]
-const DEFAULT_WV_ARGS: &str = "--use-angle=swiftshader --enable-unsafe-swiftshader";
-
-/// The page every surface loads: wry serves a custom protocol as http://<name>.localhost/ with WebView2.
-#[cfg(windows)]
-const START_URL: &str = "http://morc.localhost/index.html";
-
-/// The native handle the platform layer works with: the HWND.
-#[cfg(windows)]
-fn native_handle(window: &Window) -> isize {
-    window.hwnd()
-}
-
-// macOS: platform/macos/app.rs
-#[cfg(target_os = "macos")]
-use crate::platform::macos::app::{native_handle, START_URL};
+use crate::platform::os::app::{native_handle, START_URL};
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum Phase {
@@ -86,32 +67,10 @@ impl Surface {
             .with_visible(false)
             .with_focused(false)
             .with_inner_size(LogicalSize::new(10.0, 10.0));
-        #[cfg(windows)]
-        let builder = builder
-            .with_skip_taskbar(true)
-            .with_no_redirection_bitmap(true) // no default GDI surface behind the transparent page (suspected source of the pale top band)
-            .with_undecorated_shadow(false);
-        #[cfg(target_os = "macos")]
-        let builder = crate::platform::macos::app::window_builder(builder);
+        let builder = crate::platform::os::app::window_builder(builder);
         let window = builder.build(target).map_err(|e| e.to_string())?;
         winstyle::overlay_styles(native_handle(&window));
-        #[allow(unused_mut)]
-        let mut wvb = WebViewBuilder::new();
-        // Graphics backend. Hardware WebGL gets its context reset within 20-70 s on this machine (Intel Iris Xe + a transparent window),
-        // leaving a dead canvas; Google's SwiftShader (software) is stable and plenty for these scenes. WebView2 allows ONE configuration per
-        // browser process, so this is host-wide. MORC_WV_ARGS=gpu keeps hardware; any other value is passed through as extra browser flags.
-        // macOS: WKWebView has no browser flags and uses the GPU; MORC_WV_ARGS is ignored there.
-        #[cfg(windows)]
-        {
-            let extra = match std::env::var("MORC_WV_ARGS").ok().as_deref() {
-                Some("gpu") => None,
-                Some(a) => Some(a.to_string()),
-                None => Some(DEFAULT_WV_ARGS.to_string()),
-            };
-            if let Some(extra) = extra {
-                wvb = wvb.with_additional_browser_args(format!("--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection {extra}"));   // wry's own default flag is kept
-            }
-        }
+        let wvb = crate::platform::os::app::webview_builder(WebViewBuilder::new());
         let webview = wvb
             .with_transparent(true)
             .with_background_color((0, 0, 0, 0))

@@ -22,18 +22,14 @@ pub fn run(surface: &str, topic: &str, action: &Value, proxy: &Proxy) -> Effect 
             let t = action["target"].as_str().unwrap_or("");
             let ok = t.starts_with("https://") || t.starts_with("http://") || std::path::Path::new(t).exists();
             if ok {
-                #[cfg(windows)]
-                let _ = util::hidden(Command::new("rundll32").args(["url.dll,FileProtocolHandler", t])).spawn();
-                #[cfg(target_os = "macos")]
-                crate::platform::macos::process::open_target(t);
+                crate::platform::os::process::open_target(t);
             }
             Effect::None
         }
-        // Put text on the clipboard. The page also tries the browser clipboard; Windows keeps that path (WebView2 allows it on
-        // http://morc.localhost), macOS copies on the host (platform/macos/process.rs).
+        // Put text on the clipboard. The page also tries the browser clipboard; the host copies too where that can fail
+        // (platform/<os>/process.rs copy_text: pbcopy on macOS, nothing on Windows where WebView2 allows it).
         "copy" => {
-            #[cfg(target_os = "macos")]
-            crate::platform::macos::process::copy_text(action["text"].as_str().unwrap_or("").to_string());
+            crate::platform::os::process::copy_text(action["text"].as_str().unwrap_or("").to_string());
             Effect::None
         }
         "run" => {

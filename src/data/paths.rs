@@ -57,10 +57,7 @@ pub fn home_dir() -> PathBuf {
 }
 
 pub fn runtime_dir() -> PathBuf {
-    #[cfg(windows)]
-    let base = PathBuf::from(std::env::var("LOCALAPPDATA").unwrap_or_else(|_| ".".into()));
-    #[cfg(target_os = "macos")]
-    let base = crate::platform::macos::process::runtime_base();
+    let base = crate::platform::os::process::runtime_base();
     let d = base.join("morc");
     let _ = std::fs::create_dir_all(&d);
     d

@@ -41,16 +41,8 @@ pub fn deep_merge(base: &mut Value, over: &Value) {
     }
 }
 
-/// Spawn a process with no console window flash.
-#[cfg(windows)]
-pub fn hidden(cmd: &mut std::process::Command) -> &mut std::process::Command {
-    use std::os::windows::process::CommandExt;
-    cmd.creation_flags(0x0800_0000) // CREATE_NO_WINDOW
-}
-
-// macOS: platform/macos/process.rs
-#[cfg(target_os = "macos")]
-pub use crate::platform::macos::process::hidden;
+/// Spawn a process with no console window flash (platform/<os>/process.rs).
+pub use crate::platform::os::process::hidden;
 
 /// The Python launcher the CLI plugins and `morc graph` run with: the `py` launcher on Windows, `python3` elsewhere.
 pub const PYTHON: &str = if cfg!(windows) { "py" } else { "python3" };
@@ -73,14 +65,5 @@ pub fn clock_to_min(s: &str) -> Option<u32> {
     Some(h.trim().parse::<u32>().ok()? * 60 + m.trim().parse::<u32>().ok()?)
 }
 
-/// Current local minutes since midnight.
-#[cfg(windows)]
-pub fn local_minutes() -> u32 {
-    use windows::Win32::System::SystemInformation::GetLocalTime;
-    let t = unsafe { GetLocalTime() };
-    t.wHour as u32 * 60 + t.wMinute as u32
-}
-
-// macOS: platform/macos/clock.rs
-#[cfg(target_os = "macos")]
-pub use crate::platform::macos::clock::local_minutes;
+/// Current local minutes since midnight (platform/<os>/clock.rs).
+pub use crate::platform::os::clock::local_minutes;

@@ -138,24 +138,8 @@ pub fn load() -> Worker {
     w
 }
 
-/// Seconds since the last keyboard or mouse input anywhere in Windows.
-#[cfg(windows)]
-pub fn idle_seconds() -> u64 {
-    use windows::Win32::System::SystemInformation::GetTickCount;
-    use windows::Win32::UI::Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO};
-    unsafe {
-        let mut li = LASTINPUTINFO { cbSize: std::mem::size_of::<LASTINPUTINFO>() as u32, dwTime: 0 };
-        if GetLastInputInfo(&mut li).as_bool() {
-            (GetTickCount().wrapping_sub(li.dwTime) / 1000) as u64
-        } else {
-            0
-        }
-    }
-}
-
-// macOS: platform/macos/sys.rs
-#[cfg(target_os = "macos")]
-pub use crate::platform::macos::sys::idle_seconds;
+/// Seconds since the last keyboard or mouse input anywhere (platform/<os>/sys.rs).
+pub use crate::platform::os::sys::idle_seconds;
 
 fn activity_file() -> PathBuf {
     paths::runtime_dir().join("activity.jsonl")
