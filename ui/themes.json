@@ -108,8 +108,8 @@
         "glass-glow": "190 215 255 / .085",
         "glass-rim": "255 255 255 / .30",
         "rim-accent": ".20",
-        "lens-center": "6 8 12 / .30",
-        "lens-edge": "0 0 0 / .56",
+        "lens-center": "6 8 12 / .16",
+        "lens-edge": "0 0 0 / .62",
         "lens-rim": "0 0 0 / .62",
         "lens-vignette": "0 0 0 / .40",
         "lens-line": "165 200 235 / .32",
@@ -118,7 +118,7 @@
         "fill-lift": "0 0% 100% / .28",
         "fill-rim": "0 0 0 / .55",
         "lens-glow": "140 190 245 / .24",
-        "fill-alpha": "80%"
+        "fill-alpha": "100%"
       }
     }
   }

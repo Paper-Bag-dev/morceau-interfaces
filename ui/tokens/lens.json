@@ -1,6 +1,6 @@
 {
   "about": "the glass skin's lens pills (list rows, badges, buttons): how far the edge darkening reaches inside the pill, and the inner line. Colors are in themes.json (lens-*).",
-  "lens-shadow": "14px 3px",
+  "lens-shadow": "22px 6px",
   "lens-shadow-small": "8px 1px",
   "lens-line-w": "1px",
   "lens-glow-r": "7px"
