@@ -1,12 +1,15 @@
-//! The gates every wake passes: enabled, live session (optional), PC idle, rate limit, chore cooldown. Split out of wake/mod.rs.
+//! The gates every wake passes: enabled (on / off / only with no live session), live session (optional), PC idle, rate limit, chore cooldown. Split out of wake/mod.rs.
 
 use super::*;
 
 /// `direct` = the user just clicked a button that asked for background work (payload "bg": true). They are plainly at the PC, so the
 /// live-session and idle gates are skipped; the enabled switch and the rate limit still apply.
 pub(super) fn gate(w: &worker::Worker, chore: bool, direct: bool, click: bool) -> Result<Vec<u128>, &'static str> {
-    if !w.enabled {
-        return Err("disabled");
+    match w.enabled {
+        worker::Mode::Off => return Err("disabled"),
+        // the default: with a Claude session open, its hook hands the click to it, so no second agent (not even for a direct click)
+        worker::Mode::NoSession if w.session_live() => return Err("session-live"),
+        _ => {}
     }
     if !direct {
         if w.defer_to_session {

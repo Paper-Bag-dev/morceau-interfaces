@@ -47,6 +47,9 @@ pub fn hook_json(event_name: &str) -> String {
     if std::env::var("MORC_HEADLESS").is_ok() {
         return String::new();
     }
+    // was a session already live before this hook? In "no_session" mode the background agent was asleep then, so nothing went to it
+    let w = crate::worker::load();
+    let was_live = w.session_live();
     touch_session();
     let ev = unread(false);
     if ev.is_empty() {
@@ -57,8 +60,12 @@ pub fn hook_json(event_name: &str) -> String {
         ev.len()
     )];
     // a click marked bg:true is already being handled by the background agent: tell the session, do not hand it over as work.
-    // With the background agent off (prefs/worker.json "enabled": false) nobody else will act on it, so every event is the session's.
-    let agent_on = crate::worker::load().enabled;
+    // With the background agent off, or asleep because this session was live ("no_session"), nobody else acted on it: every event is the session's.
+    let agent_on = match w.enabled {
+        crate::worker::Mode::On => true,
+        crate::worker::Mode::Off => false,
+        crate::worker::Mode::NoSession => !was_live,
+    };
     let (bg, mine): (Vec<&Value>, Vec<&Value>) = ev.iter().partition(|e| agent_on && e["payload"]["bg"].as_bool().unwrap_or(false));
     for e in mine.iter().take(20) {
         lines.push(format!("- {}", e));

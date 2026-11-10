@@ -63,7 +63,8 @@ cargo build --release                 # target\release\morc.exe
 4. **Make your own**: `morc commands` lists the tools; `docs/extending.md` shows components, fragments, recipes and CLI plugins; `docs/protocol.md` is the spec format.
 5. **Wire up your agent** (optional): see *Agents* below.
 6. **Triggers** (optional): copy an example from `examples/triggers/` into `<data folder>\triggers\` and point `source.file` at a JSON file you maintain.
-7. **Chore agent** (optional, off by default): set `"enabled": true` in `<data folder>\prefs\worker.json`, pick `model`, and read the gates below first.
+7. **Chore agent** (on only while no Claude session is open, by default): `"enabled"` in `<data folder>\prefs\worker.json` is `"no_session"` (the
+   default), `true` (any time) or `false` (never). Pick `model`, and read the gates below first.
 
 ## Your data folder
 Everything that is yours lives outside the install, so upgrading never touches it. It is found by, in order: `MORC_HOME`, the path in
@@ -189,9 +190,11 @@ are in `docs/design.md`; the CSS variables are in `ui/theme.css` and `ui/core/th
 - **Claude Code**: merge `integrations/claude-code/settings.example.json` into `~/.claude/settings.json` (two hooks that inject your clicks and drags into the
   session as `[morc] N UI interaction(s) ...`), and copy `integrations/claude-code/skills/morc-screen` to `~/.claude/skills/`. `CLAUDE.md` imports `AGENTS.md`.
 - **Any other agent**: point it at `AGENTS.md` (how to work on the repo) and `docs/agent.md` (how to drive it). The CLI is the whole interface.
-- **Chore agent (headless, opt-in)**: the host can spawn `claude -p --model <model>` with `docs/agent.md` as its system prompt. Gates, in order: an interactive
+- **Chore agent (headless; by default only while no Claude session is open)**: the host can spawn `claude -p --model <model>` with `docs/agent.md` as its system prompt. Gates, in order: an interactive
   session was active recently (rest), the PC has had no input for `idle_s` (rest), the hourly rate limit, the chore cooldown. It exits when done, and sets its next
-  wake with `morc wake set`. It never runs unless `prefs/worker.json` says `"enabled": true`.
+  wake with `morc wake set`. By default (`"enabled": "no_session"`) it runs only while no interactive
+  Claude session is live (one whose hooks touched morc within `session_fresh_s`); with a session open, your clicks go to that session instead.
+  `true` lets it run any time the gates allow; `false` turns it off. Without the Claude Code hooks installed no session ever counts as live.
 
 ## Security and privacy
 - The command port is `127.0.0.1` only and needs the per-machine token in `%LOCALAPPDATA%\morc`.

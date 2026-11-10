@@ -66,8 +66,10 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
     and used scored placement, which put cards bottom-left over a maximised window (`host/layout.rs`). The pre-measure wrap width follows the
     same rule (`host/view.rs`), and when nothing in the ladder fits, a card starts top-right of the work area instead of the scorer's corner.
     Precedence: `--at`, then a region the card names, then the spot the user carried that topic to, then the ladder.
-  - When the background agent is off (`prefs/worker.json` "enabled": false), `morc hook` hands every click to the interactive session, including
-    ones marked `bg:true` (`agent/inbox.rs`).
+  - Background agent modes (`prefs/worker.json` "enabled"): `"no_session"` (the default) runs it only while no interactive Claude session is
+    live, so with a session open every click goes to that session; `true` = any time; `false` = never (`agent/worker.rs` `Mode`, `wake/gate.rs`).
+    `morc hook` hands every click to the session, including `bg:true` ones, unless the agent was allowed to run when the click happened
+    (`agent/inbox.rs`). A session only counts as live through the Claude Code hooks (`integrations/claude-code/`).
 - **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
   target. A cfg mistake only shows up when that target is compiled.
 

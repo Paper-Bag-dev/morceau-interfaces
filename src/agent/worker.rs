@@ -2,20 +2,23 @@
 //! it is spawned only when the gates in wake.rs allow, does a few quick chores, and exits (= sleeps).
 //!
 //! prefs/worker.json (hot-reloaded, written with defaults on first use; edit it, nothing needs a rebuild):
-//!   enabled            true (the default) = the background agent can be woken; set false to opt out (it costs tokens)
+//!   enabled            when the background agent may be woken (it costs tokens):
+//!                        "no_session" (the default) = only while no interactive Claude session is live (a session's `morc hook` touched morc
+//!                                     within session_fresh_s); while one is, every click goes to that session instead
+//!                        true / "on"  = any time the other gates allow;  false / "off" = never
 //!   model              the `claude --model` value for the chore agent
 //!   persona            file (relative to the morc folder) appended as its system prompt: docs/agent.md
 //!   idle_s             the PC counts as idle after this many seconds without keyboard/mouse input: the agent stays asleep
 //!   defer_to_session   false (the default): the background agent and a live interactive Claude session work at the same time; true = the agent stays asleep while a session touched morc within session_fresh_s
-//!   session_fresh_s    how recent counts as live when defer_to_session is true
+//!   session_fresh_s    how recent a session's last `morc hook` must be to count as live ("no_session" and defer_to_session)
 //!   max_per_hour, min_gap_s     hard rate limit on any headless wake
 //!   chore_cooldown_min          at least this long between chore wakes (stats accumulate in between)
 //!   max_turns          cap on the agent's turns per wake
 //!   track_titles       log the active window (exe + title) on every change to activity.jsonl so the agent can see what you work on
 //!   redact             titles containing any of these words are logged as "(redacted)"
 
-use crate::{paths, placement, util};
-use serde::{Deserialize, Serialize};
+use crate::{inbox, paths, placement, util};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::{json, Value};
 use std::fs;
 use std::io::Write;
@@ -23,10 +26,40 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::SystemTime;
 
+/// When the background agent may run. In prefs/worker.json: true ("on"), false ("off") or "no_session" (the default).
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum Mode {
+    On,
+    Off,
+    NoSession,
+}
+
+impl Serialize for Mode {
+    fn serialize<S: Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Mode::On => s.serialize_bool(true),
+            Mode::Off => s.serialize_bool(false),
+            Mode::NoSession => s.serialize_str("no_session"),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for Mode {
+    fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        Ok(match Value::deserialize(d)? {
+            Value::Bool(true) => Mode::On,
+            Value::Bool(false) => Mode::Off,
+            Value::String(s) if s == "on" => Mode::On,
+            Value::String(s) if s == "off" => Mode::Off,
+            _ => Mode::NoSession,
+        })
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(default)]
 pub struct Worker {
-    pub enabled: bool,
+    pub enabled: Mode,
     pub model: String,
     pub persona: String,
     pub idle_s: u64,
@@ -42,10 +75,17 @@ pub struct Worker {
     pub redact: Vec<String>,
 }
 
+impl Worker {
+    /// Did an interactive Claude session touch morc (through `morc hook`) within session_fresh_s?
+    pub fn session_live(&self) -> bool {
+        inbox::session_age_s().map(|age| age < self.session_fresh_s).unwrap_or(false)
+    }
+}
+
 impl Default for Worker {
     fn default() -> Self {
         Worker {
-            enabled: true, // on by default: the background agent answers "show more" clicks. Gates (rate limit, one agent at a time) keep it cheap; set "enabled": false in prefs/worker.json to opt out.
+            enabled: Mode::NoSession, // by default the background agent covers only for an absent Claude session: with one open, your clicks go to it. "on" / true or "off" / false in prefs/worker.json.
             model: "claude-haiku-5-5".into(),
             persona: "docs/agent.md".into(),
             idle_s: 180,
@@ -187,4 +227,23 @@ pub fn last_chore_ms() -> u128 {
 
 pub fn mark_chore() {
     let _ = fs::write(chore_file(), util::now_ms().to_string());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn mode(json: &str) -> Mode {
+        serde_json::from_str::<Worker>(json).unwrap().enabled
+    }
+
+    #[test]
+    fn enabled_reads_all_three_modes() {
+        assert_eq!(mode(r#"{"enabled": true}"#), Mode::On);
+        assert_eq!(mode(r#"{"enabled": "on"}"#), Mode::On);
+        assert_eq!(mode(r#"{"enabled": false}"#), Mode::Off);
+        assert_eq!(mode(r#"{"enabled": "off"}"#), Mode::Off);
+        assert_eq!(mode(r#"{"enabled": "no_session"}"#), Mode::NoSession);
+        assert_eq!(mode(r#"{}"#), Mode::NoSession); // the default
+    }
 }
