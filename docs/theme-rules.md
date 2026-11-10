@@ -44,7 +44,8 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
 ## Behavior
 10. **Every hover rule is written `:is(:hover, .hov)`.** On macOS the page cannot see the pointer while our app is inactive; the host
     sends the pointer and the page marks what is under it `.hov`. A bare `:hover` silently does nothing there.
-11. **Compact first.** Cards show compact (`limits.compact`) and open on hover. Anything list-like joins the compact rules in
+11. **Compact first.** List cards, and ANY card with a lot to show (natural height past `limits.compact-if-taller`, charts aside), show
+    compact (`limits.compact`) and open on hover with the damped spring. Anything list-like joins the compact rules in
     `components/plate/plate.css` (truncate to a few rows, a fading peek) and the selector list in `core/compact.js`. Opening and folding
     are mirrors (`compact.expand` / `compact.collapse`): nothing pops, nothing jumps.
 12. **Motion is a damped spring** (`limits.spring-*`) or a short ease, triggered by the user (hover, press, arrival). Never loop for

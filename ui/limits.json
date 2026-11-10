@@ -1,5 +1,5 @@
 {
-  "about": "Minimum and maximum sizes, timings and thresholds the page uses. Leave these alone unless the user points something out or the annoyance vector says so; if you must change one, change it here (or override it in your prefs/ui.json under \"limits\"), never in the code. The host reloads this file by itself. `compact` (user, 11-10): every card first shows at this fraction of its size and grows smoothly to full size on hover (1 = off); `arrive-pulse-ms`: how long a new card's soft glow lasts. `spring-stiffness` / `spring-damping`: the grow/shrink spring (damping near 2*sqrt(stiffness) = no overshoot; lower = bouncier). `shrink-delay-ms`: how long the pointer must be off a grown card before it folds back.",
+  "about": "Minimum and maximum sizes, timings and thresholds the page uses. Leave these alone unless the user points something out or the annoyance vector says so; if you must change one, change it here (or override it in your prefs/ui.json under \"limits\"), never in the code. The host reloads this file by itself. `compact` (user, 11-10): every card first shows at this fraction of its size and grows smoothly to full size on hover (1 = off); `arrive-pulse-ms`: how long a new card's soft glow lasts. `spring-stiffness` / `spring-damping`: the grow/shrink spring (damping near 2*sqrt(stiffness) = no overshoot; lower = bouncier). `shrink-delay-ms`: how long the pointer must be off a grown card before it folds back. `compact-if-taller`: a card whose natural height passes this (logical px) starts compact and opens on hover, like the lists.",
   "min-zoom": 0.7,
   "max-zoom": 2.2,
   "hover-grow": 1.25,
@@ -18,5 +18,6 @@
   "spring-damping": 28,
   "shrink-delay-ms": 450,
   "medium-scale": 1.12,
-  "large-scale": 1.3
+  "large-scale": 1.3,
+  "compact-if-taller": 380
 }

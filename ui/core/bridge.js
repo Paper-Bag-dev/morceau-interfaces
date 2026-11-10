@@ -52,6 +52,9 @@ const LISTY = '.c-list, .c-pastes, .c-check', VISUAL = '.c-model, .c-graph, .c-c
 // No size: a plain list (.c-list) starts compact, everything else at full size.
 const COMPACT = () => {
   const sz = stage.dataset.size;
+  // a card with a lot to show (its natural height past limits.compact-if-taller) starts compact and springs open on hover, whatever its
+  // kind, charts aside (user, 11-10: long cards like the asks follow the compact + damped-spring way)
+  if (stage.dataset.tall === '1' && sz !== 'large' && !stage.querySelector(VISUAL)) return Math.min(1, lim('compact', 1));
   if (sz === 'medium' || sz === 'large') return 1;
   if (sz === 'compact' || (stage.querySelector('.c-list') && !stage.querySelector(VISUAL))) return Math.min(1, lim('compact', 1));
   return 1;
@@ -188,6 +191,11 @@ function measure() {
   }
   rects = rects.filter((r) => r[2] > 0 && r[3] > 0).map((r) => r.map((n) => Math.round(n)));
   // the first view can arrive before the content: once it is here, a card that should not be compact (or should) switches, no motion
+  // how much the card has to show, measured once at its natural (uncompacted) size
+  if (stage.dataset.tall === undefined && !stage.classList.contains('compact') && document.querySelector('#surface [data-hit]')) {
+    const h = stage.getBoundingClientRect().height / zoom;
+    stage.dataset.tall = h > lim('compact-if-taller', 380) ? '1' : '0';
+  }
   if (!grownFrom && !morphing && stage.classList.contains('compact') !== (COMPACT() < 0.99)) { setView({}); return; }
   const glass = glassRects(1);
   const msg = { t: 'layout', w: Math.ceil(w0), h: Math.ceil(h0), rects, ...(morphing ? {} : { glass }), settled: !!document.querySelector('#surface [data-hit]') };   // no content yet (cold start): the host waits instead of showing an empty shell   // reaching here = the fit loop is done

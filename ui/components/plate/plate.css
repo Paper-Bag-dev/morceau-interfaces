@@ -71,10 +71,10 @@ html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid rgb(var(
 /* (no accent glow inside the plate: it colored the glass; user, 11-10) */
 #stage.compact .card-plate { border: var(--compact-border-w, 1.5px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--compact-edge-a, 70%), transparent); border-radius: var(--compact-radius, 30px); }
 @property --fade-stop { syntax: '<length>'; inherits: false; initial-value: 0px; }
-:is(.c-list, .c-pastes, .c-check) { max-height: var(--full-h, none); --fade-stop: 0px;
+:is(.c-list, .c-pastes, .c-check, .c-asks) { max-height: var(--full-h, none); --fade-stop: 0px;
   -webkit-mask-image: linear-gradient(to bottom, black calc(100% - var(--fade-stop)), transparent); mask-image: linear-gradient(to bottom, black calc(100% - var(--fade-stop)), transparent);
   transition: max-height var(--reveal-ms, 380ms) var(--ease-out), --fade-stop var(--reveal-ms, 380ms) ease, min-width var(--reveal-ms, 380ms) var(--ease-out), max-width var(--reveal-ms, 380ms) var(--ease-out); }
-:is(.c-list, .c-pastes, .c-check).revealing { overflow: hidden; }
+:is(.c-list, .c-pastes, .c-check, .c-asks).revealing { overflow: hidden; }
 /* squeezed lists are narrower too: titles cut sooner, and as the card opens the width eases out so more of each title appears */
 #stage.compact .c-list { min-width: var(--compact-list-w, 220px); max-width: var(--compact-list-w, 220px); }
 #stage.compact .c-list { max-height: calc(var(--compact-rows, 4) * (var(--row-min-h, 42px) + 2px + var(--list-gap, 6px)) + var(--compact-peek, 20px)); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
@@ -131,3 +131,8 @@ html[data-skin~="glass"] .c-check .row:nth-child(4n+3).done .box { background: h
 /* yes / no: a rich deep green and a deep coral-red from the theme (yes-fill, no-fill; user, 11-10: deeper green, not dimmed lime), black text (as specific as the flat-accent button rule, and later, so it wins) */
 html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--yes-fill, var(--pal-3-deep))); color: hsl(var(--fill-ink, 220 30% 6%)); }
 html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--no-fill, var(--pal-1-deep))); color: hsl(var(--fill-ink, 220 30% 6%)); border: 0; }
+/* yes / no stand out a little: a rim a shade lighter in their own color, a top highlight, a small shadow (still flat) */
+html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { border: 1px solid color-mix(in oklab, hsl(var(--yes-fill, 146 58% 40%)) 72%, white); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 3px rgb(0 0 0 / .35); }
+html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { border: 1px solid color-mix(in oklab, hsl(var(--no-fill, 9 62% 50%)) 72%, white); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 3px rgb(0 0 0 / .35); }
+/* long cards (asks): compact like lists until hovered */
+#stage.compact .c-asks { max-height: var(--compact-h, 190px); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }

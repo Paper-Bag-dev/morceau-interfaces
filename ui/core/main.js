@@ -60,7 +60,8 @@ window.morc = {
       case 'init':
         stage.classList.toggle('urgent', !!(m.opts && m.opts.urgent));
         stage.classList.toggle('pulse', !!(m.opts && m.opts.pulse));
-        stage.dataset.size = (m.opts && m.opts.size) || '';   // compact | medium | large (core/bridge.js COMPACT)   // motion only for importance high/critical; urgent alone is a still ring
+        stage.dataset.size = (m.opts && m.opts.size) || '';   // compact | medium | large (core/bridge.js COMPACT)
+        delete stage.dataset.tall;   // how much this card has to show is measured again for the new content   // motion only for importance high/critical; urgent alone is a still ring
         if (m.view) {   // the annoyance vector + importance, resolved by the host
           applyUi(m.view.ui);   // first: the limits and colors the rest of this init uses
           setReduced(m.view.motion < 0.3);

@@ -6,7 +6,7 @@
 //   collapse(): the same in reverse, started together with the shrink spring; the window only shrinks after both have settled.
 import { enter } from './motion.js';
 
-const LISTS = '.c-list, .c-pastes, .c-check';
+const LISTS = '.c-list, .c-pastes, .c-check, .c-asks';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function pinHeights(stage, ms) {
@@ -21,6 +21,7 @@ export function expand(stage, ms) {
   if (!reduced) {
     const cs = getComputedStyle(stage), shown = parseInt(cs.getPropertyValue('--compact-rows')) || 2, step = parseFloat(cs.getPropertyValue('--reveal-stagger-ms')) || 55;
     stage.querySelectorAll('.c-list').forEach((l) => [...l.children].slice(shown).forEach((row, i) => enter(row, 60 + i * step)));
+    stage.querySelectorAll('.c-asks, .c-pastes, .c-check').forEach((l) => [...l.querySelectorAll('.ask, .paste, .row')].slice(1).forEach((row, i) => enter(row, 60 + i * step)));
   }
   stage.classList.remove('compact');
 }
