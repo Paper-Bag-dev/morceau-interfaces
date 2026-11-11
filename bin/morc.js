@@ -24,12 +24,17 @@ function takeFlag(args, name) {
   return v || null;
 }
 
-/** The engine to run and whether it needs MORC_APP: the installed one, else a local build (dev checkout, run from the repo). */
+/**
+ * The engine to run and whether it needs MORC_APP: the installed one, else a local build ONLY inside a git checkout of the repo (dev).
+ * The npm package also carries a build in bin/native/, but that is what the installer copies from; running it straight from the npx
+ * cache would put the user's data there, so for a package user "not installed" means: show the installer.
+ */
 function engine() {
   if (fs.existsSync(places.bin)) return { exe: places.bin, app: places.read(places.appTxt) ? null : root };
+  const dev = fs.existsSync(path.join(root, 'Cargo.toml'));   // Cargo.toml is not in the npm package "files"
   const here = detect();
   const local = here && path.join(__dirname, 'native', here.key, here.exe);
-  if (local && fs.existsSync(local)) return { exe: local, app: root };
+  if (dev && local && fs.existsSync(local)) return { exe: local, app: root };
   return null;
 }
 
