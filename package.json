@@ -29,7 +29,7 @@
   },
   "files": [
     "bin/",
-    "!bin/native/**",
+    "!bin/native/selected.txt",
     "ui/",
     "!ui/models/assets/**",
     "tools/",

@@ -80,10 +80,10 @@ async function install(pkgRoot, version, want) {
 
   // Installing for the other system: it has to be done on that machine. Say so, and say whether its build is out.
   if (p.os !== process.platform) {
-    const there = await exists(url);
+    const there = fs.existsSync(path.join(pkgRoot, 'bin', 'native', p.key, p.exe)) || await exists(url);
     console.log(`  ${s.bold(p.label)} runs on ${p.os === 'darwin' ? 'a Mac' : 'Windows'}, so install it there:`);
     console.log(`    ${s.cmd('npx morceau')}  ${s.dim('then pick ' + (p.os === 'darwin' ? 'Install for Mac' : 'Install for Windows'))}`);
-    console.log(there ? `  ${s.tick()} The ${p.label} build for v${version} is on GitHub.` : `  ${s.warn('!')} The ${p.label} build for v${version} is not on GitHub yet. ${s.dim(url)}`);
+    console.log(there ? `  ${s.tick()} The ${p.label} build for v${version} is available.` : `  ${s.warn('!')} The ${p.label} build for v${version} is not out yet. It will be at ${s.dim(url)}`);
     console.log('');
     return 0;
   }
@@ -96,15 +96,20 @@ async function install(pkgRoot, version, want) {
       step(`kept your existing engine as ${s.dim(path.basename(places.bin) + '.bak')}`);
     }
   }
+  // Where the engine comes from, first match wins: a test/mirror folder, the build shipped inside this npm package, the GitHub release.
+  const local = process.env.MORC_RELEASE_DIR && path.join(process.env.MORC_RELEASE_DIR, p.asset);
+  const bundled = path.join(pkgRoot, 'bin', 'native', p.key, p.exe);
+  const from = local ? 'copied from ' + process.env.MORC_RELEASE_DIR : fs.existsSync(bundled) ? 'included in the package' : 'downloaded from GitHub';
   try {
-    const local = process.env.MORC_RELEASE_DIR;   // testing and offline mirrors: a folder holding the same asset files as the release
-    if (local) { fs.mkdirSync(path.dirname(places.bin), { recursive: true }); fs.copyFileSync(path.join(local, p.asset), places.bin); }
+    fs.mkdirSync(path.dirname(places.bin), { recursive: true });
+    if (local) fs.copyFileSync(local, places.bin);
+    else if (fs.existsSync(bundled)) fs.copyFileSync(bundled, places.bin);
     else await download(url, places.bin, `engine from GitHub (v${version})`);
   } catch (e) {
-    return fail(`Could not download the ${p.label} engine from GitHub.`, `${e.message}. Check your connection, or build from source: see ${`https://github.com/${REPO}#build`}`);
+    return fail(`Could not get the ${p.label} engine.`, `${e.message}. Check your connection, or build from source: see ${`https://github.com/${REPO}#build`}`);
   }
   if (p.os !== 'win32') fs.chmodSync(places.bin, 0o755);
-  step(`engine ${process.env.MORC_RELEASE_DIR ? 'copied from ' + process.env.MORC_RELEASE_DIR : 'downloaded from GitHub'} ${s.dim('(' + p.asset + ')')}`);
+  step(`engine ${from} ${s.dim('(' + p.key + ')')}`);
 
   const app = copyApp(pkgRoot);
   step(`app files in place ${s.dim('(' + app + ')')}`);

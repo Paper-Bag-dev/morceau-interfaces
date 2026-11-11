@@ -11,8 +11,9 @@
 | `places.js` | runtime, bin, app and data folders (mirrors `src/data/paths.rs` and `tools/cli/_home.py`). |
 | `style.js` | chalk colors with a plain-ANSI fallback; no color off a TTY or with `NO_COLOR`. |
 
-**Split from GitHub.** The npm package carries no engine. Each platform's engine is a GitHub release asset named in
-`scripts/npm/platforms.js` (`morc-windows-x64.exe`, `morc-macos-arm64`, `morc-macos-x64`); the release must exist for the package version
-before `npm publish` (`scripts/npm/check-publish.js` checks it).
+**Where the engine comes from.** First match wins: `MORC_RELEASE_DIR` (tests, mirrors), the build bundled in the package at
+`bin/native/<key>/` (Windows today), the GitHub release `v<version>` asset named in `scripts/npm/platforms.js` (`morc-windows-x64.exe`,
+`morc-macos-arm64`, `morc-macos-x64`). `scripts/npm/check-publish.js` refuses a version with no Windows engine either way. Mac engines need a
+Mac (or CI) to build; until one is bundled or uploaded, Install for Mac says it is not out yet.
 
 **Never clobbers a setup.** An existing `app.txt` / `home.txt` is kept; an engine the installer did not install is kept as `morc.exe.bak`.
