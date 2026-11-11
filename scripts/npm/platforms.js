@@ -24,7 +24,9 @@ function resolve(name) {
   const n = String(name).toLowerCase();
   if (n in ALIASES) {
     if (ALIASES[n]) return PLATFORMS.find((p) => p.key === ALIASES[n]);
-    return PLATFORMS.find((p) => p.os === 'darwin' && p.cpu === (process.arch === 'x64' ? 'x64' : 'arm64'));
+    // on a Mac: its own chip; anywhere else: Apple silicon, what almost every Mac sold since 2020 has
+    const cpu = process.platform === 'darwin' && process.arch === 'x64' ? 'x64' : 'arm64';
+    return PLATFORMS.find((p) => p.os === 'darwin' && p.cpu === cpu);
   }
   return PLATFORMS.find((p) => p.key === n) || null;
 }

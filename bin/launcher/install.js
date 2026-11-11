@@ -104,7 +104,7 @@ async function install(pkgRoot, version, want) {
     return fail(`Could not download the ${p.label} engine from GitHub.`, `${e.message}. Check your connection, or build from source: see ${`https://github.com/${REPO}#build`}`);
   }
   if (p.os !== 'win32') fs.chmodSync(places.bin, 0o755);
-  step(`engine downloaded from GitHub ${s.dim('(' + p.asset + ')')}`);
+  step(`engine ${process.env.MORC_RELEASE_DIR ? 'copied from ' + process.env.MORC_RELEASE_DIR : 'downloaded from GitHub'} ${s.dim('(' + p.asset + ')')}`);
 
   const app = copyApp(pkgRoot);
   step(`app files in place ${s.dim('(' + app + ')')}`);

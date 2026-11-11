@@ -30,21 +30,19 @@ dragged, and then quietly fade away. The engine is a small Rust host; everything
 ## Requirements
 - Windows 10 or 11 (x64) with the **Microsoft Edge WebView2 Runtime** (preinstalled on Windows 11 and current Windows 10), or
   macOS (Apple silicon or Intel).
-- **Node 16+** only for the npm install path. **Python 3.8+ (`py` launcher)** for the extended commands (`compose`, `cache`, `init`, `place`, `wake`, ...).
+- **Node 18+** only for the npm install path. **Python 3.8+ (`py` launcher)** for the extended commands (`compose`, `cache`, `init`, `place`, `wake`, ...).
 - To build from source: the Rust toolchain (https://rustup.rs) and the MSVC build tools.
 
 ## Install
-**From npm (prebuilt, recommended)**
+**From npm (recommended)**
 ```powershell
-npm i -g morceau          # adds `morc` (and `morceau`) to your PATH
-morc init                 # creates your data folder, caches the shipped components
-morc use ask-permission   # your first widget
+npx morceau               # pick Install for Windows or Install for Mac
+npx morceau use ask-permission   # your first widget
 ```
-or without installing: `npx morceau use ask-permission`.
-
-**Choose the build:** the launcher runs this machine's build by default. `npx morceau setup` asks which one you want (Windows x64,
-macOS Apple silicon, macOS Intel) and remembers it; `--platform windows|mac` (or `MORC_PLATFORM`) picks one for a single run. A build
-that is not in the package is fetched once from the GitHub release of the same version.
+The installer downloads that platform's engine from the GitHub release of the same version, puts the app files and your data in their own
+folders (`%LOCALAPPDATA%\morc`, or `~/Library/Application Support/morc` on a Mac), checks Python and starts Morceau once. After that,
+`npx morceau` shows a short list of what to do next. `npm i -g morceau` adds `morc` to your PATH; `morc install` updates the engine and app
+files and never touches your data. `--platform windows|mac` skips the question. The installer lives in `bin/launcher/` (README there).
 
 **From the git repository** (builds the engine for you; needs Rust)
 ```powershell
