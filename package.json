@@ -1,6 +1,6 @@
 {
   "name": "morceau",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Morceau: ephemeral, agent-driven UI for Windows and macOS. Borderless, transparent, self-expiring windows (cards, charts, forms, 3D) that an AI agent shows through a CLI (morc).",
   "license": "MIT",
   "author": "Paper-Bag-dev",
@@ -25,10 +25,11 @@
     "arm64"
   ],
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "files": [
     "bin/",
+    "!bin/native/**",
     "ui/",
     "!ui/models/assets/**",
     "tools/",
@@ -45,6 +46,9 @@
     "THIRD-PARTY.md",
     "README.md"
   ],
+  "dependencies": {
+    "chalk": "^4.1.2"
+  },
   "scripts": {
     "prepare": "node scripts/npm/build-from-source.js",
     "prepublishOnly": "node scripts/npm/check-publish.js"

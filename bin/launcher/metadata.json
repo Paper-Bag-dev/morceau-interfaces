@@ -1,0 +1,8 @@
+{
+  "name": "launcher",
+  "what": "npx morceau front end: first-run installer (Install for Windows / Install for Mac, engine from the GitHub release), welcome screen, engine routing",
+  "files": ["install.js", "welcome.js", "menu.js", "fetch.js", "places.js", "style.js"],
+  "entry": "bin/morc.js",
+  "depends_on": ["scripts/npm/platforms.js", "chalk (optional, falls back to ANSI)"],
+  "mirrors": ["src/data/paths.rs", "tools/cli/_home.py"]
+}

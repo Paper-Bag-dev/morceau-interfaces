@@ -12,10 +12,22 @@ pub(super) fn send(req: Value) -> Result<Value, String> {
     serde_json::from_str(&line).map_err(|e| format!("bad reply: {e}"))
 }
 
-/// Make sure a host is up, starting a hidden detached one if needed.
+fn port_answers() -> bool {
+    TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::PORT).parse().unwrap(), Duration::from_millis(200)).is_ok()
+}
+
+/// Make sure a host is up, starting a hidden detached one if needed. Every failure says why and where the log is.
 pub(super) fn ensure_host() -> Result<(), String> {
-    if TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::PORT).parse().unwrap(), Duration::from_millis(200)).is_ok() && paths::token_file().exists() {
+    if port_answers() && paths::token_file().exists() {
         return Ok(());
+    }
+    if port_answers() {
+        // something answers on the port but it is not a morc we can talk to (no token in this runtime folder)
+        return Err(format!(
+            "port {} is taken by another program (or a morc host running for another user or runtime folder {}). Close it, or run `morc stop` from that setup, then try again",
+            paths::PORT,
+            paths::runtime_dir().display()
+        ));
     }
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let mut cmd = std::process::Command::new(exe);
@@ -23,12 +35,18 @@ pub(super) fn ensure_host() -> Result<(), String> {
     crate::platform::os::process::detach(&mut cmd); // detached, windowless, no inherited handles (platform/<os>/process.rs)
     cmd.spawn().map_err(|e| e.to_string())?;
     let t0 = Instant::now();
-    while t0.elapsed() < Duration::from_secs(6) {
-        if TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::PORT).parse().unwrap(), Duration::from_millis(200)).is_ok() && paths::token_file().exists() {
+    while t0.elapsed() < Duration::from_secs(10) {
+        if port_answers() && paths::token_file().exists() {
             return Ok(());
         }
         std::thread::sleep(Duration::from_millis(100));
     }
-    Err("host did not start".into())
+    let log = paths::runtime_dir().join("host.log");
+    let last = std::fs::read_to_string(&log).ok().and_then(|s| s.lines().last().map(|l| l.to_string())).unwrap_or_default();
+    Err(format!(
+        "the host did not start within 10 s. Last line of {}: {}",
+        log.display(),
+        if last.is_empty() { "(empty: the host could not even write its log)".to_string() } else { last }
+    ))
 }
 

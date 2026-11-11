@@ -59,8 +59,11 @@ struct Host {
 pub fn run() -> ! {
     let listener = match TcpListener::bind((paths::HOST, paths::PORT)) {
         Ok(l) => l,
-        Err(_) => {
-            eprintln!("morc host already running");
+        Err(e) => {
+            // the CLI starts the host with no console, so the reason has to go to host.log or nobody ever sees it
+            let msg = format!("host not started: port {} is in use ({e}); another morc host or another program holds it", paths::PORT);
+            util::log(&msg);
+            eprintln!("{msg}");
             std::process::exit(0);
         }
     };
