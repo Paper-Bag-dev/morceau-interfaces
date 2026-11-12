@@ -19,7 +19,6 @@ Each component is one folder with its code, its styles and its metadata. A compo
 | `fluent` | The Windows 11 (Fluent) skin: style only, keyed off html[data-skin~="fluent"]. Restyles the plate, buttons, rows, badges, checklist, progress, asks, pastes and the card's own corner buttons; loads after them. | style only | plate, button, list, text, asks, stat, chart, checklist, paste, progress, layout | `fluent.css`, `metadata.json` | fl-card-radius, fl-control-radius, fl-row-radius, fl-btn-min-h, fl-btn-pad, fl-btn-size, fl-body-size, fl-title-size, fl-row-pad, fl-check-size, fl-prog-track, fl-prog-bar, fl-ctl-radius |
 | `graph` | A node-link graph on Cytoscape. | graph | plate | `graph.js`, `graph.css`, `metadata.json` | - |
 | `input` | A text field. | input | - | `input.js`, `input.css`, `metadata.json` | - |
-| `noir` | Bento fintech dark skin: style only, keyed off html[data-skin~="noir"]. Solid near-black cards, a pale-blue hero, thin big numerals, pill buttons, round icon controls, hairline rows. | style only | plate, button, list, text, asks, stat, chart, checklist, paste, progress, layout | `noir.css`, `metadata.json` | nr-card-radius, nr-inner-radius, nr-pad, nr-btn-h, nr-btn-pad, nr-btn-size, nr-title-size, nr-hero-size, nr-num-weight, nr-row-pad, nr-ctl-size, nr-prog-h |
 | `skeleton` | Shimmering placeholder shapes. | skeleton | - | `skeleton.js`, `skeleton.css`, `metadata.json` | - |
 | `spinner` | The building indicator (system blue). | spinner | - | `spinner.js`, `spinner.css`, `metadata.json` | - |
 

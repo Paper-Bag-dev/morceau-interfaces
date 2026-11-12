@@ -14,7 +14,6 @@
   "fluent",
   "graph",
   "input",
-  "noir",
   "skeleton",
   "spinner"
  ],
@@ -304,40 +303,6 @@
    "deps": [],
    "tokens": [],
    "description": "A text field."
-  },
-  "noir": {
-   "path": "components/noir",
-   "js": null,
-   "css": "noir.css",
-   "types": [],
-   "deps": [
-    "plate",
-    "button",
-    "list",
-    "text",
-    "asks",
-    "stat",
-    "chart",
-    "checklist",
-    "paste",
-    "progress",
-    "layout"
-   ],
-   "tokens": [
-    "nr-card-radius",
-    "nr-inner-radius",
-    "nr-pad",
-    "nr-btn-h",
-    "nr-btn-pad",
-    "nr-btn-size",
-    "nr-title-size",
-    "nr-hero-size",
-    "nr-num-weight",
-    "nr-row-pad",
-    "nr-ctl-size",
-    "nr-prog-h"
-   ],
-   "description": "Bento fintech dark skin: style only, keyed off html[data-skin~=\"noir\"]. Solid near-black cards, a pale-blue hero, thin big numerals, pill buttons, round icon controls, hairline rows."
   },
   "skeleton": {
    "path": "components/skeleton",
