@@ -1,4 +1,4 @@
-//! The operating-system specific parts. `windows/` and `macos/` export the SAME modules with the SAME functions (app, clock, process,
+//! The operating-system specific parts. `windows/` and `macos/` export the SAME modules with the SAME functions (app, clock, pipe, process,
 //! sys, desktop, window_style, backdrop, hotkeys, foreground_watch); `os` is the one for this build. Shared code calls
 //! `crate::platform::os::...` and never names an OS: a new platform is a new folder with the same functions, no shared file changes.
 

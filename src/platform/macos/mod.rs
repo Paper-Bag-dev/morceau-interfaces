@@ -8,6 +8,7 @@ pub mod desktop;
 pub mod foreground_watch;
 pub mod glass;
 pub mod hotkeys;
+pub mod pipe;
 pub mod process;
 pub mod sys;
 pub mod window_style;
