@@ -23,8 +23,8 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 LANGS = {"rust", "javascript", "typescript", "python", "go", "java", "kotlin", "c", "cpp", "csharp", "ruby", "php"}
 
 
-def find_db():
-    d = HERE
+def find_db(start=HERE):
+    d = start
     for _ in range(6):
         p = os.path.join(d, ".code-graph", "index.db")
         if os.path.exists(p):
@@ -122,11 +122,12 @@ def main():
     ap.add_argument("--depth", type=int, default=2)
     ap.add_argument("--min-weight", type=int, default=1)
     ap.add_argument("--title")
+    ap.add_argument("--repo", help="graph another repo: read its .code-graph/index.db (index it there first)")
     a = ap.parse_args()
     if a.root and not a.root.endswith("/"):
         a.root += "/"
 
-    uri = "file:" + find_db().replace("\\", "/")
+    uri = "file:" + find_db(os.path.abspath(os.path.expanduser(a.repo)) if a.repo else HERE).replace("\\", "/")
     try:
         c = sqlite3.connect(uri + "?mode=ro", uri=True)
         c.execute("select 1 from files limit 1")

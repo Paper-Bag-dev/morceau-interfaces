@@ -7,7 +7,7 @@ import { EXPLAIN } from '../../charts/explain.js';
 
 // {type:"graph", data:{bind:"/graph"}, width:460, height:320}
 // A node-link diagram on Cytoscape.js (vendored in ui/vendor, loaded only when a graph is shown). Schema: docs/graphs.md:
-//   {nodes:[{id,label,group,size}], edges:[{source,target,weight,kind}], flow:[ids in order], groups:[{id,label}]}
+//   {nodes:[{id,label,group,size,x?,y?}], labels?:'all', edges:[{source,target,weight,kind}], flow:[ids in order], groups:[{id,label}]}
 // Layout is an architecture diagram, not a hairball: each group is a labelled layer box, layers sit in a grid, nodes are packed inside
 // their layer (route nodes first, then biggest first). Everything stays draggable; the background pans; the wheel zooms; double-click
 // re-fits. Links are faint until you hover a node, which lights its neighbourhood. The orange dashed `flow` route is the one thing
@@ -116,7 +116,7 @@ register('graph', (c, ctx) => {
 
     const els = [];
     for (const gr of groups) els.push({ data: { id: 'layer:' + gr.id, label: gr.label || gr.id, hue: hue(gr.id) }, classes: 'layer' });
-    for (const n of g.nodes) els.push({ data: { id: n.id, label: (n.label || n.id).replace(/\.(rs|js|py)$/, ''), parent: 'layer:' + (n.group || 'nodes'), hue: hue(n.group), size: n.size || 1 }, position: pos.get(n.id), classes: onflow.has(n.id) ? 'onflow' : '' });
+    for (const n of g.nodes) els.push({ data: { id: n.id, label: (n.label || n.id).replace(/\.(rs|js|py)$/, ''), parent: 'layer:' + (n.group || 'nodes'), hue: hue(n.group), size: n.size || 1 }, position: (Number.isFinite(n.x) && Number.isFinite(n.y)) ? { x: n.x, y: n.y } : pos.get(n.id), classes: (onflow.has(n.id) ? 'onflow' : '') + (g.labels === 'all' ? ' lbl' : '') });   // x/y in the data = the sender's own layout (a tree, a diagram); labels:'all' = every dot named
     g.edges.forEach((e, i) => { if (ids.has(e.source) && ids.has(e.target)) els.push({ data: { id: 'e' + i, source: e.source, target: e.target, weight: e.weight || 1 } }); });
     for (let i = 1; i < flow.length; i++) els.push({ data: { id: 'f' + i, source: flow[i - 1], target: flow[i], weight: 1 }, classes: 'flow' });
 
@@ -131,6 +131,7 @@ register('graph', (c, ctx) => {
         { selector: 'node:childless', style: { shape: 'ellipse', width: (n) => 8 + Math.sqrt(n.data('size')) * 2.4, height: (n) => 8 + Math.sqrt(n.data('size')) * 2.4,
           'background-color': (n) => hsl(n.data('hue'), 72, 56), 'border-width': 1.4, 'border-color': F, 'border-opacity': 0.85, label: '', 'font-family': body, 'font-size': 8.5, color: F,
           'text-valign': 'bottom', 'text-margin-y': 3, 'text-background-color': hsl(fg.h, fg.s, fg.l > 50 ? 12 : 96), 'text-background-opacity': 0.9, 'text-background-padding': 2, 'text-background-shape': 'roundrectangle', 'min-zoomed-font-size': 5 } },
+        { selector: 'node.lbl', style: { label: 'data(label)' } },
         { selector: 'node.onflow', style: { 'border-color': A, 'border-opacity': 1, 'border-width': 2.6, label: 'data(label)', 'z-index': 30 } },
         { selector: 'edge', style: { 'curve-style': 'bezier', width: (e) => 0.7 + Math.min(2, Math.sqrt(e.data('weight')) * 0.4), 'line-color': F, 'line-opacity': 0.13, 'target-arrow-color': F, 'target-arrow-shape': 'triangle', 'arrow-scale': 0.5 } },
         { selector: 'edge.flow', style: { width: 2.6, 'line-color': A, 'line-opacity': 1, 'target-arrow-color': A, 'target-arrow-shape': 'triangle', 'arrow-scale': 0.95, 'line-style': 'dashed', 'line-dash-pattern': [7, 5], 'z-index': 25 } },
@@ -140,6 +141,7 @@ register('graph', (c, ctx) => {
       ],
     });
     cy.fit(undefined, 8);
+    requestAnimationFrame(() => { if (cy) { cy.resize(); cy.fit(undefined, 8); } });   // the first fit can run before the canvas has its size (zoom jumps to maxZoom): fit again once laid out
     busy.done();
 
     // arrive: layers fade up in turn, then the links (answers the surface appearing; no looping decoration)

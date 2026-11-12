@@ -130,6 +130,7 @@ fn merge_opts(over: &Opts, base: &Opts) -> Opts {
         dy: over.dy.or(base.dy),
         topic: over.topic.clone().or_else(|| base.topic.clone()),
         size: over.size.clone().or_else(|| base.size.clone()),
+        idle: over.idle.or(base.idle),
         theme: over.theme.clone().or_else(|| base.theme.clone()),
         importance: over.importance.clone().or_else(|| base.importance.clone()),
         fill: over.fill || base.fill,

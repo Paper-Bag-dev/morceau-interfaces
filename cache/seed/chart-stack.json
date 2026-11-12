@@ -1,19 +1,21 @@
 {
   "t": "save",
   "name": "chart-stack",
-  "desc": "Two charts in ONE window, a donut over a bar chart, with Close: for a tall free side. Pass /pie {title, values, labels} and /bars {title, values, labels}; values are in millions (M).",
+  "desc": "Two charts in ONE window, a donut over a bar chart: for a tall free side. Pass /pie {title, values, labels, unit} and /bars {title, values, labels, unit}; unit defaults to M.",
   "params": [
     "/pie/title",
     "/pie/values",
     "/pie/labels",
+    "/pie/unit",
     "/bars/title",
     "/bars/values",
-    "/bars/labels"
+    "/bars/labels",
+    "/bars/unit"
   ],
   "opts": {
     "min": [
       240,
-      300
+      440
     ],
     "ttl": 90,
     "topic": "charts.stack",
@@ -41,8 +43,10 @@
       "labels": {
         "bind": "/pie/labels"
       },
-      "unit": "M",
-      "height": 140
+      "unit": {
+        "bind": "/pie/unit"
+      },
+      "height": 200
     },
     {
       "id": "bars",
@@ -55,8 +59,10 @@
       "labels": {
         "bind": "/bars/labels"
       },
-      "unit": "M",
-      "height": 130
+      "unit": {
+        "bind": "/bars/unit"
+      },
+      "height": 200
     }
   ],
   "data": {
@@ -67,7 +73,8 @@
       ],
       "labels": [
         "all"
-      ]
+      ],
+      "unit": "M"
     },
     "bars": {
       "title": "Per day",
@@ -84,7 +91,8 @@
         "c",
         "d",
         "e"
-      ]
+      ],
+      "unit": "M"
     }
   }
 }

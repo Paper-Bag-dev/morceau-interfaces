@@ -52,7 +52,8 @@ register('pastes', (c, ctx) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         rippleAt(btn, e);
-        ctx.act({ do: 'copy', text });
+        // the copy also lands in the agent inbox (no wake), so the session can follow the handover row by row (user, 11-11)
+        ctx.act([{ do: 'copy', text }, { do: 'emit', payload: { kind: 'paste_copied', row: i + 1, of: items.length, title: String(it.title ?? '') } }]);
         done.add(i);
         row.classList.add('copied');
         paint();

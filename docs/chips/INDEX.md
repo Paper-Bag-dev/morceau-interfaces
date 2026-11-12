@@ -9,6 +9,7 @@ A **chip** is a ready-made card: a JSON file (the layout, already built) plus a 
 a token and read it; never type the number into `theme.css` or a chart file. Chart heights and widths are fields of the chip's JSON.
 **Plate by default:** every card's root layout sits on one frosted plate (`.card-plate`); do not add your own background. `"plate": false` on the root only when a card must float (a 3D model, a bare badge).
 
+**Per-kind limits (11-11):** any limit can be set per card size as `<size>.<key>` in `ui/limits.json` (e.g. `medium.shrink-delay-ms`); working cards (`medium`) open fast, hold 3 s and need a longer press to drag. Change timings there, never in code.
 **Where the UI rules live (each in its own small JSON, hot-reloaded):** `ui/tokens/<component>.json` (chart, text, plate ...: sizes, radii, text floors, as CSS variables), `ui/limits.json` (min and max sizes and timings: leave alone unless the user points it out or annoyance says so), `ui/themes.json` (accents, text and surface colors, light/dark schemes). Override any of them in your data folder (`prefs/tokens/<component>.json`, `prefs/ui.json`). The host caches them in memory and re-sends them to every card when a file changes. One file per component, never one big file.
 
 **STRICT RULE: every component is modular and controlled by a JSON file.** Whenever you make or change any component or chip: its layout is one JSON

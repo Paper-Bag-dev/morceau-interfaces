@@ -17,7 +17,7 @@ component (Cytoscape.js, vendored in `ui/vendor`, offline) renders it; `graph-vi
   "groups": [ {"id": "src", "label": "Rust host"} ] }
 ```
 `group` becomes a labelled layer box (colors walk round from the accent); `size` scales the dot; `weight` thickens the link; `flow` is an ordered route drawn as the
-orange dashed, slowly marching path with its nodes labelled; `groups` is optional (derived from the nodes). Unknown fields are ignored.
+orange dashed, slowly marching path with its nodes labelled; `groups` is optional (derived from the nodes); a node with `x` and `y` (canvas px) keeps that spot instead of the packed grid (draw trees and diagrams yourself); `"labels": "all"` names every dot, not only the route. Unknown fields are ignored.
 
 ## Use it
 | goal | command |
@@ -25,6 +25,7 @@ orange dashed, slowly marching path with its nodes labelled; `groups` is optiona
 | files of a project, with a route highlighted | `morc graph --root morc/ --flow report` |
 | directories as nodes | `morc graph --root tools/ --langs python --level dir` |
 | call neighbourhood of a symbol | `morc graph --symbol layout --depth 2` |
+| another repo (index it first: `code-graph-mcp incremental-index` at its root) | `morc graph --repo <path> --root app/ --langs python --level dir --min-weight 5` |
 | any graph you computed | `morc graph --file mygraph.json --title "Goals and habits"` |
 | live update a graph on screen | `morc patch graph /graph '<json>'` |
 

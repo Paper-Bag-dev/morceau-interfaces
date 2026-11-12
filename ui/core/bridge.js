@@ -5,7 +5,10 @@ import * as compact from './compact.js';
 // Minimum / maximum sizes and timings are DATA: ui/limits.json, sent by the host (overridable in prefs/ui.json). The numbers in lim(...) calls are only fallbacks.
 let limits = {};
 export function setLimits(l) { limits = l || {}; }
-const lim = (k, d) => (typeof limits[k] === 'number' ? limits[k] : d);
+// a card kind can override any limit: "<size>.<key>" in limits.json (e.g. medium.hover-delay-ms) wins for cards of that size (user, 11-11:
+// cards you keep working in open faster, hold longer and do not turn a click into a drag)
+const lim = (k, d) => { const z = document.getElementById('stage')?.dataset.size; const o = z ? limits[z + '.' + k] : undefined;
+  return typeof o === 'number' ? o : (typeof limits[k] === 'number' ? limits[k] : d); };
 export const limit = lim;   // read a limit by name from other modules (main.js uses it for the attention pulse)
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;   // no hover morph for people who asked for less motion
 
@@ -35,7 +38,7 @@ export function setView(v) {
   // compact by default: a card shows at `compact` of its size until hovered (then it grows to full, below)
   // medium (info-dense working cards: pastes, to-dos, asks) start a little bigger (limits medium-scale); large (charts, graphs) bigger still
   const sizeK = stage.dataset.size === 'medium' ? lim('medium-scale', 1.12) : stage.dataset.size === 'large' ? lim('large-scale', 1.3) : 1;   // charts and graphs start big
-  applyZoom(Math.max(lim('min-zoom', 0.85), (view.scale || 1) * sizeK * (grownFrom ? 1 : COMPACT())));
+  applyZoom(Math.max(FLOOR(), (view.scale || 1) * sizeK * (grownFrom ? 1 : COMPACT())));
   // squeezed: lists show their first rows with the next one fading out, the plate gets a solid accent edge (plate.css #stage.compact)
   setCompact(FOLDS() && !grownFrom);
   measureSoon();
@@ -50,7 +53,13 @@ const LISTY = '.c-list, .c-pastes, .c-check', VISUAL = '.c-model, .c-graph, .c-c
 // The chip can say what it is (opts.size, set on #stage as data-size by core/main.js): "compact" = a glance-and-go list (starts small),
 // "medium" = a working card you read or use (pastes, to-dos, asks: never squeezed), "large" = charts and graphs (big from the start).
 // No size: a plain list (.c-list) starts compact, everything else at full size.
+// A card whose chip sets opts.idle (0..1) rests at that fraction of its size while nobody is using it, whatever its kind (graphs and
+// charts included), springs to full size on hover and folds back after limits shrink-delay-ms (user, 11-11: "shrink the card down when
+// it's inactive"). While resting it may go below min-zoom, down to limits idle-min-zoom; once grown the normal floor applies.
+const IDLE = () => { const k = +stage.dataset.idle; return k > 0 && k < 1 ? k : 0; };
+const FLOOR = () => (IDLE() && !grownFrom ? lim('idle-min-zoom', 0.4) : lim('min-zoom', 0.85));
 const COMPACT = () => {
+  if (IDLE()) return IDLE();
   const sz = stage.dataset.size;
   // a card with a lot to show (its natural height past limits.compact-if-taller) starts compact and springs open on hover, whatever its
   // kind, charts aside (user, 11-10: long cards like the asks follow the compact + damped-spring way)
@@ -177,7 +186,7 @@ function measure() {
   const w0 = Math.max(sr.width, stage.scrollWidth * zoom), h0 = Math.max(sr.height, stage.scrollHeight * zoom);
   const k = Math.min(view.maxw / w0, view.maxh / h0);
   if (fits < 5 && (k < 1 || (view.fill && k > 1.04 && zoom < lim('max-zoom', 2.2)))) {
-    const next = Math.max(lim('min-zoom', 0.85), Math.min(lim('max-zoom', 2.2), zoom * k * 0.97));
+    const next = Math.max(FLOOR(), Math.min(lim('max-zoom', 2.2), zoom * k * 0.97));
     if (Math.abs(next - zoom) / zoom > 0.015) { fits++; applyZoom(next); return measureSoon(); }
   }
   let rects;
