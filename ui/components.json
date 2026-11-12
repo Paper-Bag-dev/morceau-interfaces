@@ -5,16 +5,17 @@
   "asks",
   "chart",
   "checklist",
-  "graph",
-  "input",
-  "layout",
   "list",
+  "text",
+  "stat",
   "paste",
   "progress",
+  "layout",
+  "fluent",
+  "graph",
+  "input",
   "skeleton",
-  "spinner",
-  "stat",
-  "text"
+  "spinner"
  ],
  "components": {
   "plate": {
@@ -29,7 +30,32 @@
     "edge-w",
     "plate-padding",
     "plate-radius",
-    "title-align"
+    "title-align",
+    "ctl-size",
+    "ctl-top",
+    "ctl-right",
+    "ctl-gap",
+    "pin-icon",
+    "x-icon",
+    "compact-border-w",
+    "compact-fade",
+    "compact-fade-ms",
+    "compact-h",
+    "compact-list-w",
+    "compact-peek",
+    "compact-radius",
+    "compact-rows",
+    "edge-a",
+    "reveal-stagger-ms",
+    "edge-base-a",
+    "edge-shimmer-a",
+    "edge-shimmer-arc",
+    "edge-shimmer-ms",
+    "edge-shimmer-laps",
+    "edge-fade-ms",
+    "compact-text-lines",
+    "compact-text-w",
+    "text-open-w"
    ],
    "description": "The shared frosted-glass material (grain + dark gradient + blur; on macOS a see-through tint over native Liquid Glass with a light that follows the pointer). Text, stat, progress, kv and chart titles sit on it."
   },
@@ -48,7 +74,9 @@
     "btn-pad-y",
     "btn-radius",
     "lens-line-w",
-    "lens-shadow-small"
+    "lens-shadow-small",
+    "btn-rim-w",
+    "btn-rim-mix"
    ],
    "description": "Buttons: primary, ghost, icon-only, yes/no, swatches, toggles, ripple and shine."
   },
@@ -103,48 +131,6 @@
    ],
    "description": "A tickable to-do list: a count and hairline progress up top, round checkboxes, clock-time badges, a coral ring on what is due. A tick answers at once, then runs the allowlisted tick-<id> action that stores the state as JSON."
   },
-  "graph": {
-   "path": "components/graph",
-   "js": "graph.js",
-   "css": "graph.css",
-   "types": [
-    "graph"
-   ],
-   "deps": [
-    "plate"
-   ],
-   "tokens": [],
-   "description": "A node-link graph on Cytoscape."
-  },
-  "input": {
-   "path": "components/input",
-   "js": "input.js",
-   "css": "input.css",
-   "types": [
-    "input"
-   ],
-   "deps": [],
-   "tokens": [],
-   "description": "A text field."
-  },
-  "layout": {
-   "path": "components/layout",
-   "js": "layout.js",
-   "css": "layout.css",
-   "types": [
-    "column",
-    "row",
-    "panel",
-    "spacer",
-    "divider",
-    "wing"
-   ],
-   "deps": [
-    "plate"
-   ],
-   "tokens": [],
-   "description": "Flex layout: columns, rows, panels, spacer, divider, wing; right-aligned cards and the leftward flow."
-  },
   "list": {
    "path": "components/list",
    "js": "list.js",
@@ -168,6 +154,51 @@
     "row-title-size"
    ],
    "description": "Rows of text, optionally clickable."
+  },
+  "text": {
+   "path": "components/text",
+   "js": "text.js",
+   "css": "text.css",
+   "types": [
+    "text",
+    "badge",
+    "kv"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "badge-min-h",
+    "badge-pad-x",
+    "badge-pad-y",
+    "badge-radius",
+    "lens-line-w",
+    "lens-shadow-small",
+    "text-radius",
+    "text-size",
+    "text-size-lg",
+    "text-size-xl"
+   ],
+   "description": "Text, key-value rows and badges."
+  },
+  "stat": {
+   "path": "components/stat",
+   "js": "stat.js",
+   "css": "stat.css",
+   "types": [
+    "stat"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "stat-cols",
+    "stat-gap",
+    "stat-hero-size",
+    "stat-tile-min-w",
+    "stat-tile-pad"
+   ],
+   "description": "One hero numeral with a label, unit and optional needle."
   },
   "paste": {
    "path": "components/paste",
@@ -196,6 +227,83 @@
    "tokens": [],
    "description": "A labelled progress bar (percent)."
   },
+  "layout": {
+   "path": "components/layout",
+   "js": "layout.js",
+   "css": "layout.css",
+   "types": [
+    "column",
+    "row",
+    "panel",
+    "spacer",
+    "divider",
+    "wing"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [],
+   "description": "Flex layout: columns, rows, panels, spacer, divider, wing; right-aligned cards and the leftward flow."
+  },
+  "fluent": {
+   "path": "components/fluent",
+   "js": null,
+   "css": "fluent.css",
+   "types": [],
+   "deps": [
+    "plate",
+    "button",
+    "list",
+    "text",
+    "asks",
+    "stat",
+    "chart",
+    "checklist",
+    "paste",
+    "progress",
+    "layout"
+   ],
+   "tokens": [
+    "fl-card-radius",
+    "fl-control-radius",
+    "fl-row-radius",
+    "fl-btn-min-h",
+    "fl-btn-pad",
+    "fl-btn-size",
+    "fl-body-size",
+    "fl-title-size",
+    "fl-row-pad",
+    "fl-check-size",
+    "fl-prog-track",
+    "fl-prog-bar",
+    "fl-ctl-radius"
+   ],
+   "description": "The Windows 11 (Fluent) skin: style only, keyed off html[data-skin~=\"fluent\"]. Restyles the plate, buttons, rows, badges, checklist, progress, asks, pastes and the card's own corner buttons; loads after them."
+  },
+  "graph": {
+   "path": "components/graph",
+   "js": "graph.js",
+   "css": "graph.css",
+   "types": [
+    "graph"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [],
+   "description": "A node-link graph on Cytoscape."
+  },
+  "input": {
+   "path": "components/input",
+   "js": "input.js",
+   "css": "input.css",
+   "types": [
+    "input"
+   ],
+   "deps": [],
+   "tokens": [],
+   "description": "A text field."
+  },
   "skeleton": {
    "path": "components/skeleton",
    "js": "skeleton.js",
@@ -217,51 +325,6 @@
    "deps": [],
    "tokens": [],
    "description": "The building indicator (system blue)."
-  },
-  "stat": {
-   "path": "components/stat",
-   "js": "stat.js",
-   "css": "stat.css",
-   "types": [
-    "stat"
-   ],
-   "deps": [
-    "plate"
-   ],
-   "tokens": [
-    "stat-cols",
-    "stat-gap",
-    "stat-hero-size",
-    "stat-tile-min-w",
-    "stat-tile-pad"
-   ],
-   "description": "One hero numeral with a label, unit and optional needle."
-  },
-  "text": {
-   "path": "components/text",
-   "js": "text.js",
-   "css": "text.css",
-   "types": [
-    "text",
-    "badge",
-    "kv"
-   ],
-   "deps": [
-    "plate"
-   ],
-   "tokens": [
-    "badge-min-h",
-    "badge-pad-x",
-    "badge-pad-y",
-    "badge-radius",
-    "lens-line-w",
-    "lens-shadow-small",
-    "text-radius",
-    "text-size",
-    "text-size-lg",
-    "text-size-xl"
-   ],
-   "description": "Text, key-value rows and badges."
   }
  }
 }

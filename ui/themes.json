@@ -12,7 +12,8 @@
     "sky": "217 91% 66%",
     "fuchsia": "292 80% 68%",
     "teal": "174 72% 48%",
-    "glacier": "199 92% 74%"
+    "glacier": "199 92% 74%",
+    "system": "14 90% 63%"
   },
   "base": {
     "background": "240 10% 3.9%",
@@ -104,6 +105,11 @@
         "coral": "14 70% 54%"
       },
       "skin": "glass"
+    },
+    "win": {
+      "about": "Windows 11: the fluent skin in your Windows accent (accents.system, read by the host; coral when Windows has none).",
+      "default": "system",
+      "skin": "fluent"
     }
   },
   "skin": "",
@@ -144,6 +150,28 @@
     "flat": {
       "about": "A variant word for the glass skin: `skin: \"glass flat\"` keeps the glass and drops the texture (grain, glints, pointer light). CSS: html[data-skin~=\"flat\"].",
       "base": {}
+    },
+    "fluent": {
+      "about": "Windows 11 (Fluent, dark): acrylic under the plate (src/platform/windows/glass.rs), 8px card corners and 4px controls, Segoe UI Variable, thin light strokes, a filled accent button and quiet standard buttons, card rows with a soft fill, the system accent (accents.system, read from Windows by the host). Sizes: ui/tokens/fluent.json; styles: ui/components/fluent/.",
+      "base": {
+        "plate-a": "38 38 38 / .62",
+        "plate-b": "30 30 30 / .70",
+        "plate-edge": "255 255 255 / .09",
+        "fl-text-2": "255 255 255 / .79",
+        "fl-text-3": "255 255 255 / .54",
+        "fl-control": "255 255 255 / .061",
+        "fl-control-hover": "255 255 255 / .084",
+        "fl-control-press": "255 255 255 / .033",
+        "fl-control-stroke": "255 255 255 / .07",
+        "fl-control-stroke-top": "255 255 255 / .093",
+        "fl-card": "255 255 255 / .05",
+        "fl-card-hover": "255 255 255 / .075",
+        "fl-card-stroke": "0 0 0 / .18",
+        "fl-on-accent": "0 0% 0%",
+        "fl-close-hover": "5 75% 44%",
+        "fl-shadow": "0 0 0 / .32",
+        "fl-ctl-bg": "44 44 44 / .92"
+      }
     }
   }
 }

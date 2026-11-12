@@ -34,3 +34,17 @@ pub fn cursor() -> (i32, i32) {
     }
     (p.x, p.y)
 }
+
+/// The user's Windows accent as the dark-mode fill Windows 11 itself uses for accent buttons ("AccentLight2" in the accent palette).
+/// None when the palette is missing (older Windows) or unreadable; the theme then keeps its own accent.
+pub fn accent_rgb() -> Option<[u8; 3]> {
+    use windows::core::w;
+    use windows::Win32::System::Registry::{RegGetValueW, HKEY_CURRENT_USER, RRF_RT_REG_BINARY};
+    let mut buf = [0u8; 32];
+    let mut len = buf.len() as u32;
+    let ok = unsafe {
+        RegGetValueW(HKEY_CURRENT_USER, w!(r"Software\Microsoft\Windows\CurrentVersion\Explorer\Accent"), w!("AccentPalette"), RRF_RT_REG_BINARY, None, Some(buf.as_mut_ptr() as *mut _), Some(&mut len))
+    };
+    // 8 colors of 4 bytes (R, G, B, A): Light3, Light2, Light1, Base, Dark1, Dark2, Dark3, ...
+    (ok.is_ok() && len >= 8).then(|| [buf[4], buf[5], buf[6]])
+}

@@ -308,3 +308,8 @@ pub fn screen_average_rgb(x: f64, y: f64, w: f64, h: f64) -> Option<[u8; 3]> {
         out
     }
 }
+
+/// The system accent for the theme: none on macOS (the theme keeps its own accent, platforms.mac in ui/themes.json).
+pub fn accent_rgb() -> Option<[u8; 3]> {
+    None
+}

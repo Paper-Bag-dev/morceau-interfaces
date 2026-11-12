@@ -1,0 +1,16 @@
+{
+  "about": "fluent skin (Windows 11): radii, control heights and paddings, type sizes. Colors are in ui/themes.json skins.fluent.",
+  "fl-card-radius": "8px",
+  "fl-control-radius": "4px",
+  "fl-row-radius": "6px",
+  "fl-btn-min-h": "32px",
+  "fl-btn-pad": "5px 12px",
+  "fl-btn-size": "14px",
+  "fl-body-size": "15px",
+  "fl-title-size": "16px",
+  "fl-row-pad": "10px 12px",
+  "fl-check-size": "20px",
+  "fl-prog-track": "1px",
+  "fl-prog-bar": "3px",
+  "fl-ctl-radius": "4px"
+}

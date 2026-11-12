@@ -77,8 +77,10 @@ pub fn hide(hwnd: isize) {
 /// Hover reaches the page by itself on Windows (WebView2 sees the pointer without the app being active): nothing to watch.
 pub fn watch_hover(_proxy: crate::ev::Proxy) {}
 
-/// Native glass under each plate: macOS only (there it is an NSGlassEffectView behind the web view); the Windows plate keeps its CSS blur.
-pub fn set_glass(_hwnd: isize, _rects: &[(i32, i32, i32, i32, i32)]) {}
+/// Native glass under each plate: a blur window cut to the plates, right under the card (glass.rs).
+pub fn set_glass(hwnd: isize, rects: &[(i32, i32, i32, i32, i32)]) {
+    super::glass::set_glass(hwnd, rects)
+}
 
 /// Clip the window to the union of rounded rects (physical px: left, top, right, bottom, radius).
 /// An empty list removes the region.

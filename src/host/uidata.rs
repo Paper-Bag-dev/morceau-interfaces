@@ -76,6 +76,12 @@ pub(super) fn ui_bundle() -> Value {
     merge(&mut tokens, &over["tokens"]);
     merge(&mut limits, &over["limits"]);
     merge(&mut themes, &over["themes"]);
+    // the OS accent joins the named accents as "system" (a theme picks it with default: "system"); without one the shipped fallback stays
+    if let Some([r, g, b]) = crate::platform::os::sys::accent_rgb() {
+        if let Some(a) = themes["accents"].as_object_mut() {
+            a.insert("system".into(), Value::String(hsl(r, g, b)));
+        }
+    }
     // the component map (ui/components.json, written by `morc ui build`) is held in memory with the rest: the CLI pulls it with `morc uimap`
     let components = read(paths::ui_dir().join("components.json"));
     let bundle = json!({"tokens": tokens, "limits": limits, "themes": themes, "components": components});
@@ -83,3 +89,18 @@ pub(super) fn ui_bundle() -> Value {
     bundle
 }
 
+/// RGB -> the theme's bare HSL parts ("208 52% 44%").
+fn hsl(r: u8, g: u8, b: u8) -> String {
+    let (r, g, b) = (r as f64 / 255.0, g as f64 / 255.0, b as f64 / 255.0);
+    let (mx, mn) = (r.max(g).max(b), r.min(g).min(b));
+    let l = (mx + mn) / 2.0;
+    let d = mx - mn;
+    let (h, s) = if d == 0.0 {
+        (0.0, 0.0)
+    } else {
+        let s = d / (1.0 - (2.0 * l - 1.0).abs());
+        let h = if mx == r { ((g - b) / d).rem_euclid(6.0) } else if mx == g { (b - r) / d + 2.0 } else { (r - g) / d + 4.0 };
+        (h * 60.0, s)
+    };
+    format!("{:.0} {:.0}% {:.0}%", h, s * 100.0, l * 100.0)
+}

@@ -1,0 +1,34 @@
+{
+  "name": "fluent",
+  "description": "The Windows 11 (Fluent) skin: style only, keyed off html[data-skin~=\"fluent\"]. Restyles the plate, buttons, rows, badges, checklist, progress, asks, pastes and the card's own corner buttons; loads after them.",
+  "types": [],
+  "css": "fluent.css",
+  "deps": [
+    "plate",
+    "button",
+    "list",
+    "text",
+    "asks",
+    "stat",
+    "chart",
+    "checklist",
+    "paste",
+    "progress",
+    "layout"
+  ],
+  "tokens": [
+    "fl-card-radius",
+    "fl-control-radius",
+    "fl-row-radius",
+    "fl-btn-min-h",
+    "fl-btn-pad",
+    "fl-btn-size",
+    "fl-body-size",
+    "fl-title-size",
+    "fl-row-pad",
+    "fl-check-size",
+    "fl-prog-track",
+    "fl-prog-bar",
+    "fl-ctl-radius"
+  ]
+}

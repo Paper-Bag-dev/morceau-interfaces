@@ -1,0 +1,77 @@
+/* fluent: the Windows 11 skin (dark). Style only, keyed off html[data-skin~="fluent"] (themes.json platforms.win.skin).
+   Material: acrylic from Windows sits under the plate (src/platform/windows/glass.rs); the page adds a light tint, a hairline stroke and a soft
+   flyout shadow. Pieces inside follow the Fluent controls: a filled ACCENT button with dark text, quiet STANDARD buttons with a stroke, card
+   rows with a soft fill that lifts on hover, square-ish 4px controls, Segoe UI Variable. Colors: themes.json skins.fluent (+ accents.system,
+   the Windows accent the host reads); sizes: ui/tokens/fluent.json. Every hover is :is(:hover, .hov). */
+
+html[data-skin~="fluent"] { --grain: none; --grain-dark: none; --specks: none;
+  --font-display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; }
+
+/* ---------- the plate: acrylic tint, hairline stroke, flyout shadow, 8px corners (the same radius Windows rounds the acrylic to) ---------- */
+html[data-skin~="fluent"] :is(.card-plate, .plate, .c-text, .c-kv, .stat, .c-prog, .c-chart .ttl) { text-shadow: none; }
+html[data-skin~="fluent"] .card-plate { background: linear-gradient(rgb(var(--plate-a)), rgb(var(--plate-b))); backdrop-filter: none;
+  border: 1px solid rgb(var(--plate-edge)); border-radius: var(--fl-card-radius, 8px); corner-shape: round;
+  box-shadow: 0 8px 16px rgb(var(--fl-shadow)); font-family: var(--font-body); }
+html[data-skin~="fluent"] #stage.compact .card-plate { border-radius: var(--fl-card-radius, 8px); }
+html[data-skin~="fluent"] #stage[data-size="chip"] .card-plate { border-radius: var(--fl-card-radius, 8px); corner-shape: round; }
+html[data-skin~="fluent"] .card-plate > .c-text.lg:first-child { font-family: var(--font-display); font-size: var(--fl-title-size, 16px); font-weight: 600; letter-spacing: 0; }
+html[data-skin~="fluent"] :is(.stat .unit, .stat .lbl, .c-kv .k, .c-prog .lbl, .tone-muted, .c-list .sub, .c-check .sub) { color: rgb(var(--fl-text-2)); }
+html[data-skin~="fluent"] .stat .num { font-family: var(--font-display); font-weight: 600; }
+
+/* ---------- buttons ---------- */
+/* standard: quiet fill, hairline stroke a touch lighter on top, white text, no lift, no shine */
+html[data-skin~="fluent"] .btn:not(.swatch):not(.on):not(.destructive):not(.icon-only) {
+  background: rgb(var(--fl-control)); color: hsl(0 0% 100%); border: 1px solid rgb(var(--fl-control-stroke)); border-top-color: rgb(var(--fl-control-stroke-top));
+  border-radius: var(--fl-control-radius, 4px); corner-shape: round; box-shadow: none; filter: none; text-shadow: none;
+  min-height: var(--fl-btn-min-h, 32px); padding: var(--fl-btn-pad, 5px 12px); font-size: var(--fl-btn-size, 14px); font-weight: 400;
+  transition: background .083s linear, color .083s linear; }
+html[data-skin~="fluent"] .btn:not(.swatch):not(.on):not(.destructive):is(:hover, .hov) { background: rgb(var(--fl-control-hover)); transform: none; box-shadow: none; filter: none; }
+html[data-skin~="fluent"] .btn:not(.swatch):not(.on):not(.destructive):active { background: rgb(var(--fl-control-press)); color: rgb(var(--fl-text-2)); transform: none; }
+/* accent: the filled primary action (Yes, Send, a primary, any tone) in the Windows accent, dark text */
+html[data-skin~="fluent"] :is(.btn.primary, .btn.good, .btn[data-tone]):not(.swatch):not(.on):not(.destructive) {
+  --fill-c: var(--btn-tone, var(--accent));
+  background: hsl(var(--fill-c)); color: hsl(var(--fl-on-accent)); border: 1px solid rgb(0 0 0 / .14); border-top-color: rgb(255 255 255 / .08); font-weight: 600; }
+html[data-skin~="fluent"] :is(.btn.primary, .btn.good, .btn[data-tone]):not(.swatch):not(.on):not(.destructive):is(:hover, .hov) { background: hsl(var(--fill-c) / .9); }
+html[data-skin~="fluent"] :is(.btn.primary, .btn.good, .btn[data-tone]):not(.swatch):not(.on):not(.destructive):active { background: hsl(var(--fill-c) / .8); color: rgb(0 0 0 / .5); }
+html[data-skin~="fluent"] .btn.icon-only { border-radius: var(--fl-control-radius, 4px); background: rgb(var(--fl-control)); border: 1px solid rgb(var(--fl-control-stroke)); box-shadow: none; }
+html[data-skin~="fluent"] .btn:disabled { opacity: .4; }
+html[data-skin~="fluent"] .shine { display: none; }
+html[data-skin~="fluent"] .ripple { background: rgb(255 255 255 / .12); }
+html[data-skin~="fluent"] :is(.btn, input):focus-visible { outline: 2px solid hsl(0 0% 100%); outline-offset: 1px; box-shadow: 0 0 0 1px hsl(0 0% 0%); }
+
+/* ---------- rows and cards inside the plate (list items, asks, checklist, pastes, stat tiles) ---------- */
+html[data-skin~="fluent"] :is(.c-list .item, .c-asks .ask, .c-check .row, .c-pastes .paste, .card-plate .row:has(> .stat + .stat) > .stat) {
+  background: rgb(var(--fl-card)); border: 1px solid rgb(var(--fl-card-stroke)); border-radius: var(--fl-row-radius, 6px); corner-shape: round; box-shadow: none; }
+html[data-skin~="fluent"] :is(.c-list .item.act, .c-check .row, .c-pastes .paste):is(:hover, .hov) { background: rgb(var(--fl-card-hover)); box-shadow: none; }
+html[data-skin~="fluent"] .c-asks .ask { padding: var(--fl-row-pad, 10px 12px); }
+html[data-skin~="fluent"] :is(.c-asks .q, .c-list .ttl, .c-check .t) { font-size: var(--fl-body-size, 15px); color: hsl(0 0% 100%); }
+html[data-skin~="fluent"] .c-asks .pick.on { box-shadow: 0 0 0 2px hsl(var(--accent)); }
+/* the number strip stays plain on the plate (theme rule 12), with the accent line under each number */
+html[data-skin~="fluent"] #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { background: none; border: 0; border-radius: 0; }
+
+/* ---------- badges: a small subtle chip; tones keep their meaning ---------- */
+html[data-skin~="fluent"] .badge { background: rgb(var(--fl-control-hover)); color: hsl(0 0% 100%); border: 1px solid rgb(var(--fl-control-stroke));
+  border-radius: var(--fl-control-radius, 4px); corner-shape: round; box-shadow: none; font-weight: 600; }
+html[data-skin~="fluent"] .badge.tone-good { color: hsl(var(--good)); } html[data-skin~="fluent"] .badge.tone-warn { color: hsl(var(--warn)); } html[data-skin~="fluent"] .badge.tone-bad { color: hsl(var(--bad)); }
+
+/* ---------- checklist: Fluent check boxes ---------- */
+html[data-skin~="fluent"] .c-check .box { width: var(--fl-check-size, 20px); height: var(--fl-check-size, 20px); border-radius: var(--fl-control-radius, 4px);
+  border: 1px solid rgb(var(--fl-text-2)); background: rgb(0 0 0 / .1); }
+html[data-skin~="fluent"] .c-check .row.done .box { background: hsl(var(--accent)); border-color: hsl(var(--accent)); color: hsl(var(--fl-on-accent)); }
+
+/* ---------- progress: a hairline track with a 3px accent bar ---------- */
+html[data-skin~="fluent"] .c-prog .track { height: var(--fl-prog-bar, 3px); background: linear-gradient(rgb(var(--fl-text-3)), rgb(var(--fl-text-3))) center / 100% var(--fl-prog-track, 1px) no-repeat; border: 0; overflow: visible; }
+html[data-skin~="fluent"] .c-prog .fill { background: hsl(var(--accent)); border-radius: 99px; }
+html[data-skin~="fluent"] .c-pastes .num { background: hsl(var(--accent)); color: hsl(var(--fl-on-accent)); border-radius: var(--fl-control-radius, 4px); }
+
+/* ---------- charts: the canvas panel matches the plate ---------- */
+html[data-skin~="fluent"] .fold-x[data-key] { border-radius: var(--fl-card-radius, 8px); }
+
+/* ---------- the card's own buttons (pin, x, layer): Windows caption-style squares; close turns red on hover ---------- */
+html[data-skin~="fluent"] #stage { --ctl-bg: rgb(var(--fl-ctl-bg)); --ctl-bg-hover: rgb(var(--fl-ctl-bg)); --ctl-fg: hsl(0 0% 100%);
+  --ctl-ring: rgb(var(--fl-control-stroke)); --ctl-ring-hover: rgb(var(--fl-control-stroke-top)); --ctl-blur: 0px; }
+html[data-skin~="fluent"] .ctl { border-radius: var(--fl-ctl-radius, 4px); box-shadow: 0 0 0 1px var(--ctl-ring), 0 2px 6px rgb(var(--fl-shadow)); }
+html[data-skin~="fluent"] .ctl:is(:hover, .hov) { transform: none !important; background: rgb(var(--fl-control-hover)), var(--ctl-bg); }
+html[data-skin~="fluent"] #dismiss:is(:hover, .hov) { background: hsl(var(--fl-close-hover)); }
+html[data-skin~="fluent"] :is(#stage.pinned #pin svg, #stage.below #layer svg rect) { fill: hsl(var(--accent)); }
