@@ -10,7 +10,13 @@ const PAD = 10;
 // the full width and labels every value (key + detail, docs/theme-rules.md 14). Sparks are already their own key.
 export function keyWidth(s) {
   if (s.kind === 'spark') return 0;
-  return Math.round((s.c.width || 280) * limit('chart-key-frac', 0.62));
+  const key = Math.round((width(s) || s.c.width || 280) * limit('chart-key-frac', 0.62));
+  // folded bars still need a slot per label: never narrower than the labels themselves (they ran together: "MonTueWed")
+  if (s.kind === 'bar' && s.labels && s.labels.length) {
+    const longest = Math.max(0, ...s.labels.map((l) => measure(l, 9.5)));
+    return Math.max(key, Math.ceil(PAD * 2 + s.labels.length * (longest + 6)));
+  }
+  return key;
 }
 
 export function width(s) {
