@@ -39,6 +39,11 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
 11. **No Close buttons.** Every card has the built-in dismiss (x); a card never adds its own Close.
 12. **Numbers.** Several = ONE long strip (`stat-tiles`, size `chip`): a single row, the numbers straight on the glass. One number =
     `stat-chip`, a flat rectangle (`chip-radius`). Never a square of four.
+12b. **Text budget, max and min (user, 11-12). Check it before EVERY push.**
+    - Max: card title at most 40 characters, each row or label at most 60, the whole card at most 120 words, with at most one muted
+      caption line. Over budget: fold it into a pill list (`list-long`), trim it or split it into another card; never shrink the type.
+    - Min: every card has a title, and every number has a unit and a label (`387 GB`, "Disk use"). A caption is not required.
+    - Type sizes stay at the floors (card text 15 px, charts 13 px, hero 32 to 36 px); no maximum.
 
 ## Size by purpose
 13. Every chip says what it is in its seed `opts.size` (user, 11-11):

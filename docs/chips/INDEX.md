@@ -138,6 +138,9 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 | `bike-viewer` | the interactive 3D bike demo | title, paint, spin, explode | [bike-viewer.md](bike-viewer.md) |
 | `skeleton-card` | an empty shimmering placeholder popup, shown under the id the real card will use | none | [skeleton-card.md](skeleton-card.md) |
 
+**Text budget before every push (user, 11-12):** title at most 40 characters, a row at most 60, the card at most 120 words; every card has a title and
+every number a unit and a label (theme-rules 12b). Over budget = a pill list, a trim or another card, never smaller type.
+
 **Rules that apply to every chip** (details in `../design.md` and `../learnings.md`): never clip, size within the container, text at least 15 px, explain each
 metric in a line, one card per kind of thing (do not stack unlike things in one card), short `ttl`, never cover your own cards.
 Every seed ships realistic sample `data` (labels, values, units), never zeros, blank strings or "A/B/C"; `--data` deep-merges over it, so

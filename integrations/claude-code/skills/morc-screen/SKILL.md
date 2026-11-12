@@ -29,3 +29,4 @@ Show things on the user's screen with the `morc` CLI (or the `morc mcp` tools) i
 7. **Events.** The hooks inject `[morc] N UI interaction(s)` lines (or the MCP `wait_events` tool returns them): act on them, then stop.
 8. **Complaints** about size, frequency or motion change the preference vector first: `morc annoy nudge size_bias 0.85 --why "<their words>"`.
 9. Never move their cursor or click for them.
+10. **Text budget (user, 11-12), before every push.** Title at most 40 characters, a row at most 60, the card at most 120 words; every card has a title and every number a unit and a label. Over budget: a pill list, a trim or another card, never smaller type (docs/theme-rules.md 12b).
