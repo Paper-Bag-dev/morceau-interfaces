@@ -1,0 +1,332 @@
+{
+ "title": "Morceau engine: modules and their calls",
+ "graph": {
+  "title": "src (dirs)",
+  "nodes": [
+   {
+    "id": "(root)",
+    "label": "(root)",
+    "group": "(root)",
+    "size": 15
+   },
+   {
+    "id": "agent",
+    "label": "agent",
+    "group": "agent",
+    "size": 42
+   },
+   {
+    "id": "agent/wake",
+    "label": "agent/wake",
+    "group": "agent",
+    "size": 12
+   },
+   {
+    "id": "cli",
+    "label": "cli",
+    "group": "cli",
+    "size": 20
+   },
+   {
+    "id": "data",
+    "label": "data",
+    "group": "data",
+    "size": 33
+   },
+   {
+    "id": "host",
+    "label": "host",
+    "group": "host",
+    "size": 45
+   },
+   {
+    "id": "ipc",
+    "label": "ipc",
+    "group": "ipc",
+    "size": 10
+   },
+   {
+    "id": "learning",
+    "label": "learning",
+    "group": "learning",
+    "size": 30
+   },
+   {
+    "id": "placement",
+    "label": "placement",
+    "group": "placement",
+    "size": 86
+   },
+   {
+    "id": "platform",
+    "label": "platform",
+    "group": "platform",
+    "size": 21
+   },
+   {
+    "id": "platform/macos",
+    "label": "platform/macos",
+    "group": "platform",
+    "size": 64
+   },
+   {
+    "id": "surface",
+    "label": "surface",
+    "group": "surface",
+    "size": 53
+   }
+  ],
+  "edges": [
+   {
+    "source": "agent",
+    "target": "data",
+    "weight": 13,
+    "kind": "calls"
+   },
+   {
+    "source": "agent",
+    "target": "(root)",
+    "weight": 11,
+    "kind": "calls"
+   },
+   {
+    "source": "agent",
+    "target": "ipc",
+    "weight": 6,
+    "kind": "imports"
+   },
+   {
+    "source": "agent/wake",
+    "target": "agent",
+    "weight": 12,
+    "kind": "calls"
+   },
+   {
+    "source": "agent/wake",
+    "target": "data",
+    "weight": 8,
+    "kind": "calls"
+   },
+   {
+    "source": "agent/wake",
+    "target": "(root)",
+    "weight": 4,
+    "kind": "calls"
+   },
+   {
+    "source": "agent/wake",
+    "target": "host",
+    "weight": 2,
+    "kind": "calls"
+   },
+   {
+    "source": "agent",
+    "target": "platform/macos",
+    "weight": 2,
+    "kind": "references"
+   },
+   {
+    "source": "agent",
+    "target": "placement",
+    "weight": 4,
+    "kind": "calls"
+   },
+   {
+    "source": "cli",
+    "target": "learning",
+    "weight": 6,
+    "kind": "calls"
+   },
+   {
+    "source": "cli",
+    "target": "data",
+    "weight": 14,
+    "kind": "calls"
+   },
+   {
+    "source": "cli",
+    "target": "agent",
+    "weight": 2,
+    "kind": "calls"
+   },
+   {
+    "source": "cli",
+    "target": "(root)",
+    "weight": 4,
+    "kind": "calls"
+   },
+   {
+    "source": "data",
+    "target": "ipc",
+    "weight": 4,
+    "kind": "imports"
+   },
+   {
+    "source": "host",
+    "target": "placement",
+    "weight": 47,
+    "kind": "calls"
+   },
+   {
+    "source": "host",
+    "target": "surface",
+    "weight": 44,
+    "kind": "calls"
+   },
+   {
+    "source": "host",
+    "target": "agent",
+    "weight": 10,
+    "kind": "calls"
+   },
+   {
+    "source": "host",
+    "target": "learning",
+    "weight": 7,
+    "kind": "calls"
+   },
+   {
+    "source": "host",
+    "target": "(root)",
+    "weight": 6,
+    "kind": "calls"
+   },
+   {
+    "source": "host",
+    "target": "platform",
+    "weight": 6,
+    "kind": "calls"
+   },
+   {
+    "source": "host",
+    "target": "platform/macos",
+    "weight": 8,
+    "kind": "calls"
+   },
+   {
+    "source": "host",
+    "target": "ipc",
+    "weight": 20,
+    "kind": "references"
+   },
+   {
+    "source": "host",
+    "target": "data",
+    "weight": 11,
+    "kind": "calls"
+   },
+   {
+    "source": "learning",
+    "target": "data",
+    "weight": 5,
+    "kind": "calls"
+   },
+   {
+    "source": "learning",
+    "target": "(root)",
+    "weight": 5,
+    "kind": "calls"
+   },
+   {
+    "source": "placement",
+    "target": "platform/macos",
+    "weight": 13,
+    "kind": "calls"
+   },
+   {
+    "source": "placement",
+    "target": "data",
+    "weight": 2,
+    "kind": "calls"
+   },
+   {
+    "source": "platform",
+    "target": "ipc",
+    "weight": 3,
+    "kind": "imports"
+   },
+   {
+    "source": "platform/macos",
+    "target": "ipc",
+    "weight": 3,
+    "kind": "imports"
+   },
+   {
+    "source": "surface",
+    "target": "ipc",
+    "weight": 6,
+    "kind": "imports"
+   },
+   {
+    "source": "surface",
+    "target": "data",
+    "weight": 2,
+    "kind": "calls"
+   },
+   {
+    "source": "surface",
+    "target": "(root)",
+    "weight": 3,
+    "kind": "calls"
+   },
+   {
+    "source": "surface",
+    "target": "placement",
+    "weight": 4,
+    "kind": "references"
+   }
+  ],
+  "flow": [],
+  "groups": [
+   {
+    "id": "(root)",
+    "label": "(root)"
+   },
+   {
+    "id": "agent",
+    "label": "agent"
+   },
+   {
+    "id": "cli",
+    "label": "cli"
+   },
+   {
+    "id": "data",
+    "label": "data"
+   },
+   {
+    "id": "host",
+    "label": "host"
+   },
+   {
+    "id": "ipc",
+    "label": "ipc"
+   },
+   {
+    "id": "learning",
+    "label": "learning"
+   },
+   {
+    "id": "placement",
+    "label": "placement"
+   },
+   {
+    "id": "platform",
+    "label": "platform"
+   },
+   {
+    "id": "surface",
+    "label": "surface"
+   }
+  ],
+  "stats": {
+   "nodes": 12,
+   "edges": 33,
+   "kinds": {
+    "calls": 25,
+    "imports": 5,
+    "references": 3
+   }
+  }
+ }
+}

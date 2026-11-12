@@ -1,0 +1,40 @@
+{
+ "pie": {
+  "title": "Time by project",
+  "values": [
+   12.5,
+   7.2,
+   4.1,
+   2.3
+  ],
+  "labels": [
+   "Engine",
+   "Docs",
+   "Reviews",
+   "Meetings"
+  ],
+  "unit": "h"
+ },
+ "bars": {
+  "title": "Commits per day",
+  "values": [
+   4,
+   9,
+   6,
+   12,
+   3,
+   8,
+   11
+  ],
+  "labels": [
+   "Mon",
+   "Tue",
+   "Wed",
+   "Thu",
+   "Fri",
+   "Sat",
+   "Sun"
+  ],
+  "unit": ""
+ }
+}

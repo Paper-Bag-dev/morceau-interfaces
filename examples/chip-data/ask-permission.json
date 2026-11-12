@@ -1,0 +1,7 @@
+{
+ "title": "Restart the build server?",
+ "body": "Two jobs are queued behind a stuck one. A restart clears them in about a minute.",
+ "yes": "Restart",
+ "no": "Leave it",
+ "ctx": "demo-perm"
+}

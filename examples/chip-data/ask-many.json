@@ -1,0 +1,18 @@
+{
+ "title": "Before the release",
+ "ctx": "demo-ask",
+ "items": [
+  {
+   "id": "notes",
+   "q": "Add release notes to the changelog?"
+  },
+  {
+   "id": "tag",
+   "q": "Tag the build as 0.2.0?"
+  },
+  {
+   "id": "announce",
+   "q": "Post it in the team channel?"
+  }
+ ]
+}

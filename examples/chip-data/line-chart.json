@@ -1,0 +1,21 @@
+{
+ "title": "Response time this week",
+ "values": [
+  220,
+  198,
+  240,
+  185,
+  172,
+  190,
+  165
+ ],
+ "labels": [
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+  "Sun"
+ ]
+}

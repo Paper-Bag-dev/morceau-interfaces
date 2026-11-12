@@ -1,0 +1,15 @@
+{
+ "title": "Disk use",
+ "values": [
+  212,
+  96,
+  48,
+  31
+ ],
+ "labels": [
+  "Photos",
+  "Code",
+  "Mail",
+  "Other"
+ ]
+}

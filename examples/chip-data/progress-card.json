@@ -1,0 +1,15 @@
+{
+ "title": "Downloads",
+ "a": {
+  "label": "paper.pdf",
+  "value": 82
+ },
+ "b": {
+  "label": "dataset.zip",
+  "value": 41
+ },
+ "c": {
+  "label": "video.mp4",
+  "value": 12
+ }
+}

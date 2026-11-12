@@ -1,0 +1,8 @@
+{
+ "title": "Run the test suite?",
+ "body": "About 40 seconds; results land on this card.",
+ "yes": "Run",
+ "no": "Not now",
+ "ctx": "demo-run",
+ "state": "ask"
+}

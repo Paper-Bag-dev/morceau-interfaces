@@ -1,0 +1,22 @@
+{
+ "a": {
+  "label": "Cards shown",
+  "value": 42,
+  "unit": ""
+ },
+ "b": {
+  "label": "Clicks",
+  "value": 17,
+  "unit": ""
+ },
+ "c": {
+  "label": "Avg. on screen",
+  "value": 38,
+  "unit": "s"
+ },
+ "d": {
+  "label": "Dismissed",
+  "value": 5,
+  "unit": ""
+ }
+}

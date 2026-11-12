@@ -1,0 +1,22 @@
+{
+ "a": {
+  "label": "CPU",
+  "value": 23,
+  "unit": "%"
+ },
+ "b": {
+  "label": "Memory",
+  "value": 61,
+  "unit": "%"
+ },
+ "c": {
+  "label": "Disk",
+  "value": 48,
+  "unit": "%"
+ },
+ "d": {
+  "label": "Battery",
+  "value": 87,
+  "unit": "%"
+ }
+}

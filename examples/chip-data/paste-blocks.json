@@ -1,0 +1,24 @@
+{
+ "title": "Set up the integration",
+ "body": "Paste each block where its title says, top to bottom.",
+ "items": [
+  {
+   "id": "p1",
+   "title": "Settings › API base URL",
+   "text": "https://api.example.com/v2",
+   "note": "Paste → Save"
+  },
+  {
+   "id": "p2",
+   "title": "Settings › Webhook secret",
+   "text": "whsec_demo_9f3a1c",
+   "note": "Paste → Save"
+  },
+  {
+   "id": "p3",
+   "title": "Workflow › Start step",
+   "text": "{\"event\": \"order.created\", \"retry\": 3}",
+   "note": "Paste → Publish"
+  }
+ ]
+}

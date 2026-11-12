@@ -1,0 +1,21 @@
+{
+ "title": "Pick up where you left off",
+ "body": "Your last sessions",
+ "items": [
+  {
+   "id": "s1",
+   "text": "Morceau redesign",
+   "sub": "12 Nov · 4 h"
+  },
+  {
+   "id": "s2",
+   "text": "Eval dashboard",
+   "sub": "11 Nov · 1 h"
+  },
+  {
+   "id": "s3",
+   "text": "Release checklist",
+   "sub": "10 Nov · 25 min"
+  }
+ ]
+}
