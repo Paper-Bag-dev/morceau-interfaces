@@ -11,7 +11,8 @@
 // our app is inactive, the host marks the hovered chain with .hov instead (core/main.js markHover).
 
 import { h, render } from 'preact';
-import { useState, useEffect, useRef } from 'preact/hooks';
+import { useState, useEffect, useLayoutEffect, useRef } from 'preact/hooks';
+export { useState, useEffect, useLayoutEffect, useRef };
 import htm from 'htm';
 import { register } from './registry.js';
 import { measureSoon } from './bridge.js';
@@ -45,11 +46,25 @@ ${preset}`;
 
 const UNSET = {};
 
-export function registerView(type, View) {
-  register(type, (c, ctx) => {
-    const el = document.createElement('div');
-    el.className = 'c-view';
-    el.dataset.hit = '';
+/**
+ * registerView(type, View, opts): a Preact component as a card component. The component's ROOT element is the host the view renders into,
+ * so the DOM keeps the shape the skins, the fold rules and the tree expect (".c-list > .item", ".card-plate > .c-text.lg").
+ *   opts.tag   host tag (default div)          opts.cls   host classes: string or (c) => string (default "c-view")
+ *   opts.hit   false = the host is not a hit box (default true)
+ *   opts.slot  true = the renderer's child components are appended into the host (layouts); the view then usually renders nothing
+ * The view gets { c, ctx, useBind, act, host }. Every host carries data-view="preact" (morc tree reports it as view: "preact").
+ */
+export function registerView(type, View, opts = {}) {
+  register(type, viewFactory(type, View, opts));
+}
+
+/** The factory registerView registers: (c, ctx) -> host element. Layouts use it directly to pick host options per spec. */
+export function viewFactory(type, View, opts = {}) {
+  return (c, ctx) => {
+    const el = document.createElement(opts.tag || 'div');
+    el.className = (typeof opts.cls === 'function' ? opts.cls(c) : opts.cls) || 'c-view';
+    if (opts.hit !== false) el.dataset.hit = '';
+    el.dataset.view = 'preact';
     function Host() {
       // the bindings are made once per mount; their callbacks feed this component's state, so a patch re-renders only what changed
       const binds = useRef(null);
@@ -66,12 +81,13 @@ export function registerView(type, View) {
         return b.v === UNSET ? undefined : b.v;
       };
       useEffect(() => { measureSoon(); });
-      return h(View, { c, ctx, useBind, act: (a) => ctx.act(a) });
+      return h(View, { c, ctx, useBind, act: (a) => ctx.act(a), host: el });
     }
     render(h(Host, {}), el);
-    if (JSON.stringify(c).includes('"class"') || View.tailwind !== false) ensureTailwind();
+    if (opts.slot) ctx.children.forEach((make) => el.append(make()));
+    if (opts.tailwind !== false) ensureTailwind();
     return el;
-  });
+  };
 }
 
 // A generic element for layouts written on the fly: {type:"el", tag:"div", class:"flex gap-2", text?, children?}.

@@ -1,17 +1,16 @@
 import { register } from '../../core/registry.js';
+import { registerView, viewFactory, html, useLayoutEffect } from '../../core/view.js';
 
-const box = (cls) => (c, ctx) => {
-  const el = document.createElement('div');
-  el.className = cls + (c.panel ? ' panel' : '');
-  if (c.gap != null) el.style.setProperty('--gap', c.gap + 'px');
-  if (c.align) el.style.setProperty('--align', c.align);
-  if (c.align === 'flex-end') el.classList.add('end');   // right-aligned column: items and wrapped text hug the right edge, the block grows leftward
-  if (c.panel) el.dataset.hit = '';
-  if (c.scroll) { el.classList.add('scroll'); el.style.maxHeight = (c.maxh || 220) + 'px'; el.dataset.hit = ''; }   // scrollable group: long results stay inside a window of their own
-  ctx.children.forEach((make) => el.append(make()));
-  if (c.flow === 'wrap-left') flowLeft(el);
-  return el;
+// Layouts are Preact views whose host takes the renderer's child components (slot); the view sets the host's gap, align, panel and scroll.
+const box = (cls) => ({ c, host }) => {
+  if (c.gap != null) host.style.setProperty('--gap', c.gap + 'px');
+  if (c.align) host.style.setProperty('--align', c.align);
+  if (c.scroll) host.style.maxHeight = (c.maxh || 220) + 'px';   // scrollable group: long results stay inside a window of their own
+  if (c.flow === 'wrap-left' && !host.dataset.flowed) { host.dataset.flowed = '1'; flowLeft(host); }
+  return null;
 };
+const boxCls = (cls) => (c) => [cls, c.panel ? 'panel' : '', c.align === 'flex-end' ? 'end' : '', c.scroll ? 'scroll' : ''].filter(Boolean).join(' ');   // end: right-aligned column, the block grows leftward
+const boxHit = (c) => !!(c.panel || c.scroll);
 
 // A long column that must fit a short strip (the space under the active window): once attached, split it into the fewest columns whose
 // height fits the strip. The first column sits at the RIGHT and the rest grow leftward, so it fills from the corner toward the free space.
@@ -40,41 +39,32 @@ function flowLeft(el) {
   setTimeout(go, 120);                                     // after the first paint, so heights are real
 }
 
-register('column', box('col'));
-register('row', box('row'));
-register('panel', (c, ctx) => box('col')({ ...c, panel: true }, ctx));   // filled card for forms / grouped controls
+// panel = a filled column for forms / grouped controls; column and row are hit boxes only when filled (panel) or scrolling
+for (const [type, cls, panel] of [['column', 'col', false], ['row', 'row', false], ['panel', 'col', true]]) {
+  register(type, (c, ctx) => {
+    const spec = panel ? { ...c, panel: true } : c;
+    const make = viewFactory(type + ':box', box(cls), { cls: boxCls(cls)(spec), hit: boxHit(spec), slot: true });
+    return make(spec, ctx);
+  });
+}
 
-register('spacer', (c) => {
-  const el = document.createElement('div');
-  el.style.height = (c.size ?? 6) + 'px';
-  return el;
-});
+registerView('spacer', ({ c, host }) => { host.style.height = (c.size ?? 6) + 'px'; return null; }, { cls: 'spacer', hit: false, tailwind: false });
 
-register('divider', () => {
-  const el = document.createElement('div');
-  el.className = 'divider';
-  el.dataset.hit = '';
-  return el;
-});
+registerView('divider', () => null, { cls: 'divider', tailwind: false });
 
 // wing: the cohesion layout. `main` = the glanceable part, docked beside the active window (kept to the room that is free there);
 // `aside` = the less useful part, tucked below and allowed to run wider, so the window's silhouette becomes an L instead of a slab.
 // With morph low (or no neighbour) it is just a column. The window shape is the union of the [data-hit] plates, so gaps stay see-through.
-register('wing', (c, ctx) => {
+registerView('wing', ({ c, ctx, host }) => {
   const v = window.__view || {};
   const morph = v.morph == null ? 0.6 : v.morph;
   const room = v.dock_w || 0;
-  const el = document.createElement('div');
-  el.className = 'col wing';
-  el.style.setProperty('--align', 'flex-start');
-  const mk = (ids) => ids.map((id) => ctx.child(id));
-  const main = document.createElement('div');
-  main.className = 'col wing-main';
-  main.append(...mk(c.main || []));
-  if (morph >= 0.3 && room >= 200) main.style.maxWidth = Math.max(220, Math.min(room - 12, c.main_max || 330)) + 'px';
-  const aside = document.createElement('div');
-  aside.className = 'col wing-aside';
-  aside.append(...mk(c.aside || []));
-  el.append(main, aside);
-  return el;
-});
+  useLayoutEffect(() => {
+    host.style.setProperty('--align', 'flex-start');
+    const main = host.querySelector(':scope > .wing-main'), aside = host.querySelector(':scope > .wing-aside');
+    main.append(...(c.main || []).map((id) => ctx.child(id)));
+    aside.append(...(c.aside || []).map((id) => ctx.child(id)));
+  }, []);
+  const mw = morph >= 0.3 && room >= 200 ? Math.max(220, Math.min(room - 12, c.main_max || 330)) + 'px' : undefined;
+  return html`<div class="col wing-main" style=${{ maxWidth: mw }}></div><div class="col wing-aside"></div>`;
+}, { cls: 'col wing', hit: false });

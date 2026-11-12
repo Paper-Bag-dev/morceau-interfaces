@@ -1,21 +1,14 @@
-import { register } from '../../core/registry.js';
+import { registerView, html, useEffect, useState } from '../../core/view.js';
 
-// {type:"progress", label:"Video today", value:{bind:"/video"}, max:135, unit:"m", warnAt:.8, dangerAt:1}
-register('progress', (c, ctx) => {
-  const el = document.createElement('div');
-  el.className = 'c-prog';
-  el.dataset.hit = '';
-  el.innerHTML = '<div class="top"><span class="lbl"></span><span class="val"></span></div><div class="track"><div class="fill"></div></div>';
-  const lbl = el.querySelector('.lbl'), val = el.querySelector('.val'), fill = el.querySelector('.fill');
-  const max = c.max || 100;
-  ctx.bind(c.label, (v) => { lbl.textContent = v ?? ''; });
-  ctx.bind(c.value, (v) => {
-    const n = Number(v) || 0, ratio = n / max;
-    val.textContent = `${Number.isInteger(n) ? n : n.toFixed(1)}${c.unit || ''} / ${max}${c.unit || ''}`;
-    el.classList.remove('warn', 'bad', 'good');
-    el.classList.add(ratio >= (c.dangerAt ?? 1) ? 'bad' : ratio >= (c.warnAt ?? 0.8) ? 'warn' : c.goodBelow != null && ratio < c.goodBelow ? 'good' : 'ok');
-    // transition on the first frame after insert so the bar springs up from zero
-    requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.transform = `scaleX(${Math.max(0.02, Math.min(1, ratio))})`; }));
-  });
-  return el;
-});
+// {type:"progress", label:"Video today", value:{bind:"/video"}, max:135, unit:"m", warnAt:.8, dangerAt:1}. Preact view.
+registerView('progress', ({ c, useBind, host }) => {
+  const label = useBind(c.label), v = useBind(c.value);
+  const max = c.max || 100, n = Number(v) || 0, ratio = n / max, u = c.unit || '';
+  host.className = 'c-prog ' + (ratio >= (c.dangerAt ?? 1) ? 'bad' : ratio >= (c.warnAt ?? 0.8) ? 'warn' : c.goodBelow != null && ratio < c.goodBelow ? 'good' : 'ok');
+  // the bar springs up from zero on the frame after insert, then follows every change
+  const [w, setW] = useState(0.02);
+  useEffect(() => { requestAnimationFrame(() => requestAnimationFrame(() => setW(Math.max(0.02, Math.min(1, ratio))))); }, [ratio]);
+  return html`
+    <div class="top flex justify-between gap-3"><span class="lbl min-w-0 truncate">${label ?? ''}</span><span class="val shrink-0">${Number.isInteger(n) ? n : n.toFixed(1)}${u} / ${max}${u}</span></div>
+    <div class="track"><div class="fill" style=${{ transform: `scaleX(${w})` }}></div></div>`;
+}, { cls: 'c-prog' });

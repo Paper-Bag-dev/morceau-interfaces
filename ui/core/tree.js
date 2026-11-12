@@ -73,6 +73,8 @@ export function cardTree(r, { depth, node } = {}) {
     const el = r.root.querySelector(`[data-cid="${CSS.escape(id)}"]`);
     if (!el) n.flags = ['not-rendered'];
     else {
+      // which pipe built it: "preact" (registerView, docs/views.md) or "dom" (a hand-built component still to move onto it)
+      n.view = el.dataset.view || 'dom';
       const b = el.getBoundingClientRect();
       n.rect = [b.x, b.y, b.width, b.height].map(Math.round);
       const { flags, issues } = check(el, b, vw, vh);
