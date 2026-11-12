@@ -75,3 +75,7 @@ html[data-skin~="fluent"] .ctl { border-radius: var(--fl-ctl-radius, 4px); box-s
 html[data-skin~="fluent"] .ctl:is(:hover, .hov) { transform: none !important; background: rgb(var(--fl-control-hover)), var(--ctl-bg); }
 html[data-skin~="fluent"] #dismiss:is(:hover, .hov) { background: hsl(var(--fl-close-hover)); }
 html[data-skin~="fluent"] :is(#stage.pinned #pin svg, #stage.below #layer svg rect) { fill: hsl(var(--accent)); }
+
+/* ---------- charts sit on the acrylic: a soft card fill, never a light canvas (the bright-page scheme used to turn it white) ---------- */
+html[data-skin~="fluent"] .c-chart canvas { background: rgb(var(--fl-card)); border-radius: var(--fl-card-radius, 8px); }
+html[data-skin~="fluent"] .explain { background: rgb(var(--fl-card)); border: 1px solid rgb(var(--fl-control-stroke)); border-radius: var(--fl-row-radius, 6px); }

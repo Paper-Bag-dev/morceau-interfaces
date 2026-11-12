@@ -1,6 +1,6 @@
 {
   "name": "morceau",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Morceau: ephemeral, agent-driven UI for Windows and macOS. Borderless, transparent, self-expiring windows (cards, charts, forms, 3D) that an AI agent shows through a CLI (morc) or MCP.",
   "license": "MIT",
   "author": "Paper-Bag-dev",
