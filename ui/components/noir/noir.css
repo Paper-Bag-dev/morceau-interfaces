@@ -20,12 +20,12 @@ html[data-skin~="noir"] :is(.stat .unit, .stat .lbl, .c-kv .k, .c-prog .lbl, .to
 html[data-skin~="noir"] .stat .num { font-family: var(--font-display); font-weight: var(--nr-num-weight, 300); letter-spacing: -.03em; color: hsl(0 0% 98%); }
 html[data-skin~="noir"] #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { box-shadow: none; }
 html[data-skin~="noir"] #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat + .stat { border-left: 1px solid rgb(var(--nr-line)); }
-/* the HERO: a card that holds one number is the pale-blue gradient card with dark ink */
+/* the HERO (#stage in the selectors: the chip rules in plate.css carry an id too): a card that holds one number is the pale-blue gradient card with dark ink */
 html[data-skin~="noir"] .card-plate:has(> .stat:only-child), html[data-skin~="noir"] .card-plate:has(> .c-text.lg:first-child + .stat:last-child) {
   background: linear-gradient(135deg, rgb(var(--nr-hero-a)) 0%, rgb(var(--nr-hero-b)) 100%); color: hsl(var(--nr-hero-ink)); }
-html[data-skin~="noir"] .card-plate:is(:has(> .stat:only-child), :has(> .c-text.lg:first-child + .stat:last-child)) :is(.num, .c-text) { color: hsl(var(--nr-hero-ink)); }
-html[data-skin~="noir"] .card-plate:is(:has(> .stat:only-child), :has(> .c-text.lg:first-child + .stat:last-child)) :is(.unit, .lbl) { color: hsl(var(--nr-hero-ink) / .55); }
-html[data-skin~="noir"] .card-plate:is(:has(> .stat:only-child), :has(> .c-text.lg:first-child + .stat:last-child)) .num { font-size: var(--nr-hero-size, 44px); }
+html[data-skin~="noir"] #stage .card-plate:is(:has(> .stat:only-child), :has(> .c-text.lg:first-child + .stat:last-child)) :is(.num, .c-text) { color: hsl(var(--nr-hero-ink)); }
+html[data-skin~="noir"] #stage .card-plate:is(:has(> .stat:only-child), :has(> .c-text.lg:first-child + .stat:last-child)) :is(.unit, .lbl) { color: hsl(var(--nr-hero-ink) / .55); }
+html[data-skin~="noir"] #stage .card-plate:is(:has(> .stat:only-child), :has(> .c-text.lg:first-child + .stat:last-child)) .num { font-size: var(--nr-hero-size, 44px); }
 
 /* ---------- buttons: pills. Filled = the accent with dark ink; standard = a raised dark pill ---------- */
 html[data-skin~="noir"] .btn:not(.swatch):not(.on):not(.destructive) { background: rgb(var(--nr-raise)); color: hsl(0 0% 98%); border: 0; border-radius: 999px; corner-shape: round;
