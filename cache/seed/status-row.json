@@ -18,7 +18,23 @@
     "topic": "status.row",
     "importance": "0.8",
     "max_frac": 0.9,
-    "size": "chip"
+    "size": "chip",
+    "actions": {
+      "status": [
+        {
+          "do": "set",
+          "path": "/s",
+          "value": "$.text"
+        }
+      ],
+      "set": [
+        {
+          "do": "set",
+          "path": "/{$.key}/value",
+          "value": "$.value"
+        }
+      ]
+    }
   },
   "components": [
     {

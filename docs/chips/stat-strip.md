@@ -5,3 +5,5 @@ It sets `max_frac` 0.9 so the row does not wrap into a column; that is how a chi
 
 **Card:** `morc card tok-stats --chip stat-strip --region above --importance 0.8 --min-importance 0.7 --set a.label="Tokens, all time" --set a.value=818 --set a.unit=M ...` (b, c, d the same).
 **Show:** `morc push tok-stats`. Use `--region below` for the strip under the window. Text cards go in strips as rows; pictures go in the tall sides.
+
+**Actions (0.2):** `set {key: a..d, value}`, `label {key, text}`. Run with `morc do <id> <action> '{...}'` or the MCP `do_action` tool; no raw paths needed.

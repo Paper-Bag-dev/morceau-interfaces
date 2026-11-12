@@ -14,7 +14,23 @@
     "ttl": 120,
     "topic": "viz.graph",
     "size": "large",
-    "idle": 0.4
+    "idle": 0.4,
+    "actions": {
+      "setGraph": [
+        {
+          "do": "set",
+          "path": "/graph",
+          "value": "$"
+        }
+      ],
+      "title": [
+        {
+          "do": "set",
+          "path": "/title",
+          "value": "$.text"
+        }
+      ]
+    }
   },
   "components": [
     {

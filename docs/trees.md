@@ -39,9 +39,10 @@ Rects are css px inside the card. **Flags** are what a screenshot would have sho
 | `cut` | text cut off sideways (ellipsis / overflow hidden) | everything reachable |
 | `clipped` | content hidden below with no way to scroll to it | everything reachable |
 | `scrolls` | content continues, reachable by scrolling | fine (rule 2 allows it) |
+| `folded` | a compact card resting small hides rows; it opens on hover | fine (rule 3: rests small when unused) |
 | `offcard` | sticks out of the card window | everything reachable |
 | `hidden` | not shown right now (a `when`, display none) | none: state |
-| `empty` | a leaf that shows nothing (no text, no picture) | every row holds real content |
+| `empty` | a leaf that shows nothing (no text, picture or painted background) | every row holds real content |
 | `not-rendered` / `missing` | in the spec but not in the DOM / a child id with no component | a spec bug |
 
 So the check after a push is `morc tree <card>` and a look at the flags; a screenshot is for looks only (colors, contrast, a new component).

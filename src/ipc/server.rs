@@ -1,27 +1,22 @@
-//! The command port: localhost TCP, one JSON line in, one JSON line out, token-checked.
-//! (The token keeps web pages and other users from poking the host.)
+//! The command port: one JSON line in, one JSON line out, token-checked, over the transport (transport.rs: a local socket only this user
+//! can open by default, or localhost TCP with MORC_TRANSPORT=tcp). The token keeps other programs from poking the host.
 
-use crate::{ev::{Ev, Proxy}, protocol::Envelope};
+use crate::{ev::{Ev, Proxy}, protocol::Envelope, transport::{Conn, Listener}};
 use std::io::{BufRead, BufReader, Read, Write};
-use std::net::{TcpListener, TcpStream};
 use std::sync::mpsc;
 use std::time::Duration;
 
-pub fn spawn(listener: TcpListener, token: String, proxy: Proxy) {
-    std::thread::spawn(move || {
-        for stream in listener.incoming().flatten() {
-            let (token, proxy) = (token.clone(), proxy.clone());
-            std::thread::spawn(move || handle(stream, &token, proxy));
-        }
-    });
+pub fn spawn(listener: Listener, token: String, proxy: Proxy) {
+    listener.serve(move |conn| handle(conn, &token, proxy.clone()));
 }
 
-fn handle(stream: TcpStream, token: &str, proxy: Proxy) {
-    let _ = stream.set_read_timeout(Some(Duration::from_secs(5)));
+fn handle(mut conn: Box<dyn Conn>, token: &str, proxy: Proxy) {
     let mut line = String::new();
-    let mut reader = BufReader::new(stream.try_clone().unwrap());
-    if reader.by_ref().take(8_000_000).read_line(&mut line).unwrap_or(0) == 0 {
-        return;
+    {
+        let mut reader = BufReader::new(&mut conn);
+        if reader.by_ref().take(8_000_000).read_line(&mut line).unwrap_or(0) == 0 {
+            return;
+        }
     }
     let reply = match serde_json::from_str::<Envelope>(&line) {
         Err(e) => format!("{{\"ok\":false,\"err\":{}}}", serde_json::to_string(&e.to_string()).unwrap()),
@@ -35,6 +30,6 @@ fn handle(stream: TcpStream, token: &str, proxy: Proxy) {
             }
         }
     };
-    let mut s = stream;
-    let _ = writeln!(s, "{}", reply);
+    let _ = writeln!(conn, "{}", reply);
+    let _ = conn.flush();
 }

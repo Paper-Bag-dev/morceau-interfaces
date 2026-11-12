@@ -16,7 +16,6 @@ use crate::{
 };
 use serde_json::{json, Value};
 use std::collections::HashMap;
-use std::net::TcpListener;
 use std::time::{Duration, Instant};
 use tao::{
     dpi::{LogicalSize, PhysicalPosition},
@@ -73,10 +72,13 @@ struct Host {
 }
 
 pub fn run() -> ! {
-    let listener = match TcpListener::bind((paths::HOST, paths::port())) {
+    let listener = match crate::transport::listen() {
         Ok(l) => l,
-        Err(_) => {
-            eprintln!("morc host already running");
+        Err(e) => {
+            // another host owns the endpoint, or it could not be made: say which, in the log too (a detached host has no console)
+            let why = if e.kind() == std::io::ErrorKind::AddrInUse { "already running".to_string() } else { format!("cannot open {}: {e}", crate::transport::describe()) };
+            util::log(&format!("host not started: {why}"));
+            eprintln!("morc host {why}");
             std::process::exit(0);
         }
     };
@@ -111,7 +113,7 @@ pub fn run() -> ! {
     crate::hotkeys::spawn(proxy.clone());
     winstyle::drag_cursor_off(); // in case a previous host died mid-carry with the move cursor installed
     cache::write_registry();
-    util::log("host started");
+    util::log(&format!("host started ({})", crate::transport::describe()));
 
     let mut host = Host { proxy, surfaces: HashMap::new(), by_id: HashMap::new(), next_key: 1, parked: vec![], recent: vec![], last_use: Instant::now(), last_tick: Instant::now(), quit: false, trees: HashMap::new(), records: cards::load(), cards_dirty: Default::default(), hovered: None, shared: json!({}), root: None };
     event_loop.run(move |event, target, flow| {

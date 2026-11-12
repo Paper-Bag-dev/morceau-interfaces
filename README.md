@@ -1,25 +1,26 @@
 # Morceau
 
-**Ephemeral, agent-driven UI for Windows and macOS.** An AI agent (or you) shows small, glanceable windows on your screen with one CLI command: a stat card, a chart,
+**Ephemeral, agent-driven UI for Windows and macOS.** Your AI agent shows small, glanceable windows on your screen with one CLI or MCP call: a stat card, a chart,
 a form, a yes/no ask, a graph, a 3D model. They are borderless and transparent, sit next to what you are doing without covering it, can be clicked and
-dragged, and then quietly fade away. The engine is a small Rust host; everything it draws is plain web UI served from disk.
+dragged, and then quietly fade away. You talk to the agent and use the cards; the agent builds, places, checks and changes them. The engine is a small Rust host; everything it draws is plain web UI served from disk.
 
 ```
- agent / script / you
-        |  morc use stat-card-min --data ...        (one short CLI call, cached components, ~80 tokens)
+ your agent (Claude Code, any MCP client) / a trigger rule
+        |  morc use stat-card-min --data ...   or the MCP tool show_chip   (cached components, ~80 tokens)
         v
-   morc CLI  --localhost, token-checked-->  Rust host (windows, placement, lifetime, linter)
+   morc CLI  --local socket, token-checked-->  Rust host (windows, placement, lifetime, linter)
                                                   |  one window per card (WebView2 / WKWebView), all in ONE web process
                                                   v
                                             ui/ (components, charts, 3D) --clicks, drags--> inbox --> agent (via hooks)
 ```
 
 ## What you get
-- **A tiny CLI** (`morc use | show | compose | patch | close ...`) and a cache, so showing something you showed before costs one line.
+- **A tiny CLI and MCP server for the agent** (`morc use | show | patch | tree | card ...`, `morc mcp`) and a cache, so showing something it
+  showed before costs one line.
 - **Components**: text, stat (hero numeral with a needle), button, progress, input, list, chart (line, area, bar, donut, radar, heatmap, clock, rings, treemap,
   gauge, spark), graph (Cytoscape), 3D model viewer (three.js: procedural or glTF with animation or a bone-driven procedural idle), skeleton, spinner.
 - **Placement that does the geometry for you**: the host divides the free screen around the window you are working in into regions (right, below, left, above,
-  the four corners). You say `--region right --align top`; it fits, or falls back to the least-overlapping spot.
+  the four corners). The agent names `--region right --align top`; the host fits it, or falls back to the least-overlapping spot.
 - **Fragments and recipes**: small reusable sub-trees composed into widgets, cached by structure, parameterised with `{{params}}` and `--set` / `--data` flags.
 - **A linter** that refuses dead controls, questions that never resolve, icon-only buttons without a title, and numbers without units.
 - **A preference vector** ("annoyance vector") the agent edits when you complain (too big, too often, too flashy), per topic, with a log of why.
@@ -50,9 +51,17 @@ dragged, and then quietly fade away. The engine is a small Rust host; everything
 ```sh
 npm i -g morceau          # adds `morc` (and `morceau`) to your PATH
 morc init                 # creates your data folder, caches the shipped components
-morc use ask-permission   # your first widget
+morc use ask-permission   # check it works: a small card should appear
 ```
 or without installing: `npx morceau use ask-permission`.
+
+**Then connect your agent** (it does everything from here on):
+- **Claude Code**: merge `integrations/claude-code/settings.example.json` into your settings (the hooks pass your clicks back to it) and copy
+  the skills in `integrations/claude-code/skills/` (`morc-screen`: showing and managing cards; `morc-build`: making new ones).
+- **Any MCP client**: add a stdio server whose command is `morc` with the argument `mcp` (seven tools, docs/mcp.md).
+- **Any coding agent**: point it at `AGENTS.md` (working on Morceau) and `docs/agent.md` (using it).
+
+After that, ask in plain words ("show me today's numbers", "hide that for a bit", "make the graph big") and the agent does the rest.
 
 **From the git repository** (builds the engine for you; needs Rust)
 ```powershell
@@ -102,10 +111,11 @@ Per-machine runtime state (token, logs, usage counts, the installed exe) is unde
 |---|---|---|
 | `Ctrl+Alt+X` | `Ctrl+Option+X` | dismiss every card at once |
 | `Ctrl+Alt+Space` | `Ctrl+Option+Space` | bring back anything that needed you (parked urgent asks), next to the active window |
-| `Ctrl+Alt+Up` | `Ctrl+Option+Up` | every card to the top of the window stack |
-| `Ctrl+Alt+Down` | `Ctrl+Option+Down` | every card to the bottom of the stack (under every window that overlaps it) |
+| `Ctrl+Win+Up` (or `Ctrl+Alt+Up`) | `Ctrl+Option+Up` | every card to the top of the window stack |
+| `Ctrl+Win+Down` (or `Ctrl+Alt+Down`) | `Ctrl+Option+Down` | every card to the bottom of the stack (under every window that overlaps it) |
 | `Up` / `Down` with the pointer on a card | same | step THAT card one window up / down the stack, as far as it can go |
 
+On Windows the stack keys are `Ctrl+Win+arrows`, beside Windows' own `Win+Up/Down`; if another program owns them, `Ctrl+Alt+arrows` is used.
 If a combination is already taken (some graphics drivers use `Ctrl+Alt+arrows` to rotate the screen; macOS uses `Ctrl+Option+Space` for the
 next input source when several keyboard layouts are on), it is quietly skipped (host.log says so) and the command still works:
 `morc dismiss-all`, `morc summon`, `morc card <id> raise|lower`. No permission prompt on either system; the arrows are taken only while
@@ -126,7 +136,7 @@ the pointer is on a card and handed back the moment it leaves.
 Snap distances, button size and spacing are data, not code: `ui/limits.json` (`snap-px`, `snap-break-px`, `snap-gap`, `snap-max-speed`) and the
 `--ctl-*` variables (`ui/preset.css`).
 
-**Command line (the ones used every day)**
+**What the agent runs** (CLI; the MCP tools are the same requests, docs/mcp.md). You never need to type these.
 ```powershell
 morc card NAME --chip CHIP --set key=value ...   # write or change one card's data file (remembered in cards/)
 morc push NAME [NAME ...]                        # show cards; the host places them in free space (or --all --prefix p-)
@@ -134,7 +144,7 @@ morc status                                      # the cards on screen: id, rect
 morc space   |  morc free                        # the free regions around the active window
 morc patch ID /path value                        # change one value live; /__pulse true plays the blue look-here pulse
 morc ui build | list | show NAME | new NAME      # the UI component tree (folders: code + styles + metadata)
-morc annoy nudge crowd 0.8 --why "too crowded"   # teach the host what you treat as crowded or too big
+morc annoy nudge crowd 0.8 --why "too crowded"   # when you say it feels crowded: teach the host
 morc commands                                    # every CLI plugin with one line each
 morc dismiss-all   |  morc summon                # the hotkeys, as commands
 morc tree [ID] [--all] [--depth N]               # the scene tree / one card's tree / both merged (flags instead of screenshots)
@@ -147,7 +157,8 @@ morc patch @shared /focus '"..."'                # the store every card can bind
 morc refresh [COMPONENT]                         # reload components / plugins in the open cards, data kept
 morc mcp                                         # the same, as an MCP server (stdio)
 ```
-## Ten-minute tour
+## How an agent drives it (example)
+What an agent does when you say "put a card with my focus time next to my editor":
 ```powershell
 morc use ask-permission --data @ask.json            # inline JSON loses its quotes in Windows shells: pass a file (@file.json)
 morc show spec.json                          # any spec: {id?, opts?, components, data?, sources?}

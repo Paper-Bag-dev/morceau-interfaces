@@ -16,7 +16,40 @@
     "ttl": 25,
     "topic": "charts.line",
     "importance": "0.7",
-    "size": "large"
+    "size": "large",
+    "actions": {
+      "set": [
+        {
+          "do": "set",
+          "path": "/values",
+          "value": "$.values"
+        },
+        {
+          "do": "set",
+          "path": "/labels",
+          "value": "$.labels"
+        }
+      ],
+      "addPoint": [
+        {
+          "do": "push",
+          "path": "/values",
+          "value": "$.value"
+        },
+        {
+          "do": "push",
+          "path": "/labels",
+          "value": "$.label"
+        }
+      ],
+      "title": [
+        {
+          "do": "set",
+          "path": "/title",
+          "value": "$.text"
+        }
+      ]
+    }
   },
   "components": [
     {

@@ -6,3 +6,5 @@ accent edge, no Close (the card's own dismiss is enough). Layout: `cache/seed/st
 
 **Data:** `{"label": "Calls today", "value": 128, "unit": ""}`
 **Push:** `morc use stat-chip --id stat-calls --data @file.json --region auto`. Sizes: tokens/plate.json `chip-*`.
+
+**Actions (0.2):** `set {value}`, `bump {by}`, `label {text}`. Run with `morc do <id> <action> '{...}'` or the MCP `do_action` tool; no raw paths needed.

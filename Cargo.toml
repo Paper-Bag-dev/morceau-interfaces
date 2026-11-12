@@ -28,6 +28,10 @@ features = [
   "Win32_System_Console",
   "Win32_UI_Input_KeyboardAndMouse",
   "Win32_System_Diagnostics_Debug",
+  "Win32_System_Pipes",
+  "Win32_System_IO",
+  "Win32_Security",
+  "Win32_Storage_FileSystem",
 ]
 
 # macOS only (see "macOS port" in AGENTS.md). objc2 talks to AppKit (NSWindow, NSScreen, NSWorkspace); CoreGraphics and libdispatch are

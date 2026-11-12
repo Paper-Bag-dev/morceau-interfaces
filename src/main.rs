@@ -22,7 +22,7 @@ mod util;
 // Short names for the modules inside the folders, so code anywhere says `crate::paths`, `crate::prefs`, `crate::wake` ...
 use agent::{inbox, live_sources as sources, triggers as anticipate, wake, worker};
 use data::{assets, cache, paths};
-use ipc::{events as ev, protocol, server};
+use ipc::{events as ev, protocol, server, transport};
 use learning::{annoyance as prefs, engagement, literacy};
 use placement::{policy, regions, remembered as placed};
 use platform::{backdrop, foreground_watch as fgwatch, hotkeys, window_style as winstyle};

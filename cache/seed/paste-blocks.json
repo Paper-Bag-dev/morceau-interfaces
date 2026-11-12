@@ -16,7 +16,30 @@
     "topic": "handover.pastes",
     "max_frac": 0.8,
     "size": "medium",
-    "idle": 0.5
+    "idle": 0.5,
+    "actions": {
+      "add": [
+        {
+          "do": "push",
+          "path": "/items",
+          "value": "$"
+        }
+      ],
+      "remove": [
+        {
+          "do": "pull",
+          "path": "/items",
+          "id": "$.id"
+        }
+      ],
+      "note": [
+        {
+          "do": "set",
+          "path": "/body",
+          "value": "$.text"
+        }
+      ]
+    }
   },
   "components": [
     {

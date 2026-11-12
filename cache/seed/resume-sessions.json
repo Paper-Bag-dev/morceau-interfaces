@@ -14,7 +14,16 @@
     ],
     "sticky": true,
     "topic": "sessions.resume",
-    "size": "compact"
+    "size": "compact",
+    "actions": {
+      "remove": [
+        {
+          "do": "pull",
+          "path": "/items",
+          "id": "$.id"
+        }
+      ]
+    }
   },
   "components": [
     {

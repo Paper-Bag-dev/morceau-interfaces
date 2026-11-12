@@ -16,7 +16,28 @@
     "ttl": 25,
     "topic": "charts.week",
     "importance": "0.7",
-    "size": "large"
+    "size": "large",
+    "actions": {
+      "set": [
+        {
+          "do": "set",
+          "path": "/values",
+          "value": "$.values"
+        },
+        {
+          "do": "set",
+          "path": "/labels",
+          "value": "$.labels"
+        }
+      ],
+      "title": [
+        {
+          "do": "set",
+          "path": "/title",
+          "value": "$.text"
+        }
+      ]
+    }
   },
   "components": [
     {

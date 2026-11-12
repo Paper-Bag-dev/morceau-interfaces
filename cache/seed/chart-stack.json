@@ -20,7 +20,23 @@
     "ttl": 90,
     "topic": "charts.stack",
     "importance": "0.7",
-    "size": "large"
+    "size": "large",
+    "actions": {
+      "setPie": [
+        {
+          "do": "merge",
+          "path": "/pie",
+          "value": "$"
+        }
+      ],
+      "setBars": [
+        {
+          "do": "merge",
+          "path": "/bars",
+          "value": "$"
+        }
+      ]
+    }
   },
   "components": [
     {

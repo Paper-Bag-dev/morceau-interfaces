@@ -53,3 +53,10 @@ Variants: primary, secondary, ghost, good (green), bad (red outline), destructiv
 Any component: `"when": {"path": "/answered", "eq": false}` (also `ne`, `truthy`, `falsy`): shown only while true, with enter/leave animation and the
 window re-fitting. Pattern for a question: group with `when answered eq false` containing the text + buttons whose actions `set` a result and `answered=true`;
 a result text with `when answered eq true`. Buttons that `set` without hiding themselves (or a parent), closing, or `role:"tab"` are refused.
+
+## Transport
+The CLI (and `morc mcp`) reach the host over a LOCAL SOCKET only your user account can open, never a network port (`src/ipc/transport.rs`):
+macOS a Unix socket file `morc-<port>.sock` in the runtime folder (mode 0600; the per-user temp folder if that path is too long for a socket),
+Windows a named pipe `\\.\pipe\morc-<user>-<port>` that refuses remote clients. One JSON line in, one JSON line out, token-checked, on any
+transport. `MORC_TRANSPORT=tcp` falls back to localhost TCP (`127.0.0.1:<port>`, `MORC_PORT` to change it). host.log names the transport in
+use on every start.

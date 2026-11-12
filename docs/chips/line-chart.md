@@ -5,3 +5,5 @@ Copy of `week-chart` with `kind: "line"`. Layout: `cache/seed/line-chart.json`, 
 
 **Data:** `{"title": "Calls per hour", "values": [4, 9, 14, 11, 18, 22, 15], "labels": ["9","10","11","12","13","14","15"], "unit": "calls"}`
 **Push:** `morc use line-chart --id <id> --data @file.json --region auto`.
+
+**Actions (0.2):** `set {values, labels}`, `addPoint {value, label}`, `title {text}`. Run with `morc do <id> <action> '{...}'` or the MCP `do_action` tool; no raw paths needed.

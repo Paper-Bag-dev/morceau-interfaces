@@ -17,7 +17,7 @@ and centred" are operations on a card that exists, never a second pop. Code: `sr
 | centre on its display | `morc card <id> move --center` | `set: {"center": true}` |
 | bigger / smaller cap, then centre | `morc card <id> size --frac 0.9 --center` | `set: {"frac": 0.9, "center": true}` |
 | one level down the stack / back up (the card's third button, under the x, toggles it) | `morc card <id> lower` / `raise` (one step each) | `set: {"depth": n}` (0 = top), or `{"layer": "below" \| "top"}` |
-| every card to the top / to the bottom of the stack | Ctrl+Option+Up / Ctrl+Option+Down (Windows: Ctrl+Alt) | |
+| every card to the top / to the bottom of the stack | Ctrl+Option+Up / Down (Windows: Ctrl+Win+Up / Down, or Ctrl+Alt if taken) | |
 | step through the stack by hand | hover the card, press Down (lower, as far as it goes) / Up (higher, to the top) | |
 | pull onto the nearest edge from where it is | `morc card <id> move --snap` | |
 | close | `morc close <id>` | `set: {"state": "closed"}` |

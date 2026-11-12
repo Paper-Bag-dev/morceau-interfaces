@@ -18,7 +18,7 @@ screen no longer needs a screenshot.
   bring it back where it was; a closed card comes back with its last data, even after a restart. Records are written with a falloff
   (after 1 s of quiet, at most every 5 s): dragging a card around for fun costs one write per 5 s.
 - **Window stack.** Each card has a depth: on top, or under the 1st, 2nd ... window that overlaps it. The card's third button sends it
-  one level down and back up; `Up` / `Down` with the pointer on the card step it; `Ctrl+Alt+Up/Down` (macOS `Ctrl+Option+Up/Down`) send
+  one level down and back up; `Up` / `Down` with the pointer on the card step it; `Ctrl+Win+Up/Down` (Windows, `Ctrl+Alt` if taken; macOS `Ctrl+Option+Up/Down`) send
   every card to the top / bottom. A card under a window gets no hover through it and is never moved out from under it.
 - **Snapping.** A carried card snaps to the active window, other cards and the screen edges, slides along them and lets go when pulled
   away; a fast throw never snaps. Settings in `ui/limits.json`; `morc card <id> move --snap` from the CLI.
@@ -31,6 +31,8 @@ screen no longer needs a screenshot.
   in your data folder (`<home>/plugins`), and `morc refresh` to reload them in open cards without losing their data.
 
 ### Changed
+- **No network port.** The CLI and MCP reach the host over a local socket only your user can open (a Unix socket on macOS, a
+  named pipe on Windows) instead of localhost TCP; `MORC_TRANSPORT=tcp` keeps the old way. Nothing on the machine's network stack is exposed.
 - **The card owns its width.** Once laid out, a card's width is fixed: a long value wraps inside it instead of widening it (a chart that
   needs more room can still grow it). Text breaks inside its box rather than spilling out.
 - **The card's buttons.** Pin, dismiss and the new layer button share one look, sit on an arc around the card's top-right corner, come

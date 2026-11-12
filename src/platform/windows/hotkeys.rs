@@ -1,7 +1,7 @@
 //! System-wide shortcuts, registered on their own thread with its own message loop (no extra dependency):
 //!   Ctrl+Alt+X      dismiss every floating UI (the quick "get rid of all of it")
 //!   Ctrl+Alt+Space  bring back anything that needed you (parked urgent asks), next to the active window
-//!   Ctrl+Alt+Up     every card to the top of the window stack; Ctrl+Alt+Down: every card to the bottom
+//!   Ctrl+Win+Up     every card to the top of the window stack; Ctrl+Win+Down: every card to the bottom (Ctrl+Alt+Up/Down if taken)
 //!   Up / Down       ONLY while the pointer is on a card (`arrows(true)` on hover): step the card up / down the window stack. The host
 //!                 asks this thread (its message loop owns the registrations) with a thread message; released when the pointer leaves.
 //! If another program owns a combination, registration quietly fails and the CLI equivalents still work
@@ -11,7 +11,7 @@ use crate::{ev::{Ev, Proxy}, protocol::Request, util};
 use std::sync::atomic::{AtomicU32, Ordering};
 use windows::Win32::Foundation::{LPARAM, WPARAM};
 use windows::Win32::System::Threading::GetCurrentThreadId;
-use windows::Win32::UI::Input::KeyboardAndMouse::{RegisterHotKey, UnregisterHotKey, HOT_KEY_MODIFIERS, MOD_ALT, MOD_CONTROL, MOD_NOREPEAT};
+use windows::Win32::UI::Input::KeyboardAndMouse::{RegisterHotKey, UnregisterHotKey, HOT_KEY_MODIFIERS, MOD_ALT, MOD_CONTROL, MOD_NOREPEAT, MOD_WIN};
 use windows::Win32::UI::WindowsAndMessaging::{GetMessageW, PostThreadMessageW, MSG, WM_APP, WM_HOTKEY};
 
 const ID_DISMISS: i32 = 1;
@@ -39,8 +39,17 @@ pub fn spawn(proxy: Proxy) {
         let mods = HOT_KEY_MODIFIERS(MOD_CONTROL.0 | MOD_ALT.0 | MOD_NOREPEAT.0);
         let a = RegisterHotKey(None, ID_DISMISS, mods, 'X' as u32).is_ok();
         let b = RegisterHotKey(None, ID_SUMMON, mods, 0x20).is_ok(); // VK_SPACE
-        let c = RegisterHotKey(None, ID_ALL_UP, mods, 0x26).is_ok() && RegisterHotKey(None, ID_ALL_DOWN, mods, 0x28).is_ok(); // VK_UP / VK_DOWN
-        util::log(&format!("hotkeys: stack all Ctrl+Alt+Up/Down {}", if c { "on" } else { "unavailable" }));
+        // stack all: Ctrl+Win+Up/Down first (beside Windows' own Win+Up/Down window keys, and free of the graphics drivers that use
+        // Ctrl+Alt+arrows to rotate the screen); Ctrl+Alt+Up/Down if another program owns them
+        let win = HOT_KEY_MODIFIERS(MOD_CONTROL.0 | MOD_WIN.0 | MOD_NOREPEAT.0);
+        let mut how = "Ctrl+Win+Up/Down";
+        let mut c = RegisterHotKey(None, ID_ALL_UP, win, 0x26).is_ok() && RegisterHotKey(None, ID_ALL_DOWN, win, 0x28).is_ok(); // VK_UP / VK_DOWN
+        if !c {
+            let _ = UnregisterHotKey(None, ID_ALL_UP);
+            how = "Ctrl+Alt+Up/Down";
+            c = RegisterHotKey(None, ID_ALL_UP, mods, 0x26).is_ok() && RegisterHotKey(None, ID_ALL_DOWN, mods, 0x28).is_ok();
+        }
+        util::log(&format!("hotkeys: stack all {how} {}", if c { "on" } else { "unavailable" }));
         util::log(&format!("hotkeys: dismiss-all Ctrl+Alt+X {}, summon Ctrl+Alt+Space {}", if a { "on" } else { "unavailable" }, if b { "on" } else { "unavailable" }));
         let mut msg = MSG::default();
         while GetMessageW(&mut msg, None, 0, 0).as_bool() {

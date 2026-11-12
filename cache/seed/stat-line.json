@@ -19,7 +19,16 @@
     "topic": "stats.line",
     "importance": "0.85",
     "max_frac": 0.9,
-    "size": "chip"
+    "size": "chip",
+    "actions": {
+      "line": [
+        {
+          "do": "set",
+          "path": "/{$.key}",
+          "value": "$.text"
+        }
+      ]
+    }
   },
   "components": [
     {

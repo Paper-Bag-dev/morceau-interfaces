@@ -11,3 +11,5 @@ Specs can only name actions; the command itself lives in actions.json.
 **Push:** `morc use resume-sessions --data @file.json`. One item = the single-session card ("just this one"); five = the default list.
 **Rule:** prune old staged entries (`morc stage --prune`) now and then; a row whose action was pruned shows "not in actions.json".
 **Look:** rows are even one-line pills (title and sub line cut with an ellipsis, full text as the tooltip); on the glass skin they are dark lens pills.
+
+**Actions (0.2):** `remove {id}`. Run with `morc do <id> <action> '{...}'` or the MCP `do_action` tool; no raw paths needed.

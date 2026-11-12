@@ -19,7 +19,23 @@
     "ttl": 90,
     "topic": "status.progress",
     "importance": "0.8",
-    "size": "chip"
+    "size": "chip",
+    "actions": {
+      "set": [
+        {
+          "do": "set",
+          "path": "/{$.key}/value",
+          "value": "$.value"
+        }
+      ],
+      "label": [
+        {
+          "do": "set",
+          "path": "/{$.key}/label",
+          "value": "$.text"
+        }
+      ]
+    }
   },
   "components": [
     {

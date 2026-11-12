@@ -33,7 +33,6 @@
 use crate::{cache, inbox, paths};
 use serde_json::{json, Map, Value};
 use std::io::{BufRead, BufReader, Read, Write};
-use std::net::TcpStream;
 use std::time::{Duration, Instant};
 
 mod input;
@@ -248,7 +247,7 @@ pub fn run(args: Vec<String>) -> i32 {
             return 2;
         }
     };
-    if cmd == "stop" && TcpStream::connect((paths::HOST, paths::port())).is_err() {
+    if cmd == "stop" && !crate::transport::alive() {
         println!("{{\"ok\":true,\"note\":\"not running\"}}");
         return 0;
     }

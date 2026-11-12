@@ -1,7 +1,8 @@
 // This card's tree (docs/trees.md), built on request from the component list and the DOM: what the host's scene tree mounts under the card.
 //   {card, size, zoom, data, shared, actions, root: {id, type, rect [x,y,w,h] css px, flags?, issues?, text?, children? | more}}
 // Flags say what a screenshot would have shown: cut (text cut off sideways), clipped (content hidden with no scroll), scrolls (reachable
-// by scrolling), offcard (sticks out of the window), hidden (not shown now, e.g. a `when`), empty (a leaf that shows nothing),
+// by scrolling), folded (a compact card resting small; opens on hover), offcard (sticks out of the window), hidden (not shown now,
+// e.g. a `when`), empty (a leaf that shows nothing: no text, picture or painted background),
 // not-rendered (in the spec, not in the DOM).
 
 import { shared } from './sharedbind.js';
@@ -30,10 +31,26 @@ function check(el, b, vw, vh) {
     }
     if (e.scrollHeight > e.clientHeight + 1) {
       if (SCROLL.has(cs.overflowY)) flags.add('scrolls');
-      else if (HIDE.has(cs.overflowY) && text()) { flags.add('clipped'); if (issues.length < 3) issues.push({ flag: 'clipped', text: snippet(e) }); }
+      // a card resting folded (compact: it springs open on hover) hides rows on purpose: that is `folded`, reachable, not `clipped`
+      else if (HIDE.has(cs.overflowY) && text()) {
+        const f = document.getElementById('stage').classList.contains('compact') ? 'folded' : 'clipped';
+        flags.add(f); if (issues.length < 3) issues.push({ flag: f, text: snippet(e) });
+      }
     }
   }
   return { flags: [...flags], issues };
+}
+
+// shows something without text or a picture: a painted background (a colour swatch, a skeleton bar) on it or inside it
+function painted(el) {
+  for (const e of [el, ...el.querySelectorAll('*')]) {
+    if (!e.clientWidth || !e.clientHeight) continue;
+    const cs = getComputedStyle(e);
+    if (cs.backgroundImage !== 'none') return true;
+    const m = cs.backgroundColor.match(/[\d.]+/g);
+    if (m && (m.length < 4 || +m[3] > 0.05)) return true;
+  }
+  return false;
 }
 
 function summary(data) {
@@ -65,7 +82,7 @@ export function cardTree(r, { depth, node } = {}) {
         const t = snippet(el);
         if (t) n.text = t;
         // a leaf showing nothing at all: no text and no picture (canvas, svg, img, video)
-        else if (!flags.includes('hidden') && !el.querySelector('canvas,svg,img,video,input,textarea')) n.flags = [...(n.flags || []), 'empty'];
+        else if (!flags.includes('hidden') && !el.querySelector('canvas,svg,img,video,input,textarea') && !painted(el)) n.flags = [...(n.flags || []), 'empty'];
       }
     }
     const kids = c.children || [];

@@ -24,7 +24,23 @@
     "ttl": 90,
     "topic": "stats.tiles",
     "importance": "0.85",
-    "size": "chip"
+    "size": "chip",
+    "actions": {
+      "set": [
+        {
+          "do": "set",
+          "path": "/{$.key}/value",
+          "value": "$.value"
+        }
+      ],
+      "label": [
+        {
+          "do": "set",
+          "path": "/{$.key}/label",
+          "value": "$.text"
+        }
+      ]
+    }
   },
   "components": [
     {

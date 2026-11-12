@@ -16,7 +16,30 @@
     "ttl": 600,
     "topic": "viz.model",
     "max_frac": 0.45,
-    "size": "large"
+    "size": "large",
+    "actions": {
+      "paint": [
+        {
+          "do": "set",
+          "path": "/paint",
+          "value": "$.color"
+        }
+      ],
+      "spin": [
+        {
+          "do": "set",
+          "path": "/spin",
+          "value": "$.on"
+        }
+      ],
+      "explode": [
+        {
+          "do": "set",
+          "path": "/explode",
+          "value": "$.on"
+        }
+      ]
+    }
   },
   "components": [
     {

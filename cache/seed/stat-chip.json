@@ -14,7 +14,30 @@
     ],
     "ttl": 90,
     "topic": "stats.chip",
-    "size": "chip"
+    "size": "chip",
+    "actions": {
+      "set": [
+        {
+          "do": "set",
+          "path": "/value",
+          "value": "$.value"
+        }
+      ],
+      "bump": [
+        {
+          "do": "inc",
+          "path": "/value",
+          "by": "$.by"
+        }
+      ],
+      "label": [
+        {
+          "do": "set",
+          "path": "/label",
+          "value": "$.text"
+        }
+      ]
+    }
   },
   "components": [
     {

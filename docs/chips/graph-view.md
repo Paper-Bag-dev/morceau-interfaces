@@ -10,3 +10,5 @@ A node-link graph (code, goals, dependencies, flows) on Cytoscape: draggable nod
 **Keep it open (11-12):** `morc use` cannot drop the idle fold. For a graph that should stay full size, `morc show` a spec built from the seed: `{"id":"graph-view","opts":<seed opts without idle/ttl, plus "max_frac":0.8>,"components":<seed components>,"data":{"title","graph"}}`.
 
 **First-fit fix (11-12):** the first `cy.fit` could run before the canvas had its size and open at max zoom (small graphs, or ones with `x`/`y`). `graph.js` now fits again on the next frame. Prefer the automatic layout over hand-placed `x`/`y` unless a tree really needs it.
+
+**Actions (0.2):** `setGraph {nodes, edges, ...}`, `title {text}`. Run with `morc do <id> <action> '{...}'` or the MCP `do_action` tool; no raw paths needed.
