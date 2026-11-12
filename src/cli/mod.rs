@@ -2,7 +2,7 @@
 //!
 //!   morc show [file|-]                     show a spec: {id?, opts?, components, data?, sources?}
 //!   morc save [file|-]                     cache a component: {name, desc, params?, opts?, components, data?, sources?}
-//!   morc use <name> [--data JSON|@file.json] [--id X] [--ttl N] [--sticky] [--urgent] [--topic T] [--auto]
+//!   morc use <name> [--data JSON|@file.json] [--id X] [--ttl N] [--sticky] [--urgent] [--force] [--topic T] [--auto]
 //!                 [--region right|below|left|above|top-right|bottom-right|bottom-left|top-left|auto] [--align top-right|middle|...]
 //!                 [--dx N --dy N] [--at X,Y] [--anchor A] [--importance low|high|critical|N] [--max-frac F]
 //!   morc stream [file|-] [--delay MS]      show a spec piece by piece: skeleton cards first, then each component fades in
@@ -122,6 +122,7 @@ pub fn run(args: Vec<String>) -> i32 {
             if has(rest, "--sticky") { opts.insert("sticky".into(), json!(true)); }
             if has(rest, "--urgent") { opts.insert("urgent".into(), json!(true)); }
             if has(rest, "--auto") { opts.insert("auto".into(), json!(true)); }
+            if has(rest, "--force") { opts.insert("force".into(), json!(true)); }   // show even over a fullscreen app (the held message names this flag)
             if let Some(a) = flag(rest, "--anchor") { opts.insert("anchor".into(), json!(a)); }
             if let Some(a) = flag(rest, "--region") { opts.insert("region".into(), json!(a)); }   // right|below|left|above|mid|gap|auto
             if let Some(a) = flag(rest, "--align") { opts.insert("align".into(), json!(a)); }     // top-right, bottom, middle ...
