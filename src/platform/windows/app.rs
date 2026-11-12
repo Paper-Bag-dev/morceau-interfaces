@@ -10,7 +10,8 @@ pub const START_URL: &str = "http://morc.localhost/index.html";
 /// The hidden page that opens every card (surface/root.rs).
 pub const ROOT_URL: &str = "http://morc.localhost/root.html";
 
-const DEFAULT_WV_ARGS: &str = "--use-angle=swiftshader --enable-unsafe-swiftshader";
+/// Software rendering (Google SwiftShader), opt-in with MORC_WV_ARGS=soft.
+const SOFT_WV_ARGS: &str = "--use-angle=swiftshader --enable-unsafe-swiftshader";
 
 /// Nothing to set on Windows: tool windows (window_style.rs) already keep cards out of the taskbar and Alt-Tab.
 pub fn configure_event_loop<T: 'static>(_event_loop: &mut EventLoop<T>) {}
@@ -23,14 +24,16 @@ pub fn window_builder(builder: WindowBuilder) -> WindowBuilder {
         .with_undecorated_shadow(false)
 }
 
-/// Graphics backend. Hardware WebGL gets its context reset within 20-70 s on this machine (Intel Iris Xe + a transparent window),
-/// leaving a dead canvas; Google's SwiftShader (software) is stable and plenty for these scenes. WebView2 allows ONE configuration per
-/// browser process, so this is host-wide. MORC_WV_ARGS=gpu keeps hardware; any other value is passed through as extra browser flags.
+/// Graphics backend: the GPU by default, so card motion (springs, clip shapes, shadows) runs on the GPU as it does on macOS. Software
+/// rendering was the default because hardware WebGL lost its context within 20-70 s on one machine (Intel Iris Xe + a transparent
+/// window); it made every animation run on the CPU at a low frame rate, and 3D cards now rebuild themselves after a lost context
+/// (ui/plugins/model3d.js). WebView2 allows ONE configuration per browser process, so this is host-wide. MORC_WV_ARGS=soft = SwiftShader;
+/// any other value is passed through as extra browser flags.
 pub fn webview_builder(wvb: WebViewBuilder) -> WebViewBuilder {
     let extra = match std::env::var("MORC_WV_ARGS").ok().as_deref() {
-        Some("gpu") => None,
+        None | Some("gpu") | Some("") => None,
+        Some("soft") => Some(SOFT_WV_ARGS.to_string()),
         Some(a) => Some(a.to_string()),
-        None => Some(DEFAULT_WV_ARGS.to_string()),
     };
     match extra {
         Some(extra) => wvb.with_additional_browser_args(format!("--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection {extra}")), // wry's own default flag is kept

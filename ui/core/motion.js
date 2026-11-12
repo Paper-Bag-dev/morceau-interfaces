@@ -58,12 +58,20 @@ export function enter(el, delay = 0) {
   return el.animate(kf, { duration: SPRING.ms, delay, easing: 'linear', fill: 'backwards' });
 }
 
-/** Quick exit: no bounce, so it never feels like it is arguing with you. */
-export function leave(el) {
-  return el.animate(
-    [{ opacity: 1, transform: 'translateY(0) scale(1)' }, { opacity: 0, transform: 'translateY(6px) scale(.96)' }],
-    { duration: 170, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' },
-  );
+/** Exit: the arrival played backwards, quickly and with no bounce. A wide card folds back right to left, a long one rolls up, anything
+ *  else shrinks toward its centre while it fades (limits leave-ms, leave-to). Returns the animation (its frames drive the native glass).
+ *  It must finish well inside the host's 700 ms exit window. */
+export function leave(el, lim = (k, d) => d) {
+  const ms = lim('leave-ms', 240), to = lim('leave-to', 0.86);
+  const r = el.getBoundingClientRect();
+  const wide = r.width > r.height * lim('arrive-wide', 1.6), long = r.height > r.width * lim('arrive-long', 1.15);
+  const end = wide ? { clipPath: 'inset(0 100% 0 0 round 16px)', transform: 'scaleY(.9)', transformOrigin: '0 50%' }
+    : long ? { clipPath: 'inset(0 0 100% 0 round 16px)', transform: 'scaleX(.94)', transformOrigin: '50% 0' }
+    : { transform: `scale(${to})`, transformOrigin: '50% 50%' };
+  const start = wide ? { clipPath: 'inset(0 0% 0 0 round 16px)', transform: 'scaleY(1)', transformOrigin: '0 50%' }
+    : long ? { clipPath: 'inset(0 0 0% 0 round 16px)', transform: 'scaleX(1)', transformOrigin: '50% 0' }
+    : { transform: 'scale(1)', transformOrigin: '50% 50%' };
+  return el.animate([{ ...start, opacity: 1 }, { ...end, opacity: 0 }], { duration: ms, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'forwards' });
 }
 
 /** Attention pulse for summoned/urgent surfaces. */

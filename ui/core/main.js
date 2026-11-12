@@ -192,7 +192,7 @@ window.morc = {
         if (limit('arrive-pulse-ms', 0) > 0) { stage.classList.add('arrive'); setTimeout(() => stage.classList.remove('arrive'), limit('arrive-pulse-ms', 0)); }
         break;
       }
-      case 'leave': send({ t: 'final', data: r.store.data }); leave(root).finished.then(() => send({ t: 'left' })).catch(() => send({ t: 'left' })); break;
+      case 'leave': { send({ t: 'final', data: r.store.data }); const a = leave(root, limit); followGlass(a); a.finished.then(() => send({ t: 'left' })).catch(() => send({ t: 'left' })); break; }   // the exit mirrors the arrival; the glass follows it
       case 'pulse': pulse(root); break;
       // macOS: the host's hit test saw the pointer go onto / off the card (the web view cannot while our app is inactive)
       case 'hover': stage.dispatchEvent(new PointerEvent(m.on ? 'pointerenter' : 'pointerleave')); if (!m.on) markHover(null); break;
