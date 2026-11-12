@@ -1,4 +1,4 @@
-import { register } from '../../core/registry.js';
+import { registerView, useLayoutEffect } from '../../core/view.js';
 import { reduced } from '../../core/motion.js';
 import * as literacy from '../../core/literacy.js';
 import { working } from '../../core/working.js';
@@ -22,10 +22,9 @@ const HEIGHT = { gauge: 110, radar: 160, donut: 130, clock: 170, rings: 150, tre
 const INTRO_MS = 950;
 const SIMPLER = 'Same numbers, simpler chart: higher means more. Tell me what was unclear and I will explain it another way.';
 
-register('chart', (c, ctx) => {
-  const el = document.createElement('div');
-  el.className = 'c-chart';
-  el.dataset.hit = '';
+// Preact view (docs/views.md). Drawing is imperative by nature (a canvas), so the view mounts it once on its own host,
+// synchronously at the first commit, so the card measures it like before.
+function mount(c, ctx, el) {
   const ttl = document.createElement('div');
   ttl.className = 'ttl';
   ctx.bind(c.title, (v) => { ttl.textContent = v ?? ''; });
@@ -139,5 +138,10 @@ register('chart', (c, ctx) => {
   cv.addEventListener('pointerleave', () => { s.hover = -1; if (!raf) paint(); });
   const onZoom = () => { if (!el.isConnected) return removeEventListener('morc-zoom', onZoom); fitW(); if (!raf && s.values.length) paint(); };   // fitW: a token (text floor) may have changed the width the labels need
   addEventListener('morc-zoom', onZoom);
-  return el;
-});
+}
+
+registerView('chart', ({ c, ctx, host }) => {
+  useLayoutEffect(() => { mount(c, ctx, host); }, []);
+  return null;
+}, { cls: 'c-chart' });
+

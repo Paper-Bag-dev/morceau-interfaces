@@ -16,6 +16,7 @@ export { useState, useEffect, useLayoutEffect, useRef };
 import htm from 'htm';
 import { register } from './registry.js';
 import { measureSoon } from './bridge.js';
+import { icon as iconEl } from './icons.js';
 
 export const html = htm.bind(h);
 
@@ -100,3 +101,8 @@ register('el', (c, ctx) => {
   if (c.action) { el.dataset.hit = ''; el.addEventListener('click', () => ctx.act(c.action)); }
   return el;
 });
+
+/** An icon from core/icons.js inside a view: <${Icon} name="check" size=${13} />. The wrapper is display:contents, so flex gaps are unchanged. */
+export function Icon({ name, size = 13, cls = '' }) {
+  return h('span', { class: 'contents ' + cls, ref: (r) => { if (r && r.dataset.ic !== name + size) { r.dataset.ic = name + size; r.replaceChildren(iconEl(name, size)); } } });
+}

@@ -1,69 +1,29 @@
-import { register } from '../../core/registry.js';
+import { registerView, html, Icon, useLayoutEffect, useState } from '../../core/view.js';
 import { enter, reduced } from '../../core/motion.js';
 import { rippleAt } from '../../core/ripple.js';
-import { icon } from '../../core/icons.js';
 
 // {type:"asks", items:{bind:"/items"}, ctx:"{/ctx}", send?:"Send"}   item: {id, q, yes?, no?}
 // Several yes/no questions answered in any order, then ONE Send: a single wake {ctx, answers:{id: "yes"|"no"}} instead of one per question,
-// so a batch of decisions costs the agent one turn. Send stays disabled until every question has an answer; the card closes after Send.
-register('asks', (c, ctx) => {
-  const el = document.createElement('div');
-  el.className = 'c-asks';
-  const answers = {};
-  const send = document.createElement('button');
-  send.className = 'btn primary send';
-  send.dataset.hit = '';
-  send.append(icon('check', 13));
-  const sl = document.createElement('span');
-  sl.className = 'lb';
-  sl.textContent = c.send || 'Send answers';
-  send.append(sl);
-  let total = 0;
-  const refresh = () => { send.disabled = Object.keys(answers).length < total; };
-
-  ctx.bind(c.items, (items) => {
-    el.replaceChildren();
-    const list = Array.isArray(items) ? items : [];
-    total = list.length;
-    list.forEach((it, i) => {
-      const id = String(it.id ?? i + 1);
-      const row = document.createElement('div');
-      row.className = 'ask';
-      const q = document.createElement('div');
-      q.className = 'q';
-      q.textContent = it.q ?? '';
-      const pick = (v, label, kind) => {
-        const b = document.createElement('button');
-        b.className = `btn ${kind} pick`;
-        b.dataset.hit = '';
-        b.append(icon(v === 'yes' ? 'check' : 'x', 13));
-        const lb = document.createElement('span');
-        lb.className = 'lb';
-        lb.textContent = label;
-        b.append(lb);
-        b.addEventListener('click', (e) => {
-          rippleAt(b, e);
-          answers[id] = v;
-          row.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', x === b));
-          row.classList.add('answered');
-          refresh();
-        });
-        return b;
-      };
-      const btns = document.createElement('div');
-      btns.className = 'picks';
-      btns.append(pick('yes', it.yes || 'Yes', 'good'), pick('no', it.no || 'No', 'bad'));
-      row.append(q, btns);
-      el.append(row);
-      if (!reduced) enter(row, i * 30);
-    });
-    el.append(send);
-    refresh();
-  });
-  send.addEventListener('click', (e) => {
-    if (send.disabled) return;
-    rippleAt(send, e);
-    ctx.act([{ do: 'wake', payload: { ctx: c.ctx, answers } }, { do: 'close' }]);
-  });
-  return el;
-});
+// so a batch of decisions costs the agent one turn. Send stays disabled until every question has an answer; the card closes after Send. Preact view.
+registerView('asks', ({ c, useBind, act, host }) => {
+  const raw = useBind(c.items);
+  const list = Array.isArray(raw) ? raw : [];
+  const [answers, setAnswers] = useState({});
+  const key = JSON.stringify(list);
+  useLayoutEffect(() => { if (!reduced) host.querySelectorAll(':scope > .ask').forEach((row, i) => enter(row, i * 30)); }, [key]);
+  const ready = list.length > 0 && Object.keys(answers).length >= list.length;
+  const pick = (id, v) => (e) => { rippleAt(e.currentTarget, e); setAnswers({ ...answers, [id]: v }); };
+  const send = (e) => { if (!ready) return; rippleAt(e.currentTarget, e); act([{ do: 'wake', payload: { ctx: c.ctx, answers } }, { do: 'close' }]); };
+  return html`
+    ${list.map((it, i) => {
+      const id = String(it.id ?? i + 1), a = answers[id];
+      return html`<div key=${id} class=${'ask' + (a ? ' answered' : '')}>
+        <div class="q">${it.q ?? ''}</div>
+        <div class="picks flex gap-1.5">
+          <button class=${'btn good pick' + (a === 'yes' ? ' on' : '')} data-hit="" onClick=${pick(id, 'yes')}><${Icon} name="check" /><span class="lb">${it.yes || 'Yes'}</span></button>
+          <button class=${'btn bad pick' + (a === 'no' ? ' on' : '')} data-hit="" onClick=${pick(id, 'no')}><${Icon} name="x" /><span class="lb">${it.no || 'No'}</span></button>
+        </div>
+      </div>`;
+    })}
+    <button class="btn primary send" data-hit="" disabled=${!ready} onClick=${send}><${Icon} name="check" /><span class="lb">${c.send || 'Send answers'}</span></button>`;
+}, { cls: 'c-asks', hit: false });

@@ -1,4 +1,4 @@
-import { register } from '../../core/registry.js';
+import { registerView, useLayoutEffect } from '../../core/view.js';
 import { reduced } from '../../core/motion.js';
 import { accent, themeNum } from '../../charts/util.js';
 import * as literacy from '../../core/literacy.js';
@@ -57,11 +57,10 @@ function arrange(groups, nodes, flow, W, H) {
   return pos;
 }
 
-register('graph', (c, ctx) => {
+// Preact view (docs/views.md). Drawing is imperative by nature (Cytoscape), so the view mounts it once on its own host,
+// synchronously at the first commit, so the card measures it like before.
+function mount(c, ctx, el) {
   const W = c.width || 460, H = c.height || 320;
-  const el = document.createElement('div');
-  el.className = 'c-graph';
-  el.dataset.hit = '';
   const frame = document.createElement('div');
   frame.className = 'gframe';
   frame.style.width = W + 'px';
@@ -193,5 +192,10 @@ register('graph', (c, ctx) => {
     render();
   });
   addEventListener('morc-zoom', function onZoom() { if (!el.isConnected) return removeEventListener('morc-zoom', onZoom); fit(); if (cy) { cy.resize(); cy.fit(undefined, 8); } });   // the surface auto-fits to the screen: re-fit the diagram with it
-  return el;
-});
+}
+
+registerView('graph', ({ c, ctx, host }) => {
+  useLayoutEffect(() => { mount(c, ctx, host); }, []);
+  return null;
+}, { cls: 'c-graph' });
+
