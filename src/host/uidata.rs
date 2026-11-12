@@ -41,25 +41,9 @@ pub(super) fn ui_bundle() -> Value {
         }
         v
     };
-    let merge = |base: &mut Value, over: &Value| {
-        if let (Some(b), Some(o)) = (base.as_object_mut(), over.as_object()) {
-            for (k, v) in o {
-                if k == "about" {
-                    continue;
-                }
-                match (b.get_mut(k), v) {
-                    (Some(Value::Object(bo)), Value::Object(vo)) => {
-                        for (kk, vv) in vo {
-                            bo.insert(kk.clone(), vv.clone());
-                        }
-                    }
-                    _ => {
-                        b.insert(k.clone(), v.clone());
-                    }
-                }
-            }
-        }
-    };
+    // deep merge: an override changes only the keys it names, at any depth (prefs/ui.json "themes.platforms.win.skin" used to replace
+    // the whole platforms.win block, dropping its always-dark schemes, so cards on a dark page flipped to light paper)
+    let merge = |base: &mut Value, over: &Value| deep_merge(base, over);
     let mut tokens = json!({});
     for dir in [paths::ui_dir().join("tokens"), paths::prefs_dir().join("tokens")] {
         if let Ok(rd) = std::fs::read_dir(dir) {
@@ -103,4 +87,20 @@ fn hsl(r: u8, g: u8, b: u8) -> String {
         (h * 60.0, s)
     };
     format!("{:.0} {:.0}% {:.0}%", h, s * 100.0, l * 100.0)
+}
+
+fn deep_merge(base: &mut Value, over: &Value) {
+    if let (Some(b), Some(o)) = (base.as_object_mut(), over.as_object()) {
+        for (k, v) in o {
+            if k == "about" {
+                continue;
+            }
+            match b.get_mut(k) {
+                Some(bv) if bv.is_object() && v.is_object() => deep_merge(bv, v),
+                _ => {
+                    b.insert(k.clone(), v.clone());
+                }
+            }
+        }
+    }
 }
