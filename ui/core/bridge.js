@@ -194,6 +194,10 @@ function morph(from, to, done) {
 // each card plate's exact rounded rect: where the host may put native glass (macOS); the page draws the tint, grain and sheen on top.
 // f scales them from the top-left (the morph's origin), for moving the glass ahead of a shrink.
 function glassRects(f) {
+  // a skin with solid cards needs no native glass at all (no window under the card, fully transparent around it): the skin's CSS says
+  // `--skin-native-glass: off`, or the user's token `native-glass: off` turns it off for any skin
+  const rs = getComputedStyle(document.documentElement);
+  if (rs.getPropertyValue('--native-glass').trim() === 'off' || rs.getPropertyValue('--skin-native-glass').trim() === 'off') return [];
   const sr = stage.getBoundingClientRect();
   return [...document.querySelectorAll('.card-plate')].map((el) => {
     const r = el.getBoundingClientRect();
