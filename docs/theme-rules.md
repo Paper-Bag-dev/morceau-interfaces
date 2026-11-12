@@ -26,10 +26,10 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
    walk through `--pal-1..6` (theme.js). The glass skin walks 200 deg from the accent: pies and lines are colorful, bars keep the accent,
    sets of items (progress bars, paste numbers, done ticks, the line under each strip number) take one color each. Status colors come
    from `--good`, `--warn`, `--bad`. Colors go on items, never on the glass. Never pick a color in component code.
-7. **The accent edge marks a folded card only, as a shimmer (user, 11-11).** A folded card (rule 14) of ANY size gets a faint accent rim
-   (`edge-base-a`) with a light streak that travels slowly round it and fades out at its tail (`edge-shimmer-*`, plate.css). It is the
-   one looping motion allowed: it says "hover me, there is more". Open cards, chips and cards with nothing folded keep a neutral edge.
-   No accent glow ON the glass ever.
+7. **The accent glow marks a folded card only (user, 11-12; was a travelling shimmer line).** A folded card (rule 14) of ANY size gets a faint
+   accent rim (`edge-base-a`) and a soft accent glow INSIDE its edge that breathes in slowly, drifts a little in hue and fades away for good
+   (`edge-glow-*`, `edge-shimmer-ms` per breath, plate.css). It is the one looping motion allowed: it says "hover me, there is more".
+   Open cards, chips and cards with nothing folded keep a neutral edge. No accent glow on the glass of an open card, ever.
 
 ## Text and shapes
 8. **One line, cut, full text in the tooltip.** Titles, labels and button text never wrap: `white-space: nowrap`, ellipsis,

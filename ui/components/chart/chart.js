@@ -38,7 +38,7 @@ register('chart', (c, ctx) => {
   el.append(ttl, fold);
 
   let kind = MODS[c.kind] ? c.kind : 'line';
-  const s = { c, kind, W: 260, H: 90, values: [], target: [], labels: [], hover: -1, unit: typeof c.unit === 'string' ? c.unit : '', t: reduced ? 1 : 0 };
+  const s = { c, kind, W: 260, H: 90, values: [], target: [], labels: [], hover: -1, unit: typeof c.unit === 'string' && !c.unit.includes('{') ? c.unit : '', t: reduced ? 1 : 0 };
   // Fixed pixel width: a %-width canvas inside a shrink-wrapped surface feeds back on itself and grows every repaint.
   s.W = c.width || 280;
   cv.style.width = s.W + 'px';
@@ -129,7 +129,8 @@ register('chart', (c, ctx) => {
   }
 
   ctx.bind(c.data, setData);
-  if (c.unit && typeof c.unit === 'object') ctx.bind(c.unit, (v) => { s.unit = v ?? ''; kick(); });
+  // a {bind} or a "{/unit}" template resolves like every other prop (a template used to be drawn literally: "198{/unit}")
+  if (c.unit && (typeof c.unit === 'object' || c.unit.includes('{'))) ctx.bind(c.unit, (v) => { s.unit = v ?? ''; kick(); });
   if (c.labels) ctx.bind(c.labels, (v) => { s.labels = Array.isArray(v) ? v : []; fitW(); kick(); });
   cv.addEventListener('pointermove', (e) => {
     const z = window.__zoom || 1, r = cv.getBoundingClientRect(), h = MODS[kind].hit(s, (e.clientX - r.left) / z, (e.clientY - r.top) / z);

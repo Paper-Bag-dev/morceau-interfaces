@@ -1,5 +1,5 @@
 {
-  "about": "card plate: the arrival glow, the card title alignment, the edge, the chip look and the folded (key + detail) look. ctl-*: the pin and close buttons (size, offsets from the top-right corner, gap between them); pin-icon / x-icon their glyphs. edge-base-a: the faint accent rim of a folded card; edge-shimmer-*: the light streak that travels round it (strength, length of its tail, one lap time). edge-shimmer-laps / edge-fade-ms: how many laps the streak runs on arrival before it fades away. compact-text-lines: the lines a folded paragraph shows. compact-text-w / text-open-w: a folded paragraph's box width and its width once open.",
+  "about": "card plate: the arrival glow, the card title alignment, the edge, the chip look and the folded (key + detail) look. ctl-*: the pin and close buttons (size, offsets from the top-right corner, gap between them); pin-icon / x-icon their glyphs. edge-base-a: the faint accent rim of a folded card; edge-glow-*: the soft accent glow inside a folded card's edge (blur radius, strength, hue drift); edge-shimmer-ms: one slow breath of it; edge-shimmer-laps / edge-fade-ms: how many breaths on arrival before it fades away for good. compact-text-lines: the lines a folded paragraph shows. compact-text-w / text-open-w: a folded paragraph's box width and its width once open.",
   "arrive-glow-r": "6px",
   "arrive-glow-ms": "900",
   "title-align": "center",
@@ -28,12 +28,13 @@
   "compact-list-w": "220px",
   "edge-a": "28%",
   "edge-base-a": "14%",
-  "edge-shimmer-a": "55%",
-  "edge-shimmer-arc": "110deg",
   "edge-shimmer-ms": "9s",
   "edge-shimmer-laps": "1",
   "edge-fade-ms": "900ms",
   "compact-text-lines": "4",
   "compact-text-w": "250px",
-  "text-open-w": "340px"
+  "text-open-w": "340px",
+  "edge-glow-r": "18px",
+  "edge-glow-a": "45%",
+  "edge-glow-hue": "24deg"
 }

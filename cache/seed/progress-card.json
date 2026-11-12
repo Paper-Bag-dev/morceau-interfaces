@@ -18,7 +18,7 @@
     ],
     "ttl": 90,
     "topic": "status.progress",
-    "importance": "0.8",
+    "importance": "1",
     "size": "chip",
     "actions": {
       "set": [

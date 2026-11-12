@@ -15,7 +15,7 @@
     "ttl": 90,
     "topic": "charts.donut",
     "importance": "0.7",
-    "size": "large",
+    "size": "medium",
     "actions": {
       "set": [
         {

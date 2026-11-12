@@ -1,6 +1,6 @@
 /* progress: label, value and a track. Plate look: `plate` component. */
 .c-prog { min-width: 220px; padding: 7px 11px 8px; }
-.c-prog .top { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px; }
+.c-prog .top { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: var(--text-size, 15px); }   /* the card text floor (theme rules: 15 px), never a typed number */
 .c-prog .track { height: 8px; border-radius: 99px; background: hsl(var(--card) / .92); border: 1px solid hsl(var(--border)); overflow: hidden; }
 .c-prog .fill { height: 100%; width: 100%; transform-origin: left center; transform: scaleX(0); background: hsl(var(--accent, var(--primary))); border-radius: 99px; transition: transform .7s var(--spring), background .3s; }
 .c-prog.warn .fill { background: hsl(var(--warn)); } .c-prog.bad .fill { background: hsl(var(--bad)); } .c-prog.good .fill { background: hsl(var(--good)); }

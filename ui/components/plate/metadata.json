@@ -29,13 +29,14 @@
     "edge-a",
     "reveal-stagger-ms",
     "edge-base-a",
-    "edge-shimmer-a",
-    "edge-shimmer-arc",
     "edge-shimmer-ms",
     "edge-shimmer-laps",
     "edge-fade-ms",
     "compact-text-lines",
     "compact-text-w",
-    "text-open-w"
+    "text-open-w",
+    "edge-glow-r",
+    "edge-glow-a",
+    "edge-glow-hue"
   ]
 }

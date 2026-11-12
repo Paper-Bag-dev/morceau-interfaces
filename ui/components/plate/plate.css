@@ -69,21 +69,18 @@ html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid rgb(var(
   transition: opacity var(--compact-fade-ms, 380ms) ease; }
 #stage.compact .card-plate::before { opacity: 1; }
 /* (no accent glow inside the plate: it colored the glass; user, 11-10) */
-/* folded edge (user, 11-11): not a solid orange line but a faint accent rim with a light streak that travels slowly round it and fades
-   out at its tail, so the edge glints and disappears at a corner. Every folded card, any size. Sizes / speed: tokens/plate.json edge-shimmer-*. */
-@property --edge-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+/* folded edge (user, 11-12): no travelling line. A folded card gets a faint accent rim and a soft accent GLOW inside its edge that breathes
+   slowly, drifts a little in hue, and fades away for good (it says "hover me, there is more", then leaves). Every folded card, any size.
+   Sizes / speed: tokens/plate.json edge-glow-r, edge-glow-a, edge-glow-hue, edge-shimmer-ms (one breath), edge-shimmer-laps, edge-fade-ms. */
 #stage.compact .card-plate { border: var(--compact-border-w, 1.5px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-base-a, 14%), transparent); border-radius: var(--compact-radius, 30px); }
-.card-plate::after { content: ''; position: absolute; inset: calc(-1 * var(--compact-border-w, 1.5px)); border-radius: inherit; padding: var(--compact-border-w, 1.5px); pointer-events: none;
-  background: conic-gradient(from var(--edge-ang), transparent 0deg, transparent calc(360deg - var(--edge-shimmer-arc, 110deg)),
-    color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-shimmer-a, 55%), transparent) calc(360deg - var(--edge-shimmer-arc, 110deg) / 3),
-    color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-shimmer-a, 55%), white 25%) 352deg, transparent 360deg);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: edge-shimmer var(--edge-shimmer-ms, 9s) linear var(--edge-shimmer-laps, 1) forwards,
-    edge-fade var(--edge-fade-ms, 900ms) ease calc(var(--edge-shimmer-ms, 9s) * var(--edge-shimmer-laps, 1) - var(--edge-fade-ms, 900ms)) forwards; }
-/* the streak goes round a set number of laps on arrival, then fades away for good (user, 11-11: it must die after a while) */
-@keyframes edge-shimmer { to { --edge-ang: 360deg; } }
+.card-plate::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+  box-shadow: inset 0 0 var(--edge-glow-r, 18px) color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-glow-a, 45%), transparent);
+  animation: edge-glow var(--edge-shimmer-ms, 9s) ease-in-out var(--edge-shimmer-laps, 1),
+    edge-fade var(--edge-fade-ms, 900ms) ease calc(var(--edge-shimmer-ms, 9s) * var(--edge-shimmer-laps, 1)) forwards; }
+/* one breath: in slowly, a gentle hue drift at the top, out slowly */
+@keyframes edge-glow { 0% { opacity: 0; filter: hue-rotate(0deg); } 45% { opacity: 1; filter: hue-rotate(var(--edge-glow-hue, 24deg)); } 100% { opacity: 0; filter: hue-rotate(0deg); } }
 @keyframes edge-fade { to { opacity: 0; } }
-/* the streak lives on every plate from its arrival (so folding again after a hover never restarts it) and only shows while folded */
+/* the glow lives on every plate from its arrival (so folding again after a hover never restarts it) and only shows while folded */
 #stage:not(.compact) .card-plate::after { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .card-plate::after { animation: none; opacity: 0; } }
 @property --fade-stop { syntax: '<length>'; inherits: false; initial-value: 0px; }
