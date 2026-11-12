@@ -46,8 +46,15 @@ impl Host {
         opts.ttl = Some(opts.ttl.unwrap_or(crate::lifetime::DEFAULT_TTL) * pv("ttl_bias"));
         let may_beep = pv("sound") > 0.5;
 
-        let mut payload = json!({"t": "init", "id": id, "components": components, "data": if data.is_null() { json!({}) } else { data },
-                             "opts": {"urgent": opts.urgent, "pulse": matches!(opts.importance.as_deref(), Some("high") | Some("critical")), "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme, "align": opts.align, "size": opts.size}, "literacy": literacy::snapshot()});
+        let mut data = if data.is_null() { json!({}) } else { data };
+        if opts.persist {
+            state::restore(&id, &mut data);   // the last snapshot wins over the spec's starting data
+        }
+        let mut payload = json!({"t": "init", "id": id, "components": components, "data": data,
+                             "opts": {"urgent": opts.urgent, "pulse": matches!(opts.importance.as_deref(), Some("high") | Some("critical")), "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme, "align": opts.align, "size": opts.size, "actions": opts.actions, "persist": opts.persist}, "literacy": literacy::snapshot()});
+        if self.root.is_none() {
+            payload["shared"] = self.shared.clone();   // unlinked cards start from the host's copy of the shared store
+        }
         payload["sources"] = srcs.clone(); // kept in last_init so a summoned or restored card is bound to its live data again
         self.parked.retain(|p| p.id != id);
         sources::register(&id, &srcs);

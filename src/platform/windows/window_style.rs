@@ -98,3 +98,49 @@ pub fn set_region(hwnd: isize, rects: &[(i32, i32, i32, i32, i32)]) {
         SetWindowRgn(h(hwnd), Some(all), true);
     }
 }
+
+/// Stack depth: 0 = topmost above every window; n = not topmost, just under the n-th window that overlaps the card (front to back,
+/// `rect` = its visible plate, physical px). Only overlapping windows count; with none, the foreground window is level 1. A covered
+/// window gets no mouse on Windows, so hover needs nothing more. Returns the depth applied (clamped to how low it can go).
+pub fn set_depth(hwnd: isize, depth: usize, rect: crate::placement::R) -> usize {
+    unsafe extern "system" fn each(w: HWND, lp: windows::Win32::Foundation::LPARAM) -> windows::core::BOOL {
+        let out = &mut *(lp.0 as *mut Vec<HWND>);
+        if IsWindowVisible(w).as_bool() && !IsIconic(w).as_bool() {
+            out.push(w);
+        }
+        windows::core::BOOL(1)
+    }
+    unsafe {
+        let mut all: Vec<HWND> = vec![];
+        let _ = EnumWindows(Some(each), windows::Win32::Foundation::LPARAM(&mut all as *mut _ as isize));
+        let me = windows::Win32::System::Threading::GetCurrentProcessId();
+        let rect_of = |w: HWND| {
+            let mut r = windows::Win32::Foundation::RECT::default();
+            GetWindowRect(w, &mut r).ok().map(|_| crate::placement::R { l: r.left, t: r.top, r: r.right, b: r.bottom })
+        };
+        let others: Vec<HWND> = all
+            .into_iter()
+            .filter(|w| {
+                let mut pid = 0u32;
+                GetWindowThreadProcessId(*w, Some(&mut pid));
+                pid != me
+            })
+            .collect();
+        let mut levels: Vec<HWND> = others.iter().copied().filter(|w| rect_of(*w).map(|r| r.overlap(&rect) > 0).unwrap_or(false)).collect();
+        if levels.is_empty() {
+            let fg = GetForegroundWindow();
+            if !fg.0.is_null() && fg.0 as isize != hwnd {
+                levels.push(fg);
+            }
+        }
+        let d = depth.min(levels.len());
+        let flags = SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE;
+        if d == 0 {
+            let _ = SetWindowPos(h(hwnd), Some(HWND_TOPMOST), 0, 0, 0, 0, flags);
+        } else {
+            let _ = SetWindowPos(h(hwnd), Some(HWND_NOTOPMOST), 0, 0, 0, 0, flags);
+            let _ = SetWindowPos(h(hwnd), Some(levels[d - 1]), 0, 0, 0, 0, flags);   // insert after = just under that window
+        }
+        d
+    }
+}

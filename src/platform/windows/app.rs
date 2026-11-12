@@ -3,10 +3,12 @@
 use tao::event_loop::EventLoop;
 use tao::platform::windows::{WindowBuilderExtWindows, WindowExtWindows};
 use tao::window::{Window, WindowBuilder};
-use wry::{WebViewBuilder, WebViewBuilderExtWindows};
+use wry::{WebViewBuilder, WebViewBuilderExtWindows, WebViewExtWindows};
 
 /// The page every surface loads: wry serves a custom protocol as http://<name>.localhost/ with WebView2.
 pub const START_URL: &str = "http://morc.localhost/index.html";
+/// The hidden page that opens every card (surface/root.rs).
+pub const ROOT_URL: &str = "http://morc.localhost/root.html";
 
 const DEFAULT_WV_ARGS: &str = "--use-angle=swiftshader --enable-unsafe-swiftshader";
 
@@ -39,4 +41,24 @@ pub fn webview_builder(wvb: WebViewBuilder) -> WebViewBuilder {
 /// The handle the platform layer works with: the HWND.
 pub fn native_handle(window: &Window) -> isize {
     window.hwnd()
+}
+
+/// Linked cards (one hidden root page window.open()s every card; docs/process-model.md), on by default like macOS: the cards share the
+/// root's WebView2 environment, so `window.opener.morcShared` is one object for all. MORC_LINKED=0 turns it off (the host relays the
+/// shared store instead).
+pub fn linked_cards() -> bool {
+    std::env::var("MORC_LINKED").map(|v| v != "0").unwrap_or(true)
+}
+
+/// WebView2 lets a page open windows when the new-window handler answers; nothing to switch on.
+pub fn allow_script_windows(_wv: &wry::WebView) {}
+
+/// A card opened by the root: built on the opener's environment (WebView2 requires the same one for a popup).
+pub fn linked_builder<'a>(wvb: WebViewBuilder<'a>, req: &wry::NewWindowFeatures) -> WebViewBuilder<'a> {
+    wvb.with_environment(req.opener.environment.clone())
+}
+
+/// Hand the new web view to WebView2 as the popup's target.
+pub fn linked_response(wv: &wry::WebView) -> wry::NewWindowResponse {
+    wry::NewWindowResponse::Create { webview: wv.webview() }
 }

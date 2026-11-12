@@ -52,6 +52,13 @@ pub struct Opts {
     /// A wake payload fired ONCE when this surface first appears: the background agent starts preparing what the card's "show more"
     /// button will reveal, so the click is answered at once instead of after the agent has started. The host adds `surface` and `bg`.
     pub prefetch: Option<Value>,
+    /// Named actions: {"addItem": [step, ...]}. A step is a page action (set, push, pull, merge, inc, toggle, shared.set ...) whose strings may
+    /// use the call's args: "$" (all args), "$.text" (one arg, value kept as is), "x {$.text}" (inside a string). Run with `morc do`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub actions: Option<Value>,
+    /// Keep this card's data across closes and restarts: snapshots in <home>/state/<id>.json, actions logged in <id>.history.jsonl.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub persist: bool,
 }
 
 #[derive(Deserialize, Debug)]
@@ -91,6 +98,45 @@ pub enum Request {
         attach: Value,
     },
     Close { id: String },
+    /// The trees (docs/trees.md): no id = the scene tree; id = that card's tree; all = the scene with every card's tree mounted.
+    Tree {
+        id: Option<String>,
+        depth: Option<u32>,
+        node: Option<String>,
+        #[serde(default)]
+        all: bool,
+    },
+    /// A card as a resource (docs/cards.md): get (default) | set | hide | show | front | move | size. Never shows it twice; a hidden or
+    /// closed card comes back from its record (spec, last data, spot).
+    Card {
+        id: String,
+        op: String,
+        /// move: the visible content's top-left, physical px.
+        at: Option<[i32; 2]>,
+        /// move / size: centre it on its display (size: once the new size is measured).
+        #[serde(default)]
+        center: bool,
+        /// size: the new size cap as a fraction of the work area (0.2 .. 0.98).
+        frac: Option<f64>,
+        /// set: the wanted state, e.g. {"state": "hidden"} or {"state": "shown", "frac": 0.9, "center": true}.
+        #[serde(default)]
+        set: Value,
+    },
+    /// Every card the host knows: live ones and the hidden / closed ones it can bring back (`morc cards`).
+    Cards,
+    /// Re-load components and plugins in every card that is open, in place: the cards keep their data (no re-show, no pop).
+    /// names = only these components (folder names or plugin files); empty = all.
+    Refresh {
+        #[serde(default)]
+        names: Vec<String>,
+    },
+    /// Run a card's named action (opts.actions) with JSON args; the answer is the page's ({ok, state?} or {ok:false, err}).
+    Do {
+        id: String,
+        name: String,
+        #[serde(default)]
+        args: Value,
+    },
     /// Cache a spec under a name (also updates cache/registry.md).
     Save {
         name: String,

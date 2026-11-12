@@ -34,6 +34,8 @@ features = [
 # called through small extern blocks in src/platform/macos/sys.rs.
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
+# WKPreferences: let the hidden root page open the (linked) cards by script (platform/macos/app.rs).
+objc2-web-kit = { version = "0.3", default-features = false, features = ["std", "objc2-app-kit", "objc2-core-foundation", "WKWebView", "WKWebViewConfiguration", "WKPreferences"] }
 global-hotkey = "0.7"
 
 [profile.release]

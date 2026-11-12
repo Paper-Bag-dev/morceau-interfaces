@@ -38,6 +38,7 @@ export class Store {
   }
 
   notify(path) {
+    if (this.onChange) this.onChange(path);   // persisted cards: core/main.js schedules a snapshot
     for (const s of [...this.subs]) {
       const a = s.path === '' ? '/' : s.path;
       if (path === '/' || a === '/' || a === path || a.startsWith(path + '/') || path.startsWith(a + '/')) s.cb(this.get(s.path));

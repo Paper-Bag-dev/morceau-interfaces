@@ -9,6 +9,12 @@ pub enum Ev {
     Cmd(Request, Option<Sender<String>>),
     /// A message from a webview page: (surface key, raw JSON text).
     Ipc(u64, String),
+    /// The hidden root page loaded: it can open the cards waiting for it (linked cards, see surface/root.rs).
+    RootReady,
+    /// Up (-1) / Down (+1) pressed while the pointer is on a card: step that card up / down the window stack (host/cards.rs).
+    Step(i32),
+    /// Ctrl+Option+Up (-1) / Down (+1): EVERY card to the top of the window stack / to the bottom (under every window overlapping it).
+    StackAll(i32),
     /// The active window changed.
     Foreground,
     /// The pointer went onto (true) or off (false) a card's content: (native window handle, inside). macOS only: its web views do not

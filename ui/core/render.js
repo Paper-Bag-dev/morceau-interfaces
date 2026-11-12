@@ -1,13 +1,34 @@
 // Builds the DOM from a flat component list and keeps it bound to the data model.
 //   components: [{id, type, ...props, children?: [ids]}]   root = id "root" (or the first)
 //   any prop can be a literal, {bind: "/path"}, or a string template "CPU {/cpu:0}%"
+//   a path starting with "@" ("@/sel", "{@/sel}") is the SHARED store every linked card sees (core/sharedbind.js)
+//   named actions (opts.actions, docs/state.md) run through call(); each run is reported to the host ("did") for the history log
 
 import { Store } from './store.js';
 import { get } from './registry.js';
 import { enter, leave, reduced } from './motion.js';
 import { measureSoon } from './bridge.js';
+import { shared } from './sharedbind.js';
 
-const TPL = /\{(\/[^}:]*)(?::(\d))?\}/g;
+const TPL = /\{(@?\/[^}:]*)(?::(\d))?\}/g;
+const ARG = /\{\$\.([\w.]+)\}/g;
+const pick = (o, k) => k.split('.').reduce((x, p) => (x == null ? undefined : x[p]), o);
+let seq = 0;
+
+// Fill a named action's step with the call's args: "$" = all args, "$.k" = one arg (value kept as is), "{$.k}" inside a string,
+// "$id" = a fresh id (the same one for every step of this call, so paired updates such as items + order agree), "$now" = ms time.
+function fill(v, args, id) {
+  if (typeof v === 'string') {
+    if (v === '$') return args;
+    if (v === '$id') return id;
+    if (v === '$now') return Date.now();
+    if (/^\$\.[\w.]+$/.test(v)) return pick(args, v.slice(2));
+    return v.replace(ARG, (_, k) => { const x = pick(args, k); return x == null ? '' : typeof x === 'object' ? JSON.stringify(x) : String(x); });
+  }
+  if (Array.isArray(v)) return v.map((x) => fill(x, args, id));
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fill(x, args, id)]));
+  return v;
+}
 
 function fmt(v, digits) {
   if (v == null) return '';
@@ -22,9 +43,27 @@ export class Renderer {
     this.store = new Store({});
     this.comps = new Map();
     this.unsubs = [];
+    this.actions = {};
+    this.shared = shared();
+    addEventListener('pagehide', () => this.unsubs.forEach((u) => u()));   // shared-store listeners live in the root page: drop ours
+  }
+
+  // One door for reads and writes: "@/x" goes to the shared store, anything else to this card's store.
+  get(p) { return p && p[0] === '@' ? this.shared.get(p.slice(1)) : this.store.get(p); }
+  set(p, v) { return p && p[0] === '@' ? this.shared.set(p.slice(1), v) : this.store.set(p, v); }
+  sub(p, cb) { return p && p[0] === '@' ? this.shared.sub(p.slice(1), cb) : this.store.sub(p, cb); }
+
+  /** Run a named action with JSON args. Throws if it does not exist; the host logs it for persisted cards. */
+  call(name, args) {
+    const steps = this.actions[name];
+    if (!steps) throw new Error(`no action "${name}" (this card has: ${Object.keys(this.actions).join(', ') || 'none'})`);
+    const id = 'i' + Date.now().toString(36) + (seq++).toString(36);
+    for (const st of Array.isArray(steps) ? steps : [steps]) this.act(fill(st, args ?? {}, id));
+    this.send({ t: 'did', name, args: args ?? null });
   }
 
   init(msg) {
+    this.actions = (msg.opts && msg.opts.actions) || {};
     this.store = new Store(msg.data || {});
     this.comps = new Map((msg.components || []).map((c) => [c.id, c]));
     this.build();
@@ -103,6 +142,8 @@ export class Renderer {
     try {
       const el = fn(c, this.ctx(c));
       el.dataset.cid = id;
+      // "class": Tailwind utilities written on the fly, on any component (core/view.js loads the generator on first use)
+      if (c.class) { el.classList.add(...String(c.class).split(/\s+/).filter(Boolean)); import('./view.js').then((v) => v.ensureTailwind()); }
       if (c.when) this.applyWhen(el, c.when);
       return el;
     } catch (e) {
@@ -139,8 +180,8 @@ export class Renderer {
       }
       measureSoon();
     };
-    apply(this.store.get(w.path));
-    this.unsubs.push(this.store.sub(w.path, apply));
+    apply(this.get(w.path));
+    this.unsubs.push(this.sub(w.path, apply));
   }
 
   error(msg) {
@@ -154,7 +195,7 @@ export class Renderer {
 
   /** Resolve {/path} templates inside any JSON value (used for action payloads). */
   resolve(v) {
-    if (typeof v === 'string') return v.replace(TPL, (_, p, d) => fmt(this.store.get(p), d));
+    if (typeof v === 'string') return v.replace(TPL, (_, p, d) => fmt(this.get(p), d));
     if (Array.isArray(v)) return v.map((x) => this.resolve(x));
     if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, this.resolve(x)]));
     return v;
@@ -170,14 +211,14 @@ export class Renderer {
       /** Call cb(value) now and whenever the value changes. Accepts literal, {bind}, or "template {/x}". */
       bind(v, cb) {
         if (v && typeof v === 'object' && 'bind' in v) {
-          cb(self.store.get(v.bind));
-          self.unsubs.push(self.store.sub(v.bind, cb));
+          cb(self.get(v.bind));
+          self.unsubs.push(self.sub(v.bind, cb));
         } else if (typeof v === 'string' && TPL.test(v)) {
           TPL.lastIndex = 0;
           const paths = [...v.matchAll(TPL)].map((m) => m[1]);
           const run = () => cb(self.resolve(v));
           run();
-          for (const p of new Set(paths)) self.unsubs.push(self.store.sub(p, run));
+          for (const p of new Set(paths)) self.unsubs.push(self.sub(p, run));
         } else {
           TPL.lastIndex = 0;
           cb(v);
@@ -189,8 +230,14 @@ export class Renderer {
         if (Array.isArray(action)) return action.forEach((a) => self.act(a));
         const a = self.resolve(action);
         switch (a.do) {
-          case 'set': return self.store.set(a.path, a.value);
-          case 'toggle': return self.store.set(a.path, !self.store.get(a.path));
+          case 'set': return self.set(a.path, a.value);
+          case 'toggle': return self.set(a.path, !self.get(a.path));
+          // list and record edits (named actions use them; paths may be "@/..." too). pull removes by item id, index or equal value.
+          case 'push': return self.set(a.path, [...(self.get(a.path) || []), a.value]);
+          case 'pull': return self.set(a.path, (self.get(a.path) || []).filter((x, i) => ('id' in a ? !(x && x.id === a.id) : 'index' in a ? i !== a.index : x !== a.value)));
+          case 'merge': return self.set(a.path, { ...(self.get(a.path) || {}), ...(a.value || {}) });
+          case 'inc': return self.set(a.path, (+self.get(a.path) || 0) + (a.by ?? 1));
+          case 'call': try { return self.call(a.name, a.args); } catch (e) { return self.send({ t: 'log', msg: e.message }); }
           // the browser clipboard is tried, AND the host copies too (pbcopy on macOS, where WKWebView may refuse a morc:// page; surface/actions.rs)
           case 'copy': if (navigator.clipboard) navigator.clipboard.writeText(String(a.text ?? '')).catch(() => {}); return self.send({ t: 'act', action: a, comp: c.id });
           case 'close': return self.send({ t: 'close' });

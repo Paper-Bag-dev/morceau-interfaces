@@ -4,7 +4,7 @@ use super::*;
 
 pub(super) fn send(req: Value) -> Result<Value, String> {
     let token = std::fs::read_to_string(paths::token_file()).map_err(|_| "no token".to_string())?;
-    let mut s = TcpStream::connect((paths::HOST, paths::PORT)).map_err(|e| e.to_string())?;
+    let mut s = TcpStream::connect((paths::HOST, paths::port())).map_err(|e| e.to_string())?;
     s.set_read_timeout(Some(Duration::from_secs(8))).ok();
     writeln!(s, "{}", json!({"token": token.trim(), "req": req})).map_err(|e| e.to_string())?;
     let mut line = String::new();
@@ -14,7 +14,7 @@ pub(super) fn send(req: Value) -> Result<Value, String> {
 
 /// Make sure a host is up, starting a hidden detached one if needed.
 pub(super) fn ensure_host() -> Result<(), String> {
-    if TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::PORT).parse().unwrap(), Duration::from_millis(200)).is_ok() && paths::token_file().exists() {
+    if TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::port()).parse().unwrap(), Duration::from_millis(200)).is_ok() && paths::token_file().exists() {
         return Ok(());
     }
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
@@ -24,7 +24,7 @@ pub(super) fn ensure_host() -> Result<(), String> {
     cmd.spawn().map_err(|e| e.to_string())?;
     let t0 = Instant::now();
     while t0.elapsed() < Duration::from_secs(6) {
-        if TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::PORT).parse().unwrap(), Duration::from_millis(200)).is_ok() && paths::token_file().exists() {
+        if TcpStream::connect_timeout(&format!("{}:{}", paths::HOST, paths::port()).parse().unwrap(), Duration::from_millis(200)).is_ok() && paths::token_file().exists() {
             return Ok(());
         }
         std::thread::sleep(Duration::from_millis(100));

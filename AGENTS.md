@@ -1,7 +1,8 @@
 ﻿# AGENTS.md: working on Morceau (for any coding agent)
 
-Morceau is a Windows-only host that shows borderless, transparent, self-expiring UI windows ("surfaces") driven by an AI agent through a CLI (`morc`).
-Rust engine (tao + wry/WebView2 + the `windows` crate) + an ES-module web UI served from disk + CLI plugins (Python). Read `README.md` first.
+Morceau is a host for Windows and macOS that shows borderless, transparent, self-expiring UI windows ("surfaces", cards) driven by an AI agent
+through a CLI (`morc`) or MCP (`morc mcp`). Rust engine (tao + wry: WebView2 on Windows, WKWebView on macOS) + an ES-module web UI served from disk
++ CLI plugins (Python). Read `README.md` first, then `CHANGELOG.md` for what changed in 0.2.
 
 ## Layout (what lives where)
 | path | what |
@@ -11,7 +12,9 @@ Rust engine (tao + wry/WebView2 + the `windows` crate) + an ES-module web UI ser
 | `tools/cli/*.py` | CLI plugins: any script here becomes `morc <name>`; files starting with `_` are helpers. `tools/graph_export.py` feeds `morc graph` |
 | `cache/seed/`, `cache/fragments/`, `cache/recipes/` | shipped generic components, reusable sub-trees, example recipes |
 | `docs/` | protocol, design tokens, charts, graphs, extending, the agent system prompt (`agent.md`) and the chore prompt |
-| `examples/`, `integrations/` | sample triggers/actions/data; Claude Code hooks and skill |
+| `examples/`, `integrations/` | sample triggers/actions/data; Claude Code hooks and skills (`morc-screen`: using cards; `morc-build`: making components) |
+| `src/host/tree.rs`, `cards.rs`, `snap.rs`, `state.rs`, `src/cli/mcp.rs` | 0.2: the trees, cards as resources (+ the window stack), magnetic carry, persisted state, the MCP adapter |
+| `ui/core/tree.js`, `view.js`, `sharedbind.js`, `pointer.js`, `shared.js`, `ui/root.html`, `ui/preset.css` | 0.2: card trees, Preact + Tailwind, the shared store, the hidden root page that opens every card, the look preset |
 | `bin/` | `morc.js` (npm shim); `morc.exe` is a build artefact (git-ignored) |
 
 Three folders at runtime (see `src/paths.rs`): the install (`MORC_APP`), the user's data (`MORC_HOME`, or `<runtime>/home.txt`), and per-machine
@@ -96,6 +99,21 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
 - **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
   target. A cfg mistake only shows up when that target is compiled.
 
+## 0.2 in one minute (read before touching cards, the host or the UI core)
+- **Look with trees, not screenshots.** `morc tree <card>` gives every component's rect and flags (`cut`, `clipped`, `scrolls`, `offcard`,
+  `hidden`, `empty`), the card's width owner, state and buttons; `morc tree` gives the scene (windows front to back, cards, `covers`). A
+  screenshot is for looks only (colors, contrast). docs/trees.md.
+- **Never show a card twice.** To hide, bring back, move, resize, raise or lower a card that exists, use `morc card <id> hide|show|front|
+  lower|raise|move|size|set` (docs/cards.md); data changes are `morc patch` or a named action (`morc do`, docs/state.md). Close + show is
+  only for a new card.
+- **Values that tune behaviour are data**: `ui/limits.json` (snap, timings), `prefs/*.json` (placement), `--ctl-*` / tokens (looks). Never a
+  constant in code.
+- **Cross-platform by default.** Every engine change ships for Windows and macOS in the same change, behind the same names in
+  `src/platform/<os>/`. Only styles and cards may differ. Before done: `cargo check --target x86_64-pc-windows-msvc` (or the macOS target from
+  Windows) and say plainly what was type-checked but not run.
+- **Layout is right by construction** (docs/views.md): the card owns its width (the engine locks it after layout), children fill it, text wraps,
+  long content scrolls inside, controls never shrink. The tree must show no `cut`, `clipped`, `offcard`, `empty`.
+
 ## Rules of the house
 - **Show on screen first (hard rule).** Whenever the user asks to be shown something (list, status, report, plan, progress), first check whether it can go on their screen through the `morc` CLI and do that. Terminal text only if morc is unavailable or the host defers, and say why. Text may accompany a card, never replace it.
 1. **Composable, not edited per variation.** A new look, size, model or card is data (fragment params, recipe `vars`, `--set` / `--data` flags), never a
@@ -109,7 +127,7 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
 5. **Design tokens are law** (`docs/design.md`): one accent, rounded, small, sentence case, no all-caps/eyebrows/mono labels/arrow glyphs, type floors.
 6. **Keep personal data out of this repo.** No tokens, paths from your machine, names, stats files. Examples use `myapp`/`stats.json`. The `main` branch is
    the shareable engine; personal setups live on a separate branch or in the data folder.
-7. **Responsive by default.** Padding plus flex/flow; no absolute positioning for content; components size themselves from their content and the box (labels measured, long text ellipsised); the window follows the content and hover growth is a smooth transition. A long label, a narrow box or a hover must not clip anything. **Never clip, always size within the container:** an item is exactly as wide as its content, never padded to a default width; text wraps or ends in an ellipsis.
+7. **Responsive by default.** Padding plus flex/flow; no absolute positioning for content; components size themselves from their content and the box (labels measured, long text ellipsised); the window follows the content and hover growth is a smooth transition. A long label, a narrow box or a hover must not clip anything. **Never clip, always size within the container:** an item is exactly as wide as its content, never padded to a default width; text wraps (an ellipsis only with the full text in a tooltip). Check with `morc tree <card>`, not by eye.
 8. **No hardcoded sizes (strict).** Choices like min widths, radii, type sizes, paddings and text floors are tokens in `ui/tokens.json` (override in `prefs/ui.json`), sent as CSS variables; never a number typed into `theme.css` or chart code.
 8b. **Modular, JSON-controlled (strict).** Any component you make: layout in one JSON, every variable thing (data, align, importance, floors, region, ttl) a field of its card JSON, never per-component code in Python or Rust; docs/chips/INDEX.md has the full rule and the done-checklist.
 9a. **Split responsibilities into folders (strict, default).** Every isolated unit lives in its own folder with its code, styles, metadata.json and a short md: UI components are `ui/components/<name>/` (`morc ui new`, `morc ui build`, index `ui/COMPONENTS.md`), Rust is one module per responsibility (split `host.rs` by concern, never grow it), config is one small JSON per component. Dependencies are listed by name, never copied or merged into a big file. Start by reading the index and fetch only the folder you need.
@@ -120,6 +138,14 @@ Putting something on screen = **use a chip** (`docs/chips/INDEX.md`: pick the ch
 exports `width()` so a card is exactly as wide as its content).
 
 ## Pitfalls we already hit
+- **Ids sent to a page must stay under 2^53** (JS numbers): a random u64 reply id came back rounded and matched nothing (cards "did not answer").
+- **macOS `windowNumberAtPoint` skips windows that ignore the mouse**: a card ignores it until the hit test says the pointer is on it, so using
+  it for "is something in front" made every card unclickable. Lowered cards check the window list instead (platform/macos/window_style.rs).
+- **The visible card is the plate, not the window**: the window and the hit shape include the corner buttons and a see-through margin. Snap,
+  `covers` and centring use `Surface::content_rect` (the plate the page reports).
+- **One place styles the card's buttons** (`ui/theme.css` "controls"): a second rule elsewhere (plate.css had one) silently wins.
+- **`morc card` is two commands**: `morc card <id> <op>` (built in, when `<op>` is get/set/hide/show/front/lower/raise/move/size) and the `card`
+  plugin (`morc card NAME --chip --set`). Do not add an op word that a plugin flag could collide with.
 - PowerShell: `R`, `rp`, `diff`, `sc`, `sleep` and friends are aliases; never name a helper function with a short alias-like name. `@(@(a,b))` with one pair
   flattens. A backtick-n inside single quotes is a literal. Prefer the editor tool or a small script file over inline replacement.
 - Windows arguments mangle inline JSON: pass JSON by file (`morc compose --recipe FILE`).

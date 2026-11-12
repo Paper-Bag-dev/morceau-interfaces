@@ -10,6 +10,16 @@
 //!   morc act <id> <action.json>            run an action on a surface as if it had been clicked
 //!   morc graph [--file g.json | exporter args] [--title T]   show a node-link graph (docs/graphs.md)
 //!   morc close <id> | dismiss-all | summon | list | status | stop
+//!   morc tree [<card>] [--all] [--depth N] [--node ID]   the scene tree, one card's tree, or both merged (docs/trees.md)
+//!   morc do <card> <action> [args JSON|@file]   run a card's named action (opts.actions; docs/state.md)
+//!   morc patch @shared <pointer> <value> ...    change the store every linked card can bind to ({"bind": "@/path"})
+//!   morc card <id> get                    a card's state: shown | hidden | closed, layer, spot, size cap, chip (docs/cards.md)
+//!   morc card NAME --chip C --set k=v      (the `card` plugin: a card's data file; any second word that is not an op below goes there)
+//!   morc card <id> set '{"state":"hidden"}'   set the state you want (state, layer below|top, at, center, frac); never shows it twice
+//!   morc card <id> hide|show|front|lower|raise | move --at X,Y|--center|--snap | size --frac F [--center]   the same as shortcuts
+//!   morc cards                             every card the host knows (live, hidden, closed)
+//!   morc refresh [component ...]          re-load components / plugins in the open cards, keeping their data (docs/plugins.md)
+//!   morc mcp                               a stdio MCP server over the same commands (docs/mcp.md)
 //!   morc space                             JSON: the free regions around the active window (see also `morc free`)
 //!   morc uimap                             JSON: the UI component map (paths, types, deps, tokens) from the host's memory
 //!   morc annoy [show|set|nudge|quiet|mute-app|mute-topic|theme ...]   the preference vector (docs/agent.md)
@@ -31,6 +41,7 @@ mod connect;
 mod plugins;
 mod stream;
 mod annoy;
+pub mod mcp;
 use input::*;
 use connect::*;
 use plugins::*;
@@ -63,6 +74,7 @@ pub fn run(args: Vec<String>) -> i32 {
         }
         "annoy" => return annoy(rest),
         "stream" => return stream(rest),
+        "mcp" => return mcp::serve(),
         "commands" => {
             for (n, d) in external_list() {
                 println!("{n:<16}{d}");
@@ -78,7 +90,15 @@ pub fn run(args: Vec<String>) -> i32 {
     }
 
     // Extension point: any script in tools/cli/ (<name>.py / .ps1 / .cmd) is a subcommand `morc <name> ...` (built-ins win).
-    const BUILTIN: &[&str] = &["show", "save", "use", "patch", "act", "close", "summon", "list", "status", "stop", "dismiss-all", "graph", "registry", "inbox", "hook", "annoy", "help", "stream", "commands", "space", "chore"];
+    const BUILTIN: &[&str] = &["show", "save", "use", "patch", "act", "close", "summon", "list", "status", "stop", "dismiss-all", "graph", "registry", "inbox", "hook", "annoy", "help", "stream", "commands", "space", "chore", "tree", "do", "mcp", "refresh", "card", "cards"];
+    // `morc card` is two commands sharing a name: `morc card <id> <op>` (a card on screen as a resource, built in) when the second word is
+    // one of its ops, else the `card` plugin (`morc card NAME --chip C --set k=v`: a card's data file). Old usage keeps working.
+    const CARD_OPS: &[&str] = &["get", "set", "hide", "show", "front", "lower", "raise", "move", "size"];
+    if cmd == "card" && !rest.get(1).map(|o| CARD_OPS.contains(&o.as_str())).unwrap_or(false) {
+        if let Some(p) = external(cmd) {
+            return run_external(&p, rest);
+        }
+    }
     if !BUILTIN.contains(&cmd) {
         if let Some(p) = external(cmd) {
             return run_external(&p, rest);
@@ -177,6 +197,40 @@ pub fn run(args: Vec<String>) -> i32 {
             let ttl = flag(rest, "--ttl").and_then(|t| t.parse::<f64>().ok()).unwrap_or(120.0);
             Ok(json!({"t": "use", "name": "graph-view", "id": flag(rest, "--id").unwrap_or_else(|| "graph".into()), "opts": {"ttl": ttl, "topic": "viz.graph", "max_frac": flag(rest, "--max-frac").and_then(|t| t.parse::<f64>().ok()).unwrap_or(0.82)}, "data": {"graph": graph, "title": title}}))
         }
+        "tree" => {
+            let id = rest.first().filter(|a| !a.starts_with("--")).cloned();
+            Ok(json!({"t": "tree", "id": id, "all": has(rest, "--all"), "node": flag(rest, "--node"),
+                      "depth": flag(rest, "--depth").and_then(|d| d.parse::<u32>().ok())}))
+        }
+        "do" => {
+            let (Some(id), Some(name)) = (rest.first(), rest.get(1)) else { return Err("do <card> <action> [args JSON|@file]".into()) };
+            let args = match rest.get(2) {
+                None => json!(null),
+                Some(a) => match a.strip_prefix('@') {
+                    Some(path) => read_input(Some(&path.to_string()))?,
+                    None => parse_value(a),
+                },
+            };
+            Ok(json!({"t": "do", "id": id, "name": name, "args": args}))
+        }
+        "card" => {
+            let Some(id) = rest.first() else { return Err("card <id> [get|set JSON|hide|show|front|move|size ...]".into()) };
+            let mut op = rest.get(1).cloned().unwrap_or_else(|| "get".into());
+            if op == "move" && has(rest, "--snap") {
+                op = "snap".into();
+            }
+            let set = if op == "set" {
+                let a = rest.get(2).ok_or("card <id> set '{\"state\":\"hidden\"}' (or @file)")?;
+                match a.strip_prefix('@') { Some(p) => read_input(Some(&p.to_string()))?, None => serde_json::from_str(a).map_err(|e| format!("set: {e}"))? }
+            } else { json!(null) };
+            let at = flag(rest, "--at").and_then(|a| {
+                let v: Vec<i32> = a.split(',').filter_map(|n| n.trim().parse().ok()).collect();
+                (v.len() == 2).then(|| [v[0], v[1]])
+            });
+            Ok(json!({"t": "card", "id": id, "op": op, "at": at, "center": has(rest, "--center"), "frac": flag(rest, "--frac").and_then(|f| f.parse::<f64>().ok()), "set": set}))
+        }
+        "cards" => Ok(json!({"t": "cards"})),
+        "refresh" => Ok(json!({"t": "refresh", "names": rest})),
         "list" => Ok(json!({"t": "list"})),
         "status" => Ok(json!({"t": "status"})),
         "uimap" => Ok(json!({"t": "ui_map"})),
@@ -194,7 +248,7 @@ pub fn run(args: Vec<String>) -> i32 {
             return 2;
         }
     };
-    if cmd == "stop" && TcpStream::connect((paths::HOST, paths::PORT)).is_err() {
+    if cmd == "stop" && TcpStream::connect((paths::HOST, paths::port())).is_err() {
         println!("{{\"ok\":true,\"note\":\"not running\"}}");
         return 0;
     }

@@ -25,3 +25,12 @@ pub fn beep() {
         let _ = windows::Win32::System::Diagnostics::Debug::MessageBeep(windows::Win32::UI::WindowsAndMessaging::MESSAGEBOX_STYLE(0x40));
     }
 }
+
+/// The pointer, physical px (the process is per-monitor DPI aware).
+pub fn cursor() -> (i32, i32) {
+    let mut p = windows::Win32::Foundation::POINT::default();
+    unsafe {
+        let _ = windows::Win32::UI::WindowsAndMessaging::GetCursorPos(&mut p);
+    }
+    (p.x, p.y)
+}

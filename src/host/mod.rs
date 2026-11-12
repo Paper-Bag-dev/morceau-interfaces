@@ -31,6 +31,10 @@ mod ipc;
 mod layout;
 mod show;
 mod tick;
+mod tree;
+mod cards;
+pub mod snap;
+mod state;
 use uidata::{ui_bundle, ui_stamp};
 use view::{cohesion_for, is_important, scope_of, view_for};
 
@@ -55,10 +59,21 @@ struct Host {
     /// when the last tick ran: while the user is away, every card's clock is held for the time between ticks
     last_tick: Instant,
     quit: bool,
+    /// The hidden page that opens every card when cards are linked (macOS); made with the first card. Last field: cards drop before it.
+    /// Requests waiting for pages to answer (trees, named actions), by reply id (host/tree.rs).
+    trees: HashMap<u64, tree::TreeQuery>,
+    /// Every card the host knows, by id: state, spot, spec and last data (host/cards.rs), kept in <runtime>/cards.json.
+    records: serde_json::Map<String, Value>,
+    cards_dirty: cards::Dirty,
+    /// The card under the pointer (its page says so): while there is one, Up / Down step it through the window stack.
+    hovered: Option<u64>,
+    /// The shared store for cards that are NOT linked (Windows, MORC_LINKED=0): the host keeps it and relays every change (cards.rs).
+    shared: Value,
+    root: Option<crate::surface::root::Root>,
 }
 
 pub fn run() -> ! {
-    let listener = match TcpListener::bind((paths::HOST, paths::PORT)) {
+    let listener = match TcpListener::bind((paths::HOST, paths::port())) {
         Ok(l) => l,
         Err(_) => {
             eprintln!("morc host already running");
@@ -98,7 +113,7 @@ pub fn run() -> ! {
     cache::write_registry();
     util::log("host started");
 
-    let mut host = Host { proxy, surfaces: HashMap::new(), by_id: HashMap::new(), next_key: 1, parked: vec![], recent: vec![], last_use: Instant::now(), last_tick: Instant::now(), quit: false };
+    let mut host = Host { proxy, surfaces: HashMap::new(), by_id: HashMap::new(), next_key: 1, parked: vec![], recent: vec![], last_use: Instant::now(), last_tick: Instant::now(), quit: false, trees: HashMap::new(), records: cards::load(), cards_dirty: Default::default(), hovered: None, shared: json!({}), root: None };
     event_loop.run(move |event, target, flow| {
         if let Event::UserEvent(ev) = event {
             host.handle(ev, target);
@@ -109,6 +124,11 @@ pub fn run() -> ! {
         }
         *flow = if host.quit { ControlFlow::Exit } else { host.next_flow() };
     })
+}
+
+/// A number from ui/limits.json (merged with prefs/ui.json, hot-reloaded): the snapping settings live there, never in code.
+fn snap_setting(name: &str, default: f64) -> f64 {
+    ui_bundle()["limits"][name].as_f64().unwrap_or(default)
 }
 
 fn rand_u64() -> u64 {
@@ -139,12 +159,16 @@ fn merge_opts(over: &Opts, base: &Opts) -> Opts {
         auto: over.auto,
         force: over.force,
         prefetch: over.prefetch.clone().or_else(|| base.prefetch.clone()),
+        actions: over.actions.clone().or_else(|| base.actions.clone()),
+        persist: over.persist || base.persist,
     }
 }
 
 impl Host {
     fn handle(&mut self, ev: Ev, target: &EventLoopWindowTarget<Ev>) {
         match ev {
+            Ev::Cmd(Request::Tree { id, depth, node, all }, reply) => self.tree(id, depth, node, all, reply),
+            Ev::Cmd(Request::Do { id, name, args }, reply) => self.ask_card(&id, json!({"t": "do", "name": name, "args": args}), reply),
             Ev::Cmd(req, reply) => {
                 let r = self.cmd(req, target);
                 if let Some(tx) = reply {
@@ -152,6 +176,13 @@ impl Host {
                 }
             }
             Ev::Ipc(key, text) => self.ipc(key, &text),
+            Ev::RootReady => {
+                if let Some(root) = self.root.as_mut() {
+                    root.set_ready();
+                }
+            }
+            Ev::Step(dir) => self.step(dir),
+            Ev::StackAll(dir) => self.stack_all(dir),
             Ev::Foreground => self.on_foreground(),
             Ev::Pointer(win, x, y) => {
                 if let Some(s) = self.surfaces.values().find(|s| s.hwnd() == win) {
@@ -170,7 +201,11 @@ impl Host {
 
     fn cmd(&mut self, req: Request, target: &EventLoopWindowTarget<Ev>) -> Value {
         match req {
-            Request::Show { id, opts, components, data, sources } => self.show(id, opts, "", components, data, sources, target),
+            Request::Show { id, opts, components, data, sources } => {
+                let r = self.show(id, opts, "", components, data, sources, target);
+                self.note_shown(&r);
+                r
+            }
             Request::Use { name, id, opts, data } => {
                 let Some(c) = cache::load(&name) else { return json!({"ok": false, "err": cache::explain_missing(&name)}) };
                 let base: Opts = serde_json::from_value(c["opts"].clone()).unwrap_or_default();
@@ -181,7 +216,22 @@ impl Host {
                 util::deep_merge(&mut d, &data);
                 cache::bump_use(&name);
                 let comps = c["components"].as_array().cloned().unwrap_or_default();
-                self.show(id, merge_opts(&opts, &base), &name, comps, d, c["sources"].clone(), target)
+                let r = self.show(id, merge_opts(&opts, &base), &name, comps, d, c["sources"].clone(), target);
+                self.note_shown(&r);
+                r
+            }
+            // "@shared" = the store every linked card can bind to ({"bind": "@/path"}); it lives in the root page (surface/root.rs)
+            Request::Patch { id, data, .. } if id == "@shared" => {
+                match self.root.as_ref() {
+                    Some(r) => r.eval(&format!("window.morcSharedPatch && window.morcSharedPatch({})", Value::Object(data))),
+                    // unlinked cards: the host's copy, relayed to every card
+                    None => {
+                        for (p, v) in data {
+                            self.shared_set(None, &p, v);
+                        }
+                    }
+                }
+                json!({"ok": true})
             }
             Request::Patch { id, data, components, attach } => match self.by_id.get(&id).and_then(|k| self.surfaces.get(k)) {
                 Some(s) => {
@@ -240,12 +290,26 @@ impl Host {
             }
             Request::Status => json!({
                 "ok": true,
-                "surfaces": self.surfaces.values().filter(|s| s.phase != Phase::Spare).map(|s| json!({"id": s.id, "topic": s.topic, "visible": s.phase == Phase::Visible, "pinned": s.life.pinned, "rect": s.rect().map(|r| vec![r.l, r.t, r.r, r.b]), "theme_seen": s.opts.theme})).collect::<Vec<_>>(),
+                "surfaces": self.surfaces.values().filter(|s| s.phase != Phase::Spare).map(|s| json!({"id": s.id, "topic": s.topic, "visible": s.phase == Phase::Visible, "hidden": s.phase == Phase::Hidden, "pinned": s.life.pinned, "rect": s.rect().map(|r| vec![r.l, r.t, r.r, r.b]), "theme_seen": s.opts.theme})).collect::<Vec<_>>(),
                 "parked": self.parked.iter().map(|p| p.id.clone()).collect::<Vec<_>>(),
                 "spare": self.surfaces.values().any(|s| s.phase == Phase::Spare),
                 "claude_session_age_s": inbox::session_age_s(),
             }),
+            Request::Card { id, op, at, center, frac, set } => {
+                let r = if op == "set" { self.card_set(&id, &set, target) } else { self.card_op(&id, &op, at, center, frac, target) };
+                self.note_card(&id);
+                r
+            }
+            Request::Cards => self.cards_list(),
+            Request::Refresh { names } => {
+                let n = self.surfaces.values().filter(|s| s.ready && s.phase != Phase::Spare).inspect(|s| s.send(&json!({"t": "refresh", "names": names}))).count();
+                json!({"ok": true, "cards": n})
+            }
+            // answered in handle(): they wait for the pages
+            Request::Tree { .. } | Request::Do { .. } => json!({"ok": false, "err": "internal: routed in handle"}),
             Request::Shutdown => {
+                self.flush_cards(true);   // the last changes, even inside the falloff
+                state::flush_history(true);
                 self.quit = true;
                 json!({"ok": true})
             }
@@ -264,7 +328,10 @@ impl Host {
     fn spawn(&mut self, target: &EventLoopWindowTarget<Ev>) -> Result<u64, String> {
         let key = self.next_key;
         self.next_key += 1;
-        let s = Surface::create(target, key, self.proxy.clone())?;
+        if self.root.is_none() && crate::platform::os::app::linked_cards() {
+            self.root = Some(crate::surface::root::Root::create(target, self.proxy.clone())?);
+        }
+        let s = Surface::create(target, key, self.proxy.clone(), self.root.as_mut())?;
         self.surfaces.insert(key, s);
         Ok(key)
     }
@@ -274,6 +341,10 @@ impl Host {
     // ---------- lifecycle ----------
 
     fn begin_leave(&mut self, key: u64, outcome: Option<Outcome>) {
+        // the record keeps the spot as it was BEFORE the exit animation shrinks the content (cards.rs)
+        if let Some(id) = self.surfaces.get(&key).filter(|s| matches!(s.phase, Phase::Visible | Phase::Hidden)).map(|s| s.id.clone()) {
+            self.note_card(&id);
+        }
         let Some(s) = self.surfaces.get_mut(&key) else { return };
         if s.phase == Phase::Leaving {
             return;
@@ -299,6 +370,14 @@ impl Host {
     }
 
     fn destroy(&mut self, key: u64) {
+        if self.hovered == Some(key) {
+            self.hovered = None;
+            crate::hotkeys::arrows(false);   // never leave the arrows taken by a card that is gone
+        }
+        if let Some(root) = self.root.as_mut() {
+            root.forget(key);
+        }
+        self.note_closed(key);
         if let Some(s) = self.surfaces.remove(&key) {
             if !s.id.is_empty() && self.by_id.get(&s.id) == Some(&key) {
                 self.by_id.remove(&s.id);
@@ -348,7 +427,8 @@ impl Host {
         let Some(r) = s.rect() else { return };
         // Never relocate while the user is interacting with it (a click can change the active window): wait ~2 s of calm.
         let interacting = s.life.last_touch.elapsed() < Duration::from_millis(2000) || s.life.hover;
-        if !force && (interacting || s.user_moved || s.life.pinned || s.life.dragging || !placement::covers_foreground(&r)) {
+        // a card sent behind the active window is MEANT to be covered: never move it out from under
+        if s.depth > 0 || (!force && (interacting || s.user_moved || s.life.pinned || s.life.dragging || !placement::covers_foreground(&r))) {
             return;
         }
         let ow = 1.2 - prefs::get(&prefs::load(), &s.topic, "overlap");
@@ -383,8 +463,12 @@ impl Host {
 
     fn next_flow(&self) -> ControlFlow {
         let now = Instant::now();
-        if self.surfaces.values().any(|s| s.mv.is_some()) {
+        if !self.trees.is_empty() {
+            ControlFlow::WaitUntil(now + Duration::from_millis(50)) // a page answer is due: check its timeout
+        } else if self.surfaces.values().any(|s| s.mv.is_some()) {
             ControlFlow::WaitUntil(now + Duration::from_millis(16))
+        } else if self.surfaces.values().any(|s| s.grab.is_some()) {
+            ControlFlow::WaitUntil(now + Duration::from_millis(snap_setting("snap-frame-ms", 8.0) as u64)) // a magnetic carry: follow the pointer
         } else if self.surfaces.values().any(|s| s.drag_started.is_some()) {
             ControlFlow::WaitUntil(now + Duration::from_millis(30)) // watching for the mouse release
         } else if self.surfaces.values().any(|s| s.phase != Phase::Spare) {

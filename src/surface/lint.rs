@@ -28,9 +28,9 @@ fn walk_refs(v: &Value, out: &mut HashSet<String>) {
         }
         Value::Array(a) => a.iter().for_each(|x| walk_refs(x, out)),
         Value::String(s) => {
-            // templates: {/path} or {/path:2}
+            // templates: {/path}, {/path:2}, {@/shared}
             let mut rest = s.as_str();
-            while let Some(i) = rest.find("{/") {
+            while let Some(i) = rest.find("{/").or_else(|| rest.find("{@/")) {
                 let after = &rest[i + 1..];
                 if let Some(j) = after.find('}') {
                     let p = after[..j].split(':').next().unwrap_or("");
@@ -59,9 +59,10 @@ fn actions(a: &Value) -> Vec<&Value> {
 
 fn check_action(owner: &str, a: &Value, refs: &HashSet<String>, errs: &mut Vec<String>) {
     match a["do"].as_str().unwrap_or("") {
-        "set" | "toggle" => {
+        "set" | "toggle" | "push" | "pull" | "merge" | "inc" => {
             let p = a["path"].as_str().unwrap_or("");
-            if !shown(refs, p) {
+            // "@/..." is the shared store: another card may be the one showing it, which one card's spec cannot see
+            if !p.starts_with('@') && !shown(refs, p) {
                 errs.push(format!("{owner}: changes {p} but nothing on screen shows it (a click that changes nothing visible). Bind a component to {p}, or make the action close/replace the surface."));
             }
         }
@@ -71,7 +72,8 @@ fn check_action(owner: &str, a: &Value, refs: &HashSet<String>, errs: &mut Vec<S
                 errs.push(format!("{owner}: run puts its output at {into} but nothing shows it. Add a text bound to {into}."));
             }
         }
-        "copy" | "open" | "close" | "emit" | "wake" | "reveal" => {}
+        // call = a named action (opts.actions): its steps are checked where they are declared, not here
+        "copy" | "open" | "close" | "emit" | "wake" | "reveal" | "call" => {}
         "" => errs.push(format!("{owner}: action has no `do`")),
         other => errs.push(format!("{owner}: unknown action '{other}'")),
     }
@@ -177,6 +179,11 @@ mod tests {
 
     #[test]
     fn set_must_be_shown() {
+        // list edits count as changes; shared paths and named-action calls pass
+        assert!(!check(&[json!({"id": "b", "type": "button", "label": "Add", "role": "tab", "action": {"do": "push", "path": "/items", "value": 1}})]).is_empty());
+        assert!(check(&[json!({"id": "b", "type": "button", "label": "Add", "role": "tab", "action": {"do": "push", "path": "/items", "value": 1}}), json!({"id": "l", "type": "list", "items": {"bind": "/items"}})]).is_empty());
+        assert!(check(&[json!({"id": "b", "type": "button", "label": "Pick", "role": "tab", "action": {"do": "set", "path": "@/sel", "value": 1}})]).is_empty());
+        assert!(check(&[json!({"id": "b", "type": "button", "label": "Add", "action": {"do": "call", "name": "add"}})]).is_empty());
         let hidden = check(&[json!({"id": "b", "type": "button", "label": "+", "action": {"do": "set", "path": "/x", "value": 1}})]);
         assert!(hidden.iter().any(|m| m.contains("nothing on screen shows")));
         let shown = check(&[

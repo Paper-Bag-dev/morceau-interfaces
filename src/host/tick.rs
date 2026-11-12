@@ -15,9 +15,10 @@ impl Host {
         if !ended.is_empty() {
             winstyle::drag_cursor_off(); // onDragEnd: the user's own pointer comes back
         }
-        for k in ended {
+        for k in ended.iter().copied() {
             let Some(s) = self.surfaces.get_mut(&k) else { continue };
             s.drag_started = None;
+            s.grab = None;
             s.life.dragging = false;
             s.user_moved = true;
             s.life.on_drag_end(Instant::now());
@@ -32,12 +33,59 @@ impl Host {
             }
             s.drag_from = None;
         }
+        // the record learns the new spot at its next write (falloff in cards.rs), once per drop, never per frame
+        for k in ended {
+            if let Some(id) = self.surfaces.get(&k).map(|s| s.id.clone()) {
+                self.note_card(&id);
+            }
+        }
+    }
+
+    /// Magnetic carry (snap.rs): put each carried card where the pointer wants it, pulled onto the nearest edges.
+    fn follow_grabs(&mut self) {
+        let keys: Vec<u64> = self.surfaces.values().filter(|s| s.grab.is_some()).map(|s| s.key).collect();
+        if keys.is_empty() {
+            return;
+        }
+        let pol = policy::load();
+        let (cx, cy) = crate::platform::os::sys::cursor();
+        let fg = placement::foreground();
+        for k in keys {
+            // targets: the active window and my other visible cards (their visible content)
+            let mut targets: Vec<placement::R> = fg.rect.into_iter().collect();
+            targets.extend(self.surfaces.values().filter(|o| o.key != k && o.phase == Phase::Visible).filter_map(|o| o.content_rect()));
+            let Some(s) = self.surfaces.get_mut(&k) else { continue };
+            let (Some(r), Some(c)) = (s.rect(), s.content_rect()) else { continue };
+            // css px settings -> physical px on THIS card's display (mixed-DPI setups differ per display)
+            let scale = s.window.scale_factor();
+            let px = |name: &str, d: f64| (super::snap_setting(name, d) * scale).round() as i32;
+            let (radius, breakaway) = (px("snap-px", 0.0), px("snap-break-px", 44.0));
+            let Some(g) = s.grab.as_mut() else { continue };
+            let (il, it) = (c.l - r.l, c.t - r.t);
+            let (wx, wy) = (cx - g.offset.0, cy - g.offset.1);   // where the window would go without magnets
+            let raw = placement::R { l: wx + il, t: wy + it, r: wx + il + c.w(), b: wy + it + c.h() };
+            let work = placement::work_at((raw.l + raw.r) / 2, (raw.t + raw.b) / 2);
+            // the seam a snapped card keeps from what it snapped to: its own setting (snap-gap), not the placement gap
+            let seam = px("snap-gap", 12.0);
+            let m = super::snap::Magnets { targets: &targets, work, radius, breakaway, gap: seam, margin: pol.margin };
+            let fast = g.track((cx, cy)) > super::snap_setting("snap-max-speed", 900.0) * scale;
+            let ((x, y), st) = super::snap::apply_moving(&raw, &m, g.sticky, fast);
+            g.sticky = st;
+            if (x - il, y - it) != (r.l, r.t) {
+                s.window.set_outer_position(PhysicalPosition::new(x - il, y - it));
+            }
+        }
     }
 
     pub(super) fn tick(&mut self, target: &EventLoopWindowTarget<Ev>) {
+        self.tree_timeouts();
+        self.flush_cards(false);
+        state::flush_history(false);
         self.finish_drags();
         let now = Instant::now();
+        self.follow_grabs();
         // glide
+        let mut moved: Vec<String> = vec![];
         for s in self.surfaces.values_mut() {
             if let Some(m) = &s.mv {
                 let t = (m.start.elapsed().as_secs_f64() / MOVE_SECS).min(1.0);
@@ -47,8 +95,12 @@ impl Host {
                 s.window.set_outer_position(PhysicalPosition::new(x as i32, y as i32));
                 if t >= 1.0 {
                     s.mv = None;
+                    moved.push(s.id.clone());
                 }
             }
+        }
+        for id in moved {
+            self.note_card(&id);
         }
         // away: no input for a while stops every card's clock, so nothing expires unseen (and nothing is logged as ignored)
         let dt = now.saturating_duration_since(self.last_tick);

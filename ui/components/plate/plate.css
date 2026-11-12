@@ -79,12 +79,8 @@ html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid rgb(var(
 #stage.compact .c-list { min-width: var(--compact-list-w, 220px); max-width: var(--compact-list-w, 220px); }
 #stage.compact .c-list { max-height: calc(var(--compact-rows, 4) * (var(--row-min-h, 42px) + 2px + var(--list-gap, 6px)) + var(--compact-peek, 20px)); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
 #stage.compact :is(.c-pastes, .c-check) { max-height: var(--compact-h, 190px); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
-/* compact: no pin or dismiss (they come back on hover, as translucent grey buttons) */
-#pin, #dismiss { transition: opacity .25s ease, background .3s ease, color .3s ease, transform .35s var(--spring); }
-#stage.compact :is(#pin, #dismiss) { opacity: 0; pointer-events: none; }
-#stage.hovered:not(.compact) :is(#pin, #dismiss) { opacity: 1; pointer-events: auto; background: rgb(var(--ghost-btn, 255 255 255 / .14)); color: hsl(0 0% 100%); }
-#stage.hovered:not(.compact) :is(#pin, #dismiss) svg { fill: currentColor; }
-@media (prefers-reduced-motion: reduce) { .card-plate, .card-plate::before, :is(.c-list, .c-pastes, .c-check), #pin, #dismiss { transition: none; } }
+/* the card's own buttons (pin, x, layer) are styled in ONE place: ui/theme.css "controls" (restyle them with --ctl-* in a preset) */
+@media (prefers-reduced-motion: reduce) { .card-plate, .card-plate::before, :is(.c-list, .c-pastes, .c-check) { transition: none; } }
 /* glass skin: the pills' inner line is a quiet neutral grey (user, 11-10: an accent line read too glowy); no outer glow on hover */
 html[data-skin~="glass"] #stage {
   --lens-line-c: rgb(var(--lens-line, 206 196 188 / .16));

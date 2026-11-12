@@ -9,7 +9,7 @@ use tao::{
     event_loop::EventLoopWindowTarget,
     window::{Window, WindowBuilder},
 };
-use wry::{WebView, WebViewBuilder};
+use wry::WebViewBuilder;
 
 use crate::platform::os::app::{native_handle, START_URL};
 
@@ -20,6 +20,8 @@ pub enum Phase {
     /// Claimed; waiting for the page to report its first layout.
     Waiting,
     Visible,
+    /// Put away by `morc card <id> hide`: off screen, page and data alive, clock stopped. `show` brings it back where it was.
+    Hidden,
     /// Playing its exit animation (since).
     Leaving,
 }
@@ -51,13 +53,25 @@ pub struct Surface {
     pub drag_from: Option<R>,
     pub drag_started: Option<Instant>,
     pub mv: Option<Move>,
-    // Field order matters: the webview must drop before the window that hosts it.
-    pub webview: WebView,
-    pub window: Window,
+    /// Place in the window stack (host/cards.rs): 0 = on top of every window; n = under the n-th window overlapping it. The layer button
+    /// toggles 0 <-> 1; Up / Down while hovering, `morc card <id> lower|raise` step it.
+    pub depth: usize,
+    /// The visible plate(s) of the card, physical px relative to the window's top-left (union of the page's glass rects): what you SEE,
+    /// tighter than `inset` (which also counts the pin / x / layer buttons beside the plate). None until the page reports it.
+    pub plate: Option<(i32, i32, i32, i32)>,
+    /// A magnetic carry in progress (host/snap.rs): the host moves the window itself, frame by frame.
+    pub grab: Option<crate::host::snap::Grab>,
+    /// Centre the card once its next measured size arrives (`morc card <id> size --center`).
+    pub recenter: bool,
+    // Field order matters: the webview must drop before the window that hosts it. The window is boxed so a linked card's parked pointer
+    // stays valid while the surface moves (surface/root.rs); the web view slot is empty until a linked card's page is created.
+    pub webview: root::Slot,
+    pub window: Box<Window>,
 }
 
 impl Surface {
-    pub fn create(target: &EventLoopWindowTarget<Ev>, key: u64, proxy: Proxy) -> Result<Surface, String> {
+    /// A card. With `root` (linked cards) the root page opens its web view a moment later; without, it is built here.
+    pub fn create(target: &EventLoopWindowTarget<Ev>, key: u64, proxy: Proxy, root: Option<&mut root::Root>) -> Result<Surface, String> {
         let builder = WindowBuilder::new()
             .with_title("")
             .with_decorations(false)
@@ -68,20 +82,23 @@ impl Surface {
             .with_focused(false)
             .with_inner_size(LogicalSize::new(10.0, 10.0));
         let builder = crate::platform::os::app::window_builder(builder);
-        let window = builder.build(target).map_err(|e| e.to_string())?;
+        let window = Box::new(builder.build(target).map_err(|e| e.to_string())?);
         winstyle::overlay_styles(native_handle(&window));
-        let wvb = crate::platform::os::app::webview_builder(WebViewBuilder::new());
-        let webview = wvb
-            .with_transparent(true)
-            .with_background_color((0, 0, 0, 0))
-            .with_accept_first_mouse(true)
-            .with_custom_protocol("morc".into(), |_id, req| assets::handle(req))
-            .with_ipc_handler(move |req| {
-                let _ = proxy.send_event(Ev::Ipc(key, req.body().clone()));
-            })
-            .with_url(START_URL)
-            .build(&window)
-            .map_err(|e| e.to_string())?;
+        let webview: root::Slot = Default::default();
+        match root {
+            Some(root) => root.open(key, &window, webview.clone()),
+            None => {
+                let wv = card_builder(WebViewBuilder::new())
+                    .with_custom_protocol("morc".into(), |_id, req| assets::handle(req))
+                    .with_ipc_handler(move |req| {
+                        let _ = proxy.send_event(Ev::Ipc(key, req.body().clone()));
+                    })
+                    .with_url(START_URL)
+                    .build(&*window)
+                    .map_err(|e| e.to_string())?;
+                *webview.borrow_mut() = Some(wv);
+            }
+        }
         let now = Instant::now();
         Ok(Surface {
             key,
@@ -97,6 +114,10 @@ impl Surface {
             life: Life::new(None, false, now),
             user_moved: false,
             inset: (0, 0, 0, 0),
+            recenter: false,
+            grab: None,
+            depth: 0,
+            plate: None,
             auto_moved_at: None,
             drag_from: None,
             drag_started: None,
@@ -114,7 +135,20 @@ impl Surface {
     /// Send a message to the page.
     pub fn send(&self, msg: &Value) {
         let js = msg.to_string().replace('\u{2028}', "\\u2028").replace('\u{2029}', "\\u2029");
-        let _ = self.webview.evaluate_script(&format!("window.morc&&window.morc.recv({js})"));
+        if let Some(wv) = self.webview.borrow().as_ref() {
+            let _ = wv.evaluate_script(&format!("window.morc&&window.morc.recv({js})"));
+        }
+    }
+
+    /// What you actually see of the card (physical px): its plate when the page reported it, else the outer rect minus the see-through
+    /// margin around the hit shapes (`inset`).
+    pub fn content_rect(&self) -> Option<R> {
+        let r = self.rect()?;
+        if let Some((l, t, rr, b)) = self.plate {
+            return Some(R { l: r.l + l, t: r.t + t, r: r.l + rr, b: r.t + b });   // the plate itself, when the page has reported it
+        }
+        let (il, it, ir, ib) = self.inset;
+        Some(R { l: r.l + il, t: r.t + it, r: r.r - ir, b: r.b - ib })
     }
 
     /// Outer rect in physical pixels.
@@ -125,7 +159,13 @@ impl Surface {
     }
 }
 
-// Submodules: a card's lifetime, the actions its buttons run, and the spec linter.
+/// What every card's web view shares, linked or not: see-through, and the first click on an inactive card already counts.
+pub fn card_builder(wvb: WebViewBuilder) -> WebViewBuilder {
+    crate::platform::os::app::webview_builder(wvb).with_transparent(true).with_background_color((0, 0, 0, 0)).with_accept_first_mouse(true)
+}
+
+// Submodules: a card's lifetime, the actions its buttons run, the spec linter, and the root page that opens linked cards.
 pub mod actions;
 pub mod lifetime;
 pub mod lint;
+pub mod root;

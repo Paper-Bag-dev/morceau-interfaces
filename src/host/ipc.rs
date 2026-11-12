@@ -24,6 +24,16 @@ impl Host {
             }
             "hover" => {
                 let on = m["v"].as_bool().unwrap_or(false);
+                // Up / Down belong to the card only while the pointer is on it (registered here, released when it leaves)
+                let was = self.hovered.is_some();
+                if on {
+                    self.hovered = Some(key);
+                } else if self.hovered == Some(key) {
+                    self.hovered = None;
+                }
+                if was != self.hovered.is_some() {
+                    crate::hotkeys::arrows(self.hovered.is_some());
+                }
                 if let Some(s) = self.surfaces.get_mut(&key) {
                     s.life.on_hover(on, now);
                 }
@@ -48,9 +58,17 @@ impl Host {
                     // onStart: tell the agent a carry began ...
                     inbox::push(&s.id, &s.topic, "drag_start", &json!({"from": from.as_ref().map(placed::rect_json), "via": m["src"].as_str().unwrap_or("hold")}));
                     winstyle::drag_cursor_on(); // pointer becomes the move cursor for the whole carry
-                    // The native move loop runs inside the message pump AFTER this returns, so the end is detected in tick()
-                    // (mouse button released) rather than here.
-                    let _ = s.window.drag_window();
+                    if super::snap_setting("snap-px", 0.0) > 0.0 {
+                        // magnetic carry (snap.rs): the host follows the pointer itself, so it can pull the card onto edges mid-way
+                        if let Some(r) = s.rect() {
+                            let (cx, cy) = crate::platform::os::sys::cursor();
+                            s.grab = Some(super::snap::Grab::new((cx - r.l, cy - r.t)));
+                        }
+                    } else {
+                        // The native move loop runs inside the message pump AFTER this returns, so the end is detected in tick()
+                        // (mouse button released) rather than here.
+                        let _ = s.window.drag_window();
+                    }
                 }
             }
             "kbd" => {
@@ -104,6 +122,22 @@ impl Host {
             }
             "dismiss" => self.begin_leave(key, Some(Outcome::Dismissed)),
             "left" => self.destroy(key),
+            "reply" => self.reply_part(key, &m),
+            // the layer button: behind the active window / back on top (cards.rs keeps the state)
+            "layer" => {
+                let d = self.surfaces.get(&key).map(|s| s.depth).unwrap_or(0);
+                self.set_depth(key, if d == 0 { 1 } else { 0 });   // one level down, and back up
+            }
+            // an unlinked card wrote to the shared store (@/path): keep it and relay it (cards.rs)
+            "shared" => {
+                if let Some(p) = m["path"].as_str() {
+                    self.shared_set(Some(key), p, m["value"].clone());
+                }
+            }
+            // the page's data as it leaves: what `morc card <id> show` brings back
+            "final" => self.note_final(key, &m["data"]),
+            "did" => self.did(key, &m),
+            "snap" => self.snap(key, &m),
             "log" => util::log(&format!("page[{key}]: {}", m["msg"])),
             _ => {}
         }

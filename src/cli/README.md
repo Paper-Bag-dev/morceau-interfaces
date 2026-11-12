@@ -8,3 +8,4 @@
 | `plugins.rs` | CLI plugins: any script in `tools/cli` (data folder first) becomes `morc <name>` |
 | `stream.rs` | `morc stream`: a spec shown piece by piece, skeleton cards first |
 | `annoy.rs` | `morc annoy`: read and nudge the annoyance vector |
+| `mcp.rs` | `morc mcp`: the stdio MCP server, six fixed tools over the same requests (docs/mcp.md) |

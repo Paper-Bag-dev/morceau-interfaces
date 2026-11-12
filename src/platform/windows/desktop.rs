@@ -1,7 +1,7 @@
 //! What the desktop looks like right now on Windows: the visible windows, the monitors, the active window and whether it is fullscreen,
 //! its exe and title. placement/desktop.rs re-exports these; its snapshot wrappers (`foreground()`, `windows()`) call the `_now` ones.
 
-use crate::placement::{Foreground, R};
+use crate::placement::{Display, Foreground, SceneWin, R};
 use std::ffi::c_void;
 use windows::core::BOOL;
 use windows::Win32::Foundation::{HWND, LPARAM, RECT};
@@ -118,9 +118,6 @@ pub fn work_at(x: i32, y: i32) -> R {
 
 /// Executable name (lowercase) of the active window's process, e.g. "chrome.exe".
 pub fn fg_exe() -> Option<String> {
-    use windows::core::PWSTR;
-    use windows::Win32::Foundation::CloseHandle;
-    use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION};
     unsafe {
         let fg = GetForegroundWindow();
         if fg.0.is_null() {
@@ -128,6 +125,16 @@ pub fn fg_exe() -> Option<String> {
         }
         let mut pid = 0u32;
         GetWindowThreadProcessId(fg, Some(&mut pid));
+        exe_of(pid)
+    }
+}
+
+/// Executable name (lowercase) of a process, e.g. "chrome.exe".
+fn exe_of(pid: u32) -> Option<String> {
+    use windows::core::PWSTR;
+    use windows::Win32::Foundation::CloseHandle;
+    use windows::Win32::System::Threading::{OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION};
+    unsafe {
         let h = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid).ok()?;
         let mut buf = [0u16; 520];
         let mut n = buf.len() as u32;
@@ -156,4 +163,56 @@ pub fn fg_title() -> Option<String> {
 
 fn rect(r: RECT) -> R {
     R { l: r.left, t: r.top, r: r.right, b: r.bottom }
+}
+
+/// (frame, work area) of each monitor.
+unsafe extern "system" fn collect_frames(mon: HMONITOR, _: HDC, _: *mut RECT, lp: LPARAM) -> BOOL {
+    let out = &mut *(lp.0 as *mut Vec<(R, R)>);
+    let mut mi = MONITORINFO { cbSize: std::mem::size_of::<MONITORINFO>() as u32, ..Default::default() };
+    if GetMonitorInfoW(mon, &mut mi).as_bool() {
+        out.push((rect(mi.rcMonitor), rect(mi.rcWork)));
+    }
+    BOOL(1)
+}
+
+/// Every visible top-level window front to back (EnumWindows walks the z-order top down), ours included: (hwnd, pid, rect).
+unsafe extern "system" fn collect_scene(hwnd: HWND, lp: LPARAM) -> BOOL {
+    let out = &mut *(lp.0 as *mut Vec<(isize, u32, R)>);
+    if !IsWindowVisible(hwnd).as_bool() || IsIconic(hwnd).as_bool() || is_cloaked(hwnd) {
+        return BOOL(1);
+    }
+    let mut cls = [0u16; 64];
+    let n = GetClassNameW(hwnd, &mut cls) as usize;
+    if matches!(String::from_utf16_lossy(&cls[..n]).as_str(), "Progman" | "WorkerW" | "Shell_TrayWnd" | "Shell_SecondaryTrayWnd") {
+        return BOOL(1);
+    }
+    let mut pid = 0u32;
+    GetWindowThreadProcessId(hwnd, Some(&mut pid));
+    if let Some(r) = hwnd_rect(hwnd) {
+        out.push((hwnd.0 as isize, pid, r));
+    }
+    BOOL(1)
+}
+
+/// Displays (full frame + work area) and every visible window front to back, ours included (`mine`), with the app's exe name; for the
+/// scene tree (host/tree.rs). Window titles stay out (they can name clients).
+pub fn scene_now() -> (Vec<Display>, Vec<SceneWin>) {
+    let mut frames: Vec<(R, R)> = vec![];
+    let mut raw: Vec<(isize, u32, R)> = vec![];
+    unsafe {
+        let _ = EnumDisplayMonitors(None, None, Some(collect_frames), LPARAM(&mut frames as *mut _ as isize));
+        let _ = EnumWindows(Some(collect_scene), LPARAM(&mut raw as *mut _ as isize));
+    }
+    let me = unsafe { GetCurrentProcessId() };
+    let mut names: std::collections::HashMap<u32, String> = Default::default();
+    let displays = frames.into_iter().map(|(frame, work)| Display { frame, work }).collect();
+    let wins = raw
+        .into_iter()
+        .filter(|(_, pid, r)| *pid == me || (r.w() > 80 && r.h() > 40))
+        .map(|(h, pid, r)| {
+            let app = names.entry(pid).or_insert_with(|| exe_of(pid).unwrap_or_default()).clone();
+            SceneWin { id: h as i64, app, rect: r, mine: pid == me }
+        })
+        .collect();
+    (displays, wins)
 }

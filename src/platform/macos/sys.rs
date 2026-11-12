@@ -57,6 +57,7 @@ extern "C" {
     static kCGWindowNumber: *const c_void;
     static kCGWindowName: *const c_void;
     static kCGWindowAlpha: *const c_void;
+    static kCGWindowOwnerName: *const c_void;
 }
 #[link(name = "CoreFoundation", kind = "framework")]
 extern "C" {
@@ -86,6 +87,8 @@ pub struct WinInfo {
     pub bounds: CGRect,
     /// Only filled when this process has the Screen Recording permission; None otherwise.
     pub name: Option<String>,
+    /// The owning app's name (always available, no permission needed).
+    pub owner: Option<String>,
 }
 
 unsafe fn dict_get(d: Id, key: *const c_void) -> Id {
@@ -136,6 +139,7 @@ pub fn window_list() -> Vec<WinInfo> {
                 alpha: num(d, kCGWindowAlpha).unwrap_or(1.0),
                 bounds,
                 name: string(dict_get(d, kCGWindowName)).filter(|s| !s.is_empty()),
+                owner: string(dict_get(d, kCGWindowOwnerName)).filter(|s| !s.is_empty()),
             });
         }
         CFRelease(arr);
@@ -168,6 +172,14 @@ pub fn screens() -> Vec<Screen> {
         let flip = |r: CGRect| CGRect { origin: CGPoint { x: r.origin.x, y: primary_h - (r.origin.y + r.size.height) }, size: r.size };
         raw.into_iter().map(|(f, v)| Screen { frame: flip(f), visible: flip(v) }).collect()
     }
+}
+
+/// The pointer, physical px from the top-left of the primary display (NSEvent's is points from the bottom-left). Main thread.
+pub fn cursor() -> (i32, i32) {
+    let p: CGPoint = unsafe { msg_send![class!(NSEvent), mouseLocation] };
+    let primary_h = screens().first().map(|s| s.frame.size.height).unwrap_or(0.0);
+    let k = scale();
+    ((p.x * k).round() as i32, ((primary_h - p.y) * k).round() as i32)
 }
 
 /// Physical pixels per point on the primary display (2.0 on Retina). Mixed-DPI setups use this one factor for every display.

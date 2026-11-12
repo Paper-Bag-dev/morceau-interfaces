@@ -3,7 +3,7 @@
 //! titles (`fg_title`), which macOS only shows to apps with Screen Recording; without it the title is None.
 //! placement/desktop.rs re-exports these; its snapshot wrappers (`foreground()`, `windows()`) call the `_now` ones.
 
-use crate::placement::{Foreground, R};
+use crate::placement::{Display, Foreground, SceneWin, R};
 use super::sys::{self, CGRect};
 
 /// Points (top-left origin) to physical pixels.
@@ -86,4 +86,19 @@ pub fn fg_exe() -> Option<String> {
 pub fn fg_title() -> Option<String> {
     let pid = sys::frontmost_pid()?;
     sys::window_list().into_iter().find(|w| w.pid == pid && w.layer == 0).and_then(|w| w.name)
+}
+
+/// Displays and every on-screen window front to back (ours included, `mine`), for the scene tree (host/tree.rs). App names only: window
+/// titles stay out (they can name clients). Main thread (NSScreen).
+pub fn scene_now() -> (Vec<Display>, Vec<SceneWin>) {
+    let s = sys::scale();
+    let me = std::process::id() as i32;
+    let displays = sys::screens().iter().map(|m| Display { frame: px(&m.frame, s), work: px(&m.visible, s) }).collect();
+    let wins = sys::window_list()
+        .into_iter()
+        .filter(|w| w.alpha > 0.0 && (w.layer == 0 || w.pid == me))
+        .map(|w| SceneWin { id: w.number, app: w.owner.unwrap_or_default(), rect: px(&w.bounds, s), mine: w.pid == me })
+        .filter(|w| w.mine || (w.rect.w() > 80 && w.rect.h() > 40))
+        .collect();
+    (displays, wins)
 }

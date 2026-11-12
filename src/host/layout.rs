@@ -25,6 +25,13 @@ impl Host {
             .unwrap_or_default();
         winstyle::set_region(s.hwnd(), &rects);
         // the plates' exact rounded rects (not the padded hit shapes): where the platform may put native glass
+        // the plate(s) you see: their union is the card for snapping, the scene tree and covers (Surface::content_rect)
+        if let Some(g) = m["glass"].as_array().filter(|g| !g.is_empty()) {
+            let rs = px_rects(&json!(g), scale);
+            if !rs.is_empty() {
+                s.plate = Some((rs.iter().map(|r| r.0).min().unwrap(), rs.iter().map(|r| r.1).min().unwrap(), rs.iter().map(|r| r.2).max().unwrap(), rs.iter().map(|r| r.3).max().unwrap()));
+            }
+        }
         if m["glass"].is_array() {
             // absent mid-morph: the page is streaming the glass frame by frame then
             winstyle::set_glass(s.hwnd(), &px_rects(&m["glass"], scale));
@@ -42,6 +49,16 @@ impl Host {
         // otherwise a later resize leaves the window hanging off the screen.
         let settled = m["settled"].as_bool().unwrap_or(true);
         if s.phase == Phase::Waiting && !settled {
+            return;
+        }
+        // `morc card <id> size --center`: the new size is known now, so glide to the centre of its display
+        if s.phase == Phase::Visible && s.recenter {
+            s.recenter = false;
+            if let Some(to) = super::cards::centered(s) {
+                if let Some(r) = s.rect() {
+                    s.mv = Some(Move { from: (r.l, r.t), to, start: Instant::now() });
+                }
+            }
             return;
         }
         if s.phase == Phase::Visible && s.mv.is_none() && !s.life.dragging {
@@ -112,6 +129,13 @@ impl Host {
                 s.send(&json!({"t": "align", "right": right}));
             }
             winstyle::show_topmost_noactivate(s.hwnd());
+            if s.depth > 0 {
+                // a card brought back from its record keeps its place in the stack
+                if let Some(r) = s.content_rect() {
+                    s.depth = winstyle::set_depth(s.hwnd(), s.depth, r);
+                }
+                s.send(&json!({"t": "layer", "below": s.depth > 0, "depth": s.depth}));
+            }
             s.phase = Phase::Visible;
             s.phase_since = Instant::now();
             s.life.restart(s.opts.ttl, s.opts.sticky || s.opts.urgent, Instant::now());

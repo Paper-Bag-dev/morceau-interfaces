@@ -6,6 +6,10 @@ use std::path::PathBuf;
 
 pub const HOST: &str = "127.0.0.1";
 pub const PORT: u16 = 47831;
+/// The command port: PORT, or MORC_PORT (a second host beside the live one, e.g. a test build with its own HOME).
+pub fn port() -> u16 {
+    std::env::var("MORC_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(PORT)
+}
 
 /// The INSTALL folder: the shipped UI, tools, docs and generic components. MORC_APP, else the nearest folder above the exe that has
 /// ui/index.html (npm and release layouts and `target/release` inside a checkout), else the path in <runtime>/app.txt, else the current folder.
@@ -74,6 +78,10 @@ pub fn components_dir() -> PathBuf {
 }
 pub fn triggers_dir() -> PathBuf {
     home_dir().join("triggers")
+}
+/// Your own plugins, outside the repo (docs/plugins.md): every *.js here loads into every card, like ui/plugins.
+pub fn user_plugins_dir() -> PathBuf {
+    home_dir().join("plugins")
 }
 pub fn prefs_dir() -> PathBuf {
     home_dir().join("prefs")

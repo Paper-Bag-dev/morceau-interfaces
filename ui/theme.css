@@ -55,22 +55,14 @@ body { color: hsl(var(--ink)); cursor: default; }
 #stage { position: absolute; left: 0; top: 0; width: max-content; max-width: 3000px; padding: 36px 44px 24px 24px; }   /* long lines are limited per component (.c-text 420px); big working surfaces (graphs) set their own size */
 #surface { display: block; opacity: 0; min-width: min-content; }   /* the wrap width (max-width) can never squeeze the card below its widest rigid child, e.g. a chart canvas: min-width beats max-width */
 #surface.on { opacity: 1; }
+/* engine layout default (docs/views.md): text breaks inside its box rather than spilling out of it (a long URL, an id) */
+#surface [data-cid] { overflow-wrap: break-word; }
 
 /* Floating text has no card behind it, so it carries its own legibility. */
 /* Backdrops can be split (white page next to a dark video), so an average can't pick one ink: an outline reads on anything. */
 .c-text, .c-kv, .c-prog .top, .c-chart .ttl, .stat { color: hsl(var(--ink)); -webkit-text-stroke: var(--ink-stroke, 2.6px) rgb(var(--ink-shadow) / .62); paint-order: stroke fill; text-shadow: 0 1px 3px rgb(var(--ink-shadow) / .7), 0 0 12px rgb(var(--ink-shadow) / .45); }
 
 .panel { color: hsl(var(--foreground)); background: hsl(var(--card) / .94); border: 1px solid hsl(var(--border)); border-radius: var(--radius); padding: 10px 12px; box-shadow: 0 8px 24px rgb(0 0 0 / .4); }
-
-/* pin: far right, quiet, only on hover. Tilted 45deg so the point faces bottom-left; pinned = pushed straight in. */
-#pin { position: absolute; top: 5px; right: 44px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
-  color: hsl(var(--accent, var(--ring))); background: hsl(var(--ink-shadow) / .0); opacity: 0; pointer-events: none; transition: opacity .2s, color .15s, transform .3s var(--spring), background .25s ease, box-shadow .25s ease; }
-#pin svg { width: 19px; height: 19px; transform: rotate(45deg); transition: transform .35s var(--spring), fill .2s; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
-#stage:is(:hover, .hov) #pin { opacity: .8; pointer-events: auto; }
-#pin:is(:hover, .hov) { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
-#pin:is(:hover, .hov) svg { transform: rotate(35deg); }
-#stage.pinned #pin { opacity: .95; color: hsl(var(--accent, var(--ring))); pointer-events: auto; }
-#stage.pinned #pin svg { transform: rotate(0deg); fill: hsl(var(--accent, var(--ring)) / .4); }
 
 /* urgent: the whole shape gets a ring; it pulses only when the card is also important (opts.importance high/critical) */
 #stage.urgent::before { content: ""; position: absolute; inset: 6px; border-radius: 28px; box-shadow: 0 0 0 1.5px hsl(var(--ring) / .7), 0 0 22px hsl(var(--ring) / .25); pointer-events: none; }
@@ -80,13 +72,6 @@ body { color: hsl(var(--ink)); cursor: default; }
 #stage.dragging .btn { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 
-/* dismiss (x) sits under the pin: same quiet look, hover only. Long-press the pin to pick the whole window up. */
-#dismiss { position: absolute; top: 36px; right: 8px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
-  color: hsl(var(--accent, var(--ring))); background: transparent; opacity: 0; pointer-events: none; transition: opacity .2s, transform .3s var(--spring), background .25s ease, box-shadow .25s ease; }
-#dismiss svg { width: 16px; height: 16px; filter: drop-shadow(0 1px 2px rgb(var(--ink-shadow) / .7)); }
-#stage:is(:hover, .hov) #dismiss { opacity: .7; pointer-events: auto; }
-#dismiss:is(:hover, .hov) { opacity: 1 !important; background: #fff; transform: scale(1.1); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
-#pin.holding { transform: scale(1.25); opacity: 1 !important; background: hsl(var(--accent, var(--ring)) / .35); }
 
 /* 3D model (plugins/model3d.js): just the model and its shadow on a transparent canvas; the read-out is a plate like all raw text */
 .c-model { display: flex; flex-direction: column; gap: 6px; width: max-content; align-self: flex-start; }
@@ -120,3 +105,40 @@ body { color: hsl(var(--ink)); cursor: default; }
 /* inside the page, too: carrying shows the move cursor */
 #stage.dragging, #stage.dragging * { cursor: move !important; }
 
+/* ---------- controls: the card's own buttons (pin, x, layer) ----------
+   ONE place for their look (nothing else may style them), ONE size whatever the card's zoom (core/bridge.js applyZoom cancels it).
+   Laid on an ARC around the card's top-right corner, following its rounded edge: pin on the top edge, x on the diagonal, layer on the
+   right edge. Hidden until the pointer reaches the CORNER: #controls is a generous invisible hot zone there (not the whole card).
+   A state keeps its own button showing: pinned keeps the pin, lowered keeps the layer button. They spring in one after another, spring
+   out, and squeeze when pressed. Everything is a variable, so a preset (ui/preset.css) restyles all three at once:
+   --ctl-size  --ctl-gap (distance from the plate's edge)  --ctl-spread (how far past the corner they fan out)  --ctl-zone (extra reach of the hot zone)  --ctl-bg  --ctl-bg-hover  --ctl-fg  --ctl-ring
+   --ctl-ring-hover  --ctl-blur  --ctl-rest (opacity while shown). */
+#stage { --ctl-size: 24px; --ctl-gap: 10px; --ctl-spread: 6deg; --ctl-zone: 26px;
+  --ctl-bg: hsl(var(--card) / .82); --ctl-bg-hover: hsl(var(--card) / .96); --ctl-fg: hsl(var(--accent, var(--ring)));
+  --ctl-ring: hsl(var(--border) / .7); --ctl-ring-hover: hsl(var(--accent, var(--ring)) / .8); --ctl-blur: 10px; --ctl-rest: .9; }
+/* where each button sits is measured from the plate (core/bridge.js placeControls): on a circle around its top-right corner curve,
+   --ctl-gap away from its edge, fanned --ctl-spread past the corner's two ends. #controls is the corner hot zone around them. */
+#controls { position: absolute; top: 0; right: 0; z-index: 5; pointer-events: auto; width: var(--ctl-zone-w, 110px); height: var(--ctl-zone-h, 110px); }
+.ctl { position: absolute; width: var(--ctl-size); height: var(--ctl-size); padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+  color: var(--ctl-fg); background: var(--ctl-bg); -webkit-backdrop-filter: blur(var(--ctl-blur)) saturate(1.4); backdrop-filter: blur(var(--ctl-blur)) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--ctl-ring), 0 2px 6px rgb(0 0 0 / .28);
+  opacity: 0; transform: scale(.45); pointer-events: none;
+  transition: opacity .16s ease, transform .32s var(--spring), background .25s ease, box-shadow .25s ease; }
+#dismiss { transition-delay: 30ms; }
+#layer { transition-delay: 60ms; }
+.ctl svg { width: calc(var(--ctl-size) * .55); height: calc(var(--ctl-size) * .55); transition: transform .35s var(--spring), fill .2s; }
+/* the corner reached: spring in, one after another */
+#controls:is(:hover, .hov) .ctl { opacity: var(--ctl-rest); transform: scale(1); pointer-events: auto; }
+.ctl:is(:hover, .hov) { opacity: 1 !important; background: var(--ctl-bg-hover); transform: scale(1.12) !important; transition-delay: 0ms;
+  box-shadow: 0 0 0 1px var(--ctl-ring-hover), 0 2px 8px rgb(0 0 0 / .35); }
+.ctl.press { transform: scale(.8) !important; transition-duration: .08s; }   /* squeeze on press (core/bridge.js adds .press) */
+#stage.compact .ctl, #stage.dragging .ctl:not(#pin) { opacity: 0 !important; pointer-events: none !important; }
+/* the icons' own states */
+#pin svg { transform: rotate(45deg); }
+#pin:is(:hover, .hov) svg { transform: rotate(35deg); }
+#pin.holding { transform: scale(1.25) !important; opacity: 1 !important; background: hsl(var(--accent, var(--ring)) / .35); }
+#stage.pinned #pin { opacity: 1; transform: scale(1); pointer-events: auto; }
+#stage.pinned #pin svg { transform: rotate(0deg); fill: hsl(var(--accent, var(--ring)) / .4); }
+#stage.below #layer { opacity: 1; transform: scale(1); pointer-events: auto; }
+#stage.below #layer svg rect { fill: hsl(var(--accent, var(--ring)) / .45); }
+@media (prefers-reduced-motion: reduce) { .ctl { transition: opacity .1s; transform: none !important; } }

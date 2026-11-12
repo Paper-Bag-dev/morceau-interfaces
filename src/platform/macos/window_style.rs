@@ -41,6 +41,30 @@ fn last_pointer() -> &'static Mutex<HashMap<isize, (i32, i32)>> {
     L.get_or_init(Default::default)
 }
 
+/// Cards sent down the window stack (set_depth > 0): the hit test checks whether something covers them at the pointer.
+fn lowered() -> &'static Mutex<std::collections::HashSet<isize>> {
+    static L: OnceLock<Mutex<std::collections::HashSet<isize>>> = OnceLock::new();
+    L.get_or_init(Default::default)
+}
+
+/// Is another app's window in front of this card at this point (points, bottom-left origin, as NSEvent gives it)?
+fn covered_at(w: Id, mouse: CGPoint) -> bool {
+    let mine: isize = unsafe { msg_send![w, windowNumber] };
+    let primary_h = super::sys::screens().first().map(|s| s.frame.size.height).unwrap_or(0.0);
+    let (x, y) = (mouse.x, primary_h - mouse.y);   // window list bounds: points, top-left origin
+    let me = std::process::id() as i32;
+    for win in super::sys::window_list() {
+        if win.number as isize == mine {
+            return false;   // reached the card first: nothing above it here
+        }
+        let b = win.bounds;
+        if win.pid != me && win.layer == 0 && win.alpha > 0.0 && x >= b.origin.x && x < b.origin.x + b.size.width && y >= b.origin.y && y < b.origin.y + b.size.height {
+            return true;
+        }
+    }
+    false
+}
+
 fn shapes() -> &'static Mutex<HashMap<isize, Rects>> {
     static S: OnceLock<Mutex<HashMap<isize, Rects>>> = OnceLock::new();
     S.get_or_init(Default::default)
@@ -65,6 +89,47 @@ pub fn overlay_styles(win: isize) {
     }
     hide(win);
     start_hit_test();
+}
+
+/// Stack depth: 0 = on the floating level above every window; n = on the normal level, just under the n-th window that overlaps the card
+/// (front to back; `rect` = the card's visible plate, physical px). Only overlapping windows count, so every step is a visible change;
+/// with none overlapping, the front-most app window is level 1. Returns the depth applied (clamped to how low it can go).
+pub fn set_depth(win: isize, depth: usize, rect: crate::placement::R) -> usize {
+    let w = win as Id;
+    if w.is_null() {
+        return 0;
+    }
+    const NORMAL_LEVEL: isize = 0;
+    const FLOATING_LEVEL: isize = 3;
+    const BELOW: isize = -1;
+    let me = std::process::id() as i32;
+    let k = super::sys::scale();
+    let apps: Vec<(isize, crate::placement::R)> = super::sys::window_list()
+        .into_iter()
+        .filter(|x| x.layer == 0 && x.pid != me && x.alpha > 0.0)
+        .map(|x| {
+            let b = x.bounds;
+            (x.number as isize, crate::placement::R { l: (b.origin.x * k) as i32, t: (b.origin.y * k) as i32, r: ((b.origin.x + b.size.width) * k) as i32, b: ((b.origin.y + b.size.height) * k) as i32 })
+        })
+        .collect();
+    let mut levels: Vec<isize> = apps.iter().filter(|(_, r)| r.overlap(&rect) > 0).map(|(n, _)| *n).collect();
+    if levels.is_empty() {
+        levels = apps.first().map(|(n, _)| vec![*n]).unwrap_or_default();
+    }
+    let d = depth.min(levels.len());
+    if let Ok(mut l) = lowered().lock() {
+        if d == 0 { l.remove(&win); } else { l.insert(win); }
+    }
+    unsafe {
+        if d == 0 {
+            let _: () = msg_send![w, setLevel: FLOATING_LEVEL];
+            let _: () = msg_send![w, orderFrontRegardless];
+        } else {
+            let _: () = msg_send![w, setLevel: NORMAL_LEVEL];
+            let _: () = msg_send![w, orderWindow: BELOW, relativeTo: levels[d - 1]];
+        }
+    }
+    d
 }
 
 /// Windows swaps the system cursor while a card is carried. macOS has no public system-wide cursor swap, and the native drag loop keeps the
@@ -206,7 +271,10 @@ extern "C" fn hit_test_tick(_: *mut c_void) {
             let s: f64 = msg_send![w, backingScaleFactor];
             let x = (mouse.x - f.origin.x) * s;
             let y = (f.origin.y + f.size.height - mouse.y) * s;
-            let take = wants_mouse(x, y, rects);
+            // on the card's shape AND, for a card sent down the stack, no other app's window in front of it there (it must not react
+            // through the window covering it). Cards on top skip the check: nothing can cover them. (Not windowNumberAtPoint: a card that
+            // ignores the mouse is skipped by it, so the card would never take the mouse back.)
+            let take = wants_mouse(x, y, rects) && !(lowered().lock().map(|l| l.contains(win)).unwrap_or(false) && covered_at(w, mouse));
             // tell the page when the pointer goes onto or off the card (it cannot see that itself in an inactive app)
             let was = hovered().lock().ok().and_then(|h| h.get(win).copied()).unwrap_or(false);
             if was != take {

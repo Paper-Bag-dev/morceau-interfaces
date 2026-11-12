@@ -1,0 +1,24 @@
+/* The look preset (yours): maps the theme's CSS variables (ui/theme.css, ui/tokens, ui/themes.json) onto Tailwind's names, so classes
+   written on the fly ("bg-card text-fg rounded-card") follow the active theme and its daily drift. Change this file, not the engine.
+   The theme stores colors as bare HSL parts ("220 90% 60%", shadcn style), so each one is wrapped in hsl() here.
+   A different look = a different preset: Tailwind's own palette (bg-sky-500 ...) stays available too. */
+@theme inline {
+  --color-accent: hsl(var(--accent));
+  --color-fg: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted-foreground));
+  --color-card: hsl(var(--card));
+  --color-line: hsl(var(--border));
+  --color-ring: hsl(var(--ring));
+  --color-good: hsl(var(--good));
+  --color-warn: hsl(var(--warn));
+  --color-bad: hsl(var(--bad));
+  --color-primary: hsl(var(--primary));
+  --color-primary-fg: hsl(var(--primary-foreground));
+  --radius-card: var(--radius);
+  --font-body: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+/* The card's own buttons (pin, x, layer): set any of these to restyle them, e.g. square and solid:
+   #stage { --ctl-size: 26px; --ctl-bg: hsl(var(--card)); --ctl-ring: transparent; --ctl-blur: 0px; }
+   Full list in ui/theme.css ("The card's own controls"). */

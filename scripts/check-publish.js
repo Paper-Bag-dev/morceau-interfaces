@@ -6,7 +6,11 @@ const { spawnSync } = require('child_process');
 const root = path.resolve(__dirname, '..');
 const problems = [];
 
-if (!fs.existsSync(path.join(root, 'bin', 'morc.exe'))) problems.push('bin/morc.exe is missing: build it first (cargo build --release; node scripts/build-from-source.js)');
+// Every platform the package claims (package.json "os") must carry its engine, or `npx morceau` there fails at once.
+// Windows: scripts/release-build.ps1 on Windows. macOS: scripts/release-build-mac.sh on a Mac (arm64, plus x64 when that target is installed).
+const need = { 'morc.exe': 'Windows x64 (scripts/release-build.ps1)', 'morc-darwin-arm64': 'macOS arm64 (scripts/release-build-mac.sh)' };
+for (const [f, how] of Object.entries(need)) if (!fs.existsSync(path.join(root, 'bin', f))) problems.push(`bin/${f} is missing: build ${how}`);
+if (!fs.existsSync(path.join(root, 'bin', 'morc-darwin-x64'))) console.log('note: no bin/morc-darwin-x64: Intel Macs get a clear "missing" message (rustup target add x86_64-apple-darwin, then rebuild)');
 for (const f of ['.env', 'prefs', 'triggers', 'actions.json']) if (fs.existsSync(path.join(root, f))) problems.push(`${f} exists in the package folder: personal data must not be published (use the personal branch or a separate data folder)`);
 
 const pack = spawnSync('npm', ['pack', '--dry-run', '--json'], { cwd: root, shell: true, encoding: 'utf8' });

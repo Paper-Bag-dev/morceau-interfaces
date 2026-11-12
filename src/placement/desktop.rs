@@ -2,7 +2,21 @@
 //! title. The OS calls are in platform/<os>/desktop.rs; this file adds the snapshot and the placement helpers on top.
 
 use super::R;
-pub use crate::platform::os::desktop::{fg_exe, fg_title, foreground_now, windows_now, work_at};
+pub use crate::platform::os::desktop::{fg_exe, fg_title, foreground_now, scene_now, windows_now, work_at};
+
+/// A display for the scene tree: its full frame and its work area (physical px).
+pub struct Display {
+    pub frame: R,
+    pub work: R,
+}
+
+/// An on-screen window for the scene tree, front to back. `mine` = one of our cards.
+pub struct SceneWin {
+    pub id: i64,
+    pub app: String,
+    pub rect: R,
+    pub mine: bool,
+}
 
 #[derive(Clone)]
 pub struct Foreground {

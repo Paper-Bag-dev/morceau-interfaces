@@ -19,8 +19,9 @@ cache/.sk-*.json
 prefs/wake_flags.json
 # Downloaded Sketchfab models (large, licensed): re-create with `morc sketchfab get <uid>`
 ui/models/assets/
-# Build artefacts (the npm package ships bin/morc.exe built from this source)
+# Build artefacts (the npm package ships bin/morc.exe and bin/morc-darwin-* built from this source)
 bin/morc.exe
+bin/morc-darwin-*
 node_modules/
 *.tgz
 

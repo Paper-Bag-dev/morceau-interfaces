@@ -1,6 +1,6 @@
 # Morceau
 
-**Ephemeral, agent-driven UI for Windows.** An AI agent (or you) shows small, glanceable windows on your screen with one CLI command: a stat card, a chart,
+**Ephemeral, agent-driven UI for Windows and macOS.** An AI agent (or you) shows small, glanceable windows on your screen with one CLI command: a stat card, a chart,
 a form, a yes/no ask, a graph, a 3D model. They are borderless and transparent, sit next to what you are doing without covering it, can be clicked and
 dragged, and then quietly fade away. The engine is a small Rust host; everything it draws is plain web UI served from disk.
 
@@ -9,7 +9,7 @@ dragged, and then quietly fade away. The engine is a small Rust host; everything
         |  morc use stat-card-min --data ...        (one short CLI call, cached components, ~80 tokens)
         v
    morc CLI  --localhost, token-checked-->  Rust host (windows, placement, lifetime, linter)
-                                                  |  WebView2 windows, one per surface
+                                                  |  one window per card (WebView2 / WKWebView), all in ONE web process
                                                   v
                                             ui/ (components, charts, 3D) --clicks, drags--> inbox --> agent (via hooks)
 ```
@@ -27,14 +27,27 @@ dragged, and then quietly fade away. The engine is a small Rust host; everything
   that wakes only when you are at the PC and no interactive session is open, and sets its own next wake).
 - **Agent integration**: Claude Code hooks and a skill, `AGENTS.md` / `CLAUDE.md` for any coding agent, and a generic system prompt (`docs/agent.md`).
 
+- **Trees instead of screenshots** (`morc tree`): the scene (displays, windows front to back, cards, what covers what) and each card's own
+  tree (components, rects, and flags such as `cut`, `clipped`, `empty`), so an agent can check a card without taking a screenshot.
+- **Cards as resources** (`morc card <id> get|set|hide|show|front|lower|raise|move|size`, `morc cards`): hide one for a while, bring it
+  back where it was, make it big and centred, send it under the active window. Nothing pops twice; a closed card comes back with its data.
+- **State**: named actions per card (`morc do`), a store shared by every card (`@/path`), snapshots and an action history on disk.
+- **MCP**: `morc mcp`, seven fixed tools over the same commands.
+- **Your own look and components**: Tailwind classes written on the fly (`"class": "..."`), Preact components, a look preset you own
+  (`ui/preset.css`), plugins in your data folder, `morc refresh` reloads them in open cards without losing their data.
+- **Hands-on**: cards snap to windows, other cards and screen edges while you carry them (never during a fast throw), and step through
+  the window stack with the arrow keys. What changed and when: `CHANGELOG.md`.
+
 ## Requirements
 - Windows 10 or 11 (x64) with the **Microsoft Edge WebView2 Runtime** (preinstalled on Windows 11 and current Windows 10).
+- or macOS (Apple silicon; Intel when the package carries `morc-darwin-x64`): nothing else to install (WKWebView is part of macOS).
+  Window titles in the scene tree need no permission (only app names are read).
 - **Node 16+** only for the npm install path. **Python 3.8+ (`py` launcher)** for the extended commands (`compose`, `cache`, `init`, `place`, `wake`, ...).
-- To build from source: the Rust toolchain (https://rustup.rs) and the MSVC build tools.
+- To build from source: the Rust toolchain (https://rustup.rs) and the MSVC build tools (Windows) or `xcode-select --install` (macOS).
 
 ## Install
-**From npm (prebuilt, recommended)**
-```powershell
+**From npm (prebuilt, recommended; Windows and macOS)**
+```sh
 npm i -g morceau          # adds `morc` (and `morceau`) to your PATH
 morc init                 # creates your data folder, caches the shipped components
 morc use ask-permission   # your first widget
@@ -50,7 +63,7 @@ npm i -g github:Paper-Bag-dev/morceau-interfaces
 ```powershell
 git clone https://github.com/Paper-Bag-dev/morceau-interfaces.git
 cd morceau-interfaces
-cargo build --release                 # target\release\morc.exe
+cargo build --release                 # target\release\morc.exe (macOS: target/release/morc)
 .\target\release\morc.exe init
 ```
 `build.cmd` builds and installs to `%LOCALAPPDATA%\morc\bin\morc.exe`. Put that folder on your PATH, or use the npm install.
@@ -84,20 +97,34 @@ Everything that is yours lives outside the install, so upgrading never touches i
 Per-machine runtime state (token, logs, usage counts, the installed exe) is under `%LOCALAPPDATA%\morc`. The install folder is `MORC_APP` or found from the exe.
 
 ## Shortcuts
-**Keyboard**
-| keys | what it does |
-|---|---|
-| `Ctrl+Alt+X` | dismiss every floating card at once |
-| `Ctrl+Alt+Space` | bring back anything that needed you (parked urgent asks), next to the active window |
+**Keyboard** (system-wide; the arrow keys alone only while the pointer is on a card)
+| Windows | macOS | what it does |
+|---|---|---|
+| `Ctrl+Alt+X` | `Ctrl+Option+X` | dismiss every card at once |
+| `Ctrl+Alt+Space` | `Ctrl+Option+Space` | bring back anything that needed you (parked urgent asks), next to the active window |
+| `Ctrl+Alt+Up` | `Ctrl+Option+Up` | every card to the top of the window stack |
+| `Ctrl+Alt+Down` | `Ctrl+Option+Down` | every card to the bottom of the stack (under every window that overlaps it) |
+| `Up` / `Down` with the pointer on a card | same | step THAT card one window up / down the stack, as far as it can go |
 
-**On a card (mouse)**
+If a combination is already taken (some graphics drivers use `Ctrl+Alt+arrows` to rotate the screen; macOS uses `Ctrl+Option+Space` for the
+next input source when several keyboard layouts are on), it is quietly skipped (host.log says so) and the command still works:
+`morc dismiss-all`, `morc summon`, `morc card <id> raise|lower`. No permission prompt on either system; the arrows are taken only while
+the pointer is on a card and handed back the moment it leaves.
+
+**On a card (mouse), the same on Windows and macOS**
 | gesture | what it does |
 |---|---|
-| hold ~0.1 s on empty space or text (0.2 s on buttons), then drag | pick the card up and move it; the spot is remembered for that topic |
-| hover | pauses the lifetime; a small chart or 3D card grows a little and eases back |
-| pin (top right, shows on hover) | keep the card open; long-press it to pick the card up |
-| x (under the pin) | dismiss this card |
+| hold ~0.1 s on empty space or text (0.2 s on buttons), then drag | carry the card; near a window, another card or the screen edge it snaps on (keeping a small seam, `snap-gap`), slides along it, and lets go when you pull away; a fast throw never snaps. The spot is remembered for that topic |
+| move to the card's top-right corner | its three buttons come out on an arc around the corner (only there, not on the whole card) |
+| pin (first button) | keep the card open; hold it to carry the card |
+| x (second) | dismiss this card |
+| layer (third) | send the card one level down the window stack; click again to bring it back on top |
+| right-click | dismiss this card |
+| hover | pauses the lifetime; a compact card springs open |
 | click anything | extends the lifetime and teaches the annoyance vector what you engage with |
+
+Snap distances, button size and spacing are data, not code: `ui/limits.json` (`snap-px`, `snap-break-px`, `snap-gap`, `snap-max-speed`) and the
+`--ctl-*` variables (`ui/preset.css`).
 
 **Command line (the ones used every day)**
 ```powershell
@@ -110,6 +137,15 @@ morc ui build | list | show NAME | new NAME      # the UI component tree (folder
 morc annoy nudge crowd 0.8 --why "too crowded"   # teach the host what you treat as crowded or too big
 morc commands                                    # every CLI plugin with one line each
 morc dismiss-all   |  morc summon                # the hotkeys, as commands
+morc tree [ID] [--all] [--depth N]               # the scene tree / one card's tree / both merged (flags instead of screenshots)
+morc cards   |  morc card ID get                 # every card the host knows / one card's state (shown, hidden, closed, layer, spot)
+morc card ID hide|show|front|lower|raise         # put away, bring back, front, one step down / up the window stack
+morc card ID move --at X,Y|--center|--snap       # move it (glides); --snap pulls it onto the nearest edge
+morc card ID set '{"frac":0.9,"center":true}'    # the state you want, in one go (state, layer/depth, at, center, frac)
+morc do ID ACTION '{"text":"..."}'               # run a card's named action
+morc patch @shared /focus '"..."'                # the store every card can bind to ("@/focus")
+morc refresh [COMPONENT]                         # reload components / plugins in the open cards, data kept
+morc mcp                                         # the same, as an MCP server (stdio)
 ```
 ## Ten-minute tour
 ```powershell

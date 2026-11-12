@@ -9,7 +9,9 @@ const lim = (k, d) => (typeof limits[k] === 'number' ? limits[k] : d);
 export const limit = lim;   // read a limit by name from other modules (main.js uses it for the attention pulse)
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;   // no hover morph for people who asked for less motion
 
-export const send = (m) => window.ipc && window.ipc.postMessage(JSON.stringify(m));
+// A linked card (opened by the root page, src/surface/root.rs) shares the root's ipc channel: its key tells the host which card spoke.
+const cardKey = new URLSearchParams(location.search).get('k');
+export const send = (m) => window.ipc && window.ipc.postMessage(cardKey ? 'k' + cardKey + '\n' + JSON.stringify(m) : JSON.stringify(m));
 
 const stage = document.getElementById('stage');
 const pin = document.getElementById('pin');
@@ -24,9 +26,44 @@ function applyZoom(z) {
   zoom = z;
   window.__zoom = z;
   document.body.style.zoom = String(z);
+  // the card's own buttons keep ONE size whatever the card's zoom (nested zoom multiplies: 1/z cancels it)
+  const ctl = document.getElementById('controls');
+  if (ctl) ctl.style.zoom = String(1 / z);
   const surf = document.getElementById('surface');
   if (surf) surf.style.maxWidth = view.wrap > 0 ? Math.round(view.wrap / z - 52) + 'px' : '';   // long text wraps to the gap beside the neighbour
   window.dispatchEvent(new Event('morc-zoom'));   // charts repaint at the right resolution
+}
+
+// The card's own buttons on an arc around the plate's top-right corner: the centre of that corner's curve is the circle's centre; each button
+// sits --ctl-gap outside the edge, at 90+spread deg (pin, on the top edge side), 45 deg (x, the diagonal), -spread deg (layer, right edge
+// side). Measured in screen px (the controls cancel the card's zoom), so they hug the plate at any size or zoom. Falls back to the
+// content's box when the card has no plate (a 3D model, bare text).
+function placeControls() {
+  const ctl = document.getElementById('controls');
+  const plate = document.querySelector('#surface .card-plate') || document.querySelector('#surface > *');
+  if (!ctl || !plate) return;
+  const cs = getComputedStyle(stage), num = (n, d) => parseFloat(cs.getPropertyValue(n)) || d;
+  const size = num('--ctl-size', 24), gap = num('--ctl-gap', 6), zone = num('--ctl-zone', 26);
+  const spread = (num('--ctl-spread', 22) * Math.PI) / 180;
+  // plate corner in screen px from the stage's top-right (offset* are layout px, unaffected by transforms; x zoom = screen px)
+  const z = zoom;
+  let x = 0, y = 0;
+  for (let e = plate; e && e !== stage; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; }
+  const right = (stage.clientWidth - (x + plate.offsetWidth)) * z, top = y * z;
+  const R = Math.min(parseFloat(getComputedStyle(plate).borderTopRightRadius) || 0, plate.offsetWidth / 2, plate.offsetHeight / 2) * z;
+  const r = R + gap + size / 2;                        // circle the button centres run on
+  const cx = right + R, cy = top + R;                  // corner curve centre, measured from the stage's top-right
+  const at = (deg) => [cx - r * Math.cos(deg) - size / 2, cy - r * Math.sin(deg) - size / 2];   // [right, top] of a button
+  const spots = { pin: at(Math.PI / 2 + spread), dismiss: at(Math.PI / 4), layer: at(-spread) };
+  let w = 0, h = 0;
+  for (const [id, [rr, tt]] of Object.entries(spots)) {
+    const b = document.getElementById(id);
+    b.style.right = Math.round(rr) + 'px';
+    b.style.top = Math.round(tt) + 'px';
+    w = Math.max(w, rr + size); h = Math.max(h, tt + size);
+  }
+  ctl.style.setProperty('--ctl-zone-w', Math.round(w + zone) + 'px');   // the hot zone: the corner out to the buttons, plus a reach
+  ctl.style.setProperty('--ctl-zone-h', Math.round(h + zone) + 'px');
 }
 
 export function setView(v) {
@@ -172,6 +209,7 @@ function measure() {
     restPending = true;
     Promise.allSettled(running.map((a) => a.finished)).then(() => { restPending = false; setTimeout(measureSoon, 40); });
   }
+  placeControls();
   const sr = stage.getBoundingClientRect();
   // content can overflow its box (wide charts, long rows): measure the real extent, in zoomed px
   const w0 = Math.max(sr.width, stage.scrollWidth * zoom), h0 = Math.max(sr.height, stage.scrollHeight * zoom);
@@ -197,8 +235,13 @@ function measure() {
     });
     const p = pin.getBoundingClientRect();
     rects.push([p.left - sr.left - 3, p.top - sr.top - 3, p.width + 6, p.height + 6, p.width / 2 + 3]);
-    const d = document.getElementById('dismiss').getBoundingClientRect();
-    rects.push([d.left - sr.left - 3, d.top - sr.top - 3, d.width + 6, d.height + 6, d.width / 2 + 3]);
+    for (const id of ['dismiss', 'layer']) {
+      const d = document.getElementById(id).getBoundingClientRect();
+      rects.push([d.left - sr.left - 3, d.top - sr.top - 3, d.width + 6, d.height + 6, d.width / 2 + 3]);
+    }
+    // the corner hot zone that brings the buttons out: part of the window's shape, so the pointer reaching it is seen (macOS hit test)
+    const z = document.getElementById('controls').getBoundingClientRect();
+    rects.push([z.left - sr.left, z.top - sr.top, z.width, z.height, 0]);
   }
   rects = rects.filter((r) => r[2] > 0 && r[3] > 0).map((r) => r.map((n) => Math.round(n)));
   // the first view can arrive before the content: once it is here, a card that should not be compact (or should) switches, no motion
@@ -286,3 +329,18 @@ pin.addEventListener('click', () => {
 
 // Dismiss just this one (counts as "not interested"). Ctrl+Alt+X dismisses everything (host hotkey).
 document.getElementById('dismiss').addEventListener('click', () => send({ t: 'dismiss' }));
+
+// Layer: behind the active window and back. The host owns the state (morc card <id> lower|raise, the scene tree); it answers with
+// {"t":"layer","below"} which sets the look, so a CLI / MCP change shows here too.
+const layerBtn = document.getElementById('layer');
+// squeeze on press, for all three
+for (const b of document.querySelectorAll('#controls .ctl')) {
+  b.addEventListener('pointerdown', () => b.classList.add('press'));
+  for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) b.addEventListener(ev, () => b.classList.remove('press'));
+}
+layerBtn.addEventListener('click', () => send({ t: 'layer', below: !stage.classList.contains('below') }));
+export function setLayer(below) {
+  stage.classList.toggle('below', !!below);
+  layerBtn.title = below ? 'Bring back on top' : 'Send behind the active window';
+  layerBtn.setAttribute('aria-label', layerBtn.title);
+}

@@ -67,3 +67,45 @@ pub fn clock_to_min(s: &str) -> Option<u32> {
 
 /// Current local minutes since midnight (platform/<os>/clock.rs).
 pub use crate::platform::os::clock::local_minutes;
+
+/// Set the value at a JSON pointer ("/a/b/0"), making objects (or arrays, for a numeric next key) on the way.
+pub fn set_pointer(root: &mut serde_json::Value, ptr: &str, val: serde_json::Value) {
+    use serde_json::Value;
+    let keys: Vec<String> = ptr.split('/').skip(1).map(|k| k.replace("~1", "/").replace("~0", "~")).collect();
+    if keys.is_empty() {
+        *root = val;
+        return;
+    }
+    let mut cur = root;
+    for (i, k) in keys.iter().enumerate() {
+        let last = i == keys.len() - 1;
+        if !cur.is_object() && !cur.is_array() {
+            *cur = Value::Object(Default::default());
+        }
+        let next_default = || if keys.get(i + 1).map(|n| n.parse::<usize>().is_ok()).unwrap_or(false) { Value::Array(vec![]) } else { Value::Object(Default::default()) };
+        cur = match cur {
+            Value::Array(a) => {
+                let Ok(n) = k.parse::<usize>() else { return };
+                while a.len() <= n {
+                    a.push(Value::Null);
+                }
+                if last {
+                    a[n] = val;
+                    return;
+                }
+                if a[n].is_null() {
+                    a[n] = next_default();
+                }
+                &mut a[n]
+            }
+            Value::Object(m) => {
+                if last {
+                    m.insert(k.clone(), val);
+                    return;
+                }
+                m.entry(k.clone()).or_insert_with(next_default)
+            }
+            _ => return,
+        };
+    }
+}

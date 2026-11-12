@@ -8,14 +8,20 @@
 <body>
 <div id="stage">
   <div id="surface"></div>
-  <button id="pin" data-nodrag title="Keep this open" aria-label="Pin">
+  <!-- the card's own buttons: one stack, one look (ui/theme.css "controls"; a preset restyles all three through --ctl-*) -->
+  <div id="controls">
+  <button id="pin" class="ctl" data-nodrag title="Keep this open" aria-label="Pin">
     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 3h6l-1 7 3 3v2H7v-2l3-3z"/></svg>
   </button>
-  <button id="dismiss" data-nodrag title="Dismiss" aria-label="Dismiss">
+  <button id="dismiss" class="ctl" data-nodrag title="Dismiss" aria-label="Dismiss">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
   </button>
+  <button id="layer" class="ctl" data-nodrag title="Send behind the active window" aria-label="Send behind the active window">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg>
+  </button>
+  </div>
 </div>
-<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/","preact":"./vendor/preact/preact.module.js","preact/hooks":"./vendor/preact/hooks.module.js","htm":"./vendor/preact/htm.module.js"}}</script>
 <script type="module" src="core/main.js"></script>
 </body>
 </html>

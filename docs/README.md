@@ -12,6 +12,13 @@
 | `charts.md` | choosing a chart by the question; the chart kinds and props |
 | `graphs.md` | the node-link graph pipeline: exporter schema, code-graph source, layers and routes |
 | `phases.md` | what exists and what is planned |
+| `process-model.md` | linked cards: one web process for every card, the hidden root page, the switches |
+| `cards.md` | cards as resources: hide, show, move, size, bring back; how records reach disk (the write falloff) |
+| `trees.md` | the scene tree, card trees and the merged view; the flags that replace a screenshot check |
+| `state.md` | card store, shared store, named actions, history and snapshots |
+| `views.md` | Preact components, Tailwind classes, the look preset, the layout rules |
+| `plugins.md` | plugins (yours live outside the repo) and reloading them in place |
+| `mcp.md` | `morc mcp`: the six MCP tools |
 | `../AGENTS.md`, `../CLAUDE.md` | how any coding agent should work on the repository |
 | `../BACKLOG.md` | what is next |
 
