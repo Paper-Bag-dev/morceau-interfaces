@@ -31,7 +31,7 @@ async function releaseCheck() {
 }
 for (const f of ['.env', 'prefs', 'triggers', 'actions.json']) if (fs.existsSync(path.join(root, f))) problems.push(`${f} exists in the package folder: personal data must not be published (use the personal branch or a separate data folder)`);
 
-const pack = spawnSync('npm', ['pack', '--dry-run', '--json'], { cwd: root, shell: process.platform === 'win32', encoding: 'utf8' });
+const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: root, shell: process.platform === 'win32', encoding: 'utf8' });
 try {
   const files = JSON.parse(pack.stdout)[0].files.map((x) => x.path);
   const bad = files.filter((p) => /(^|\/)\.env$|^prefs\/|^triggers\/|^actions\.json$|models\/assets\/|\.log$|selected\.txt$|(^|\/)(\.?token|secrets?|credentials?)(\.|$)/i.test(p));   // a file NAMED token/secret/credentials, not design "tokens" (ui/tokens/, tokens-cards.json); engines come from GitHub

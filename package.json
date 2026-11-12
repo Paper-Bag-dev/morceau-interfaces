@@ -25,10 +25,11 @@
     "arm64"
   ],
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "files": [
     "bin/",
+    "!bin/native/selected.txt",
     "ui/",
     "!ui/models/assets/**",
     "tools/",
@@ -46,9 +47,12 @@
     "README.md",
     "CHANGELOG.md"
   ],
+  "dependencies": {
+    "chalk": "^4.1.2"
+  },
   "scripts": {
-    "prepare": "node scripts/build-from-source.js",
-    "prepublishOnly": "node scripts/check-publish.js"
+    "prepare": "node scripts/npm/build-from-source.js",
+    "prepublishOnly": "node scripts/npm/check-publish.js"
   },
   "keywords": [
     "ui",

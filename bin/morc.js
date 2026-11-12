@@ -1,26 +1,62 @@
 #!/usr/bin/env node
-// Thin launcher so `npx morceau ...` and the global `morc` command work. The real program is the Rust engine for this platform:
-//   Windows x64      bin/morc.exe
-//   macOS arm64/x64  bin/morc-darwin-arm64 / bin/morc-darwin-x64
-const { spawnSync } = require('child_process');
+// Entry for `npx morceau` and the global `morc`. The pieces live in bin/launcher/ (README there):
+//   npx morceau                 first time: the installer (Install for Windows / Install for Mac); after that: a short welcome
+//   npx morceau install [--platform windows|mac|macos-arm64|macos-x64]    install or update (setup is an alias)
+//   npx morceau <command> ...   runs the engine: the installed one in the runtime folder, else a build in bin/native/ (a dev checkout)
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
+const { detect } = require('../scripts/npm/platforms.js');
+const places = require('./launcher/places.js');
+const { install } = require('./launcher/install.js');
+const { welcome } = require('./launcher/welcome.js');
+const s = require('./launcher/style.js');
 
 const root = path.resolve(__dirname, '..');
-const name = process.platform === 'win32' ? 'morc.exe' : process.platform === 'darwin' ? `morc-darwin-${process.arch}` : null;
-if (!name) {
-  console.error('morc runs on Windows 10/11 and macOS (it draws WebView2 / WKWebView windows).');
-  process.exit(1);
+const version = require(path.join(root, 'package.json')).version;
+const prefix = process.env.npm_command === 'exec' ? 'npx morceau' : 'morc';
+
+function takeFlag(args, name) {
+  const i = args.indexOf(name);
+  if (i < 0) return null;
+  const v = args[i + 1];
+  args.splice(i, 2);
+  return v || null;
 }
-const exe = path.join(__dirname, name);
-if (!fs.existsSync(exe)) {
-  console.error(`${name} is missing from this install (no prebuilt engine for ${process.platform}-${process.arch} in this package).\n` +
-    '  From a git clone: cargo build --release   (then: node scripts/build-from-source.js)\n' +
-    '  Or build from git: npm i -g github:Paper-Bag-dev/morceau-interfaces   (needs the Rust toolchain)');
-  process.exit(1);
+
+/**
+ * The engine to run and whether it needs MORC_APP: the installed one, else a local build ONLY inside a git checkout of the repo (dev).
+ * The npm package also carries a build in bin/native/, but that is what the installer copies from; running it straight from the npx
+ * cache would put the user's data there, so for a package user "not installed" means: show the installer.
+ */
+function engine() {
+  if (fs.existsSync(places.bin)) return { exe: places.bin, app: places.read(places.appTxt) ? null : root };
+  const dev = fs.existsSync(path.join(root, 'Cargo.toml'));   // Cargo.toml is not in the npm package "files"
+  const here = detect();
+  const local = here && path.join(__dirname, 'native', here.key, here.exe);
+  if (dev && local && fs.existsSync(local)) return { exe: local, app: root };
+  return null;
 }
-const r = spawnSync(exe, process.argv.slice(2), {
-  stdio: 'inherit',
-  env: { ...process.env, MORC_APP: root, MORC_BIN: exe },   // the install folder (ui/, tools/, docs/) is this package; tools find the exe the same way
-});
-process.exit(r.status === null ? 1 : r.status);
+
+(async () => {
+  const args = process.argv.slice(2);
+  const want = takeFlag(args, '--platform');
+  const cmd = args[0];
+
+  if (cmd === 'install' || cmd === 'setup') process.exit(await install(root, version, want));
+  if (cmd === '-v' || cmd === '--version' || cmd === 'version') { console.log(version); return; }
+
+  const e = engine();
+  if (!cmd) {
+    if (e) return welcome(version, prefix);
+    process.exit(await install(root, version, want));
+  }
+  if (!e) {
+    console.log(`\n  ${s.bold('Morceau is not installed yet.')} Run ${s.cmd(prefix === 'morc' ? 'morc install' : 'npx morceau')} and pick Install for Windows or Install for Mac.\n`);
+    process.exit(1);
+  }
+  const env = { ...process.env, MORC_BIN: e.exe };
+  if (e.app) env.MORC_APP = e.app;
+  const r = spawnSync(e.exe, args, { stdio: 'inherit', env });
+  process.exit(r.status === null ? 1 : r.status);
+})();
