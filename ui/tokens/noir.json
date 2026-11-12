@@ -1,0 +1,15 @@
+{
+  "about": "noir skin: radii, paddings, type. Colors: ui/themes.json skins.noir.",
+  "nr-card-radius": "24px",
+  "nr-inner-radius": "18px",
+  "nr-pad": "18px 20px",
+  "nr-btn-h": "34px",
+  "nr-btn-pad": "6px 16px",
+  "nr-btn-size": "14px",
+  "nr-title-size": "17px",
+  "nr-hero-size": "44px",
+  "nr-num-weight": "300",
+  "nr-row-pad": "12px 4px",
+  "nr-ctl-size": "30px",
+  "nr-prog-h": "6px"
+}

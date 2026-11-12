@@ -14,7 +14,8 @@
     "teal": "174 72% 48%",
     "glacier": "199 92% 74%",
     "system": "14 90% 63%",
-    "ember": "22 100% 66%"
+    "ember": "22 100% 66%",
+    "ice": "212 100% 80%"
   },
   "base": {
     "background": "240 10% 3.9%",
@@ -226,6 +227,29 @@
       "chart-ink": {
         "dark": "245 245 245",
         "other": "245 245 245"
+      }
+    },
+    "noir": {
+      "about": "Bento fintech dark (user 11-12, from a Dribbble finance dashboard): near-black solid cards with big radii and no borders, one pale-blue gradient hero, huge thin numerals with dim decimals, round dark icon buttons, pill buttons, hairline row dividers, pale-blue to slate charts. Accent 'ice'. Styles: ui/components/noir/; sizes: ui/tokens/noir.json.",
+      "base": {
+        "plate-a": "20 20 22 / .96",
+        "plate-b": "16 16 18 / .96",
+        "nr-raise": "30 30 33",
+        "nr-raise-hover": "38 38 42",
+        "nr-line": "255 255 255 / .07",
+        "nr-text-2": "255 255 255 / .56",
+        "nr-text-3": "255 255 255 / .34",
+        "nr-hero-a": "226 238 255",
+        "nr-hero-b": "150 196 252",
+        "nr-hero-ink": "222 30% 9%",
+        "nr-shadow": "0 0 0 / .5",
+        "fill-ink": "222 30% 9%",
+        "chart-hue-spread": "110",
+        "chart-light-spread": "22"
+      },
+      "chart-ink": {
+        "dark": "235 238 245",
+        "other": "235 238 245"
       }
     }
   }
