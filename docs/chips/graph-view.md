@@ -12,3 +12,5 @@ A node-link graph (code, goals, dependencies, flows) on Cytoscape: draggable nod
 **First-fit fix (11-12):** the first `cy.fit` could run before the canvas had its size and open at max zoom (small graphs, or ones with `x`/`y`). `graph.js` now fits again on the next frame. Prefer the automatic layout over hand-placed `x`/`y` unless a tree really needs it.
 
 **Actions (0.2):** `setGraph {nodes, edges, ...}`, `title {text}`. Run with `morc do <id> <action> '{...}'` or the MCP `do_action` tool; no raw paths needed.
+
+**Re-fit on resize (0.2):** the diagram fits again whenever its canvas changes size (the card's width lock, the idle fold, a host resize), until you zoom or pan it yourself; double-click fits and hands the view back. Before this a graph could stay zoomed into one corner.

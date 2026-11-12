@@ -84,6 +84,11 @@ register('graph', (c, ctx) => {
   fit();
 
   let cy = null, raf = 0, data = null, started = false;
+  // Re-fit whenever the canvas changes size (the card's width lock, the idle fold, a resize from the host), unless the user has zoomed or
+  // panned the diagram themselves (a wheel or a drag on the background); double-click fits again and hands the view back.
+  let userView = false;
+  inner.addEventListener('wheel', () => { userView = true; }, { passive: true });
+  new ResizeObserver(() => { if (cy && !userView) { cy.resize(); cy.fit(undefined, 8); } }).observe(inner);
   const busy = working(el);                                  // blue pulse until the diagram is drawn
 
   // one-time explainer, same loop as the unfamiliar chart kinds
@@ -159,7 +164,8 @@ register('graph', (c, ctx) => {
       info.textContent = `${n.id()}   uses ${n.outgoers('node:childless').length}, used by ${n.incomers('node:childless').length}`;
     });
     cy.on('mouseout', 'node:childless', () => { cy.elements().removeClass('dim hl'); info.textContent = HINT; });
-    cy.on('dbltap', (ev) => { if (ev.target === cy) cy.animate({ fit: { padding: 8 } }, { duration: 300 }); });
+    cy.on('dbltap', (ev) => { if (ev.target === cy) { userView = false; cy.animate({ fit: { padding: 8 } }, { duration: 300 }); } });
+    cy.on('dragpan', () => { userView = true; });
 
     // the route: marching dashes (the one self-moving thing); stops when the surface goes away
     if (!reduced && flow.length > 1) {
