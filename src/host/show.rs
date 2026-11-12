@@ -51,7 +51,7 @@ impl Host {
             state::restore(&id, &mut data);   // the last snapshot wins over the spec's starting data
         }
         let mut payload = json!({"t": "init", "id": id, "components": components, "data": data,
-                             "opts": {"urgent": opts.urgent, "pulse": matches!(opts.importance.as_deref(), Some("high") | Some("critical")), "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme, "align": opts.align, "size": opts.size, "actions": opts.actions, "persist": opts.persist}, "literacy": literacy::snapshot()});
+                             "opts": {"urgent": opts.urgent, "pulse": matches!(opts.importance.as_deref(), Some("high") | Some("critical")), "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme, "align": opts.align, "size": opts.size, "idle": opts.idle, "actions": opts.actions, "persist": opts.persist}, "literacy": literacy::snapshot()});
         if self.root.is_none() {
             payload["shared"] = self.shared.clone();   // unlinked cards start from the host's copy of the shared store
         }

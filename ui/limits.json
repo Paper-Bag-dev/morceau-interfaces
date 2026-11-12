@@ -1,6 +1,7 @@
 {
-  "about": "Minimum and maximum sizes, timings and thresholds the page uses. Leave these alone unless the user points something out or the annoyance vector says so; if you must change one, change it here (or override it in your prefs/ui.json under \"limits\"), never in the code. The host reloads this file by itself. `compact` (user, 11-10): every card first shows at this fraction of its size and grows smoothly to full size on hover (1 = off); `arrive-pulse-ms`: how long a new card's soft glow lasts. `spring-stiffness` / `spring-damping`: the grow/shrink spring (damping near 2*sqrt(stiffness) = no overshoot; lower = bouncier). `shrink-delay-ms`: how long the pointer must be off a grown card before it folds back. `compact-if-taller`: a card whose natural height passes this (logical px) starts compact and opens on hover, like the lists. `arrive-*`: a new card grows from `arrive-from` of its size on a damped spring (lower damping = more overshoot). `snap-px` (12 Nov): a carried card is pulled onto the active window's sides, other cards and the screen edges when within this many css px (0 = off: the OS drag instead); `snap-break-px`: pull it this far from an edge to let go (until then it slides along it); `snap-frame-ms`: how often the host follows the pointer during a carry. `snap-max-speed` (css px per second): a carry faster than this never snaps (a throw to the other end of the screen); it snaps once you slow down. `snap-gap` (css px): the seam a snapped card keeps from the window / card / screen edge it snapped to.",
+  "about": "Minimum and maximum sizes, timings and thresholds the page uses. Leave these alone unless the user points something out or the annoyance vector says so; if you must change one, change it here (or override it in your prefs/ui.json under \"limits\"), never in the code. The host reloads this file by itself. `compact` (user, 11-10): every card first shows at this fraction of its size and grows smoothly to full size on hover (1 = off); `arrive-pulse-ms`: how long a new card's soft glow lasts. `spring-stiffness` / `spring-damping`: the grow/shrink spring (damping near 2*sqrt(stiffness) = no overshoot; lower = bouncier). `shrink-delay-ms`: how long the pointer must be off a grown card before it folds back. `compact-if-taller`: a card whose natural height passes this (logical px) starts compact and opens on hover, like the lists. `arrive-*`: a new card grows from `arrive-from` of its size on a damped spring (lower damping = more overshoot). `idle-min-zoom` (user, 11-11): the zoom floor for a card resting in its idle state (chip opts.idle); the normal min-zoom applies again once it grows. Per-kind overrides (user, 11-11): `<size>.<key>` (size = compact|medium|large|chip) wins over `<key>` for cards of that size. `medium` = working cards you keep clicking (pastes, to-dos, asks): they open fast (`medium.hover-delay-ms`, `medium.reveal-ms`), hold open for a while after the pointer leaves (`medium.shrink-delay-ms`) and need a longer press before a drag starts (`medium.hold-ms`, `medium.hold-ms-control`), so a click is never taken as a drag. `snap-px` (12 Nov): a carried card is pulled onto the active window's sides, other cards and the screen edges when within this many css px (0 = off: the OS drag instead); `snap-break-px`: pull it this far from an edge to let go (until then it slides along it); `snap-frame-ms`: how often the host follows the pointer during a carry. `snap-max-speed` (css px per second): a carry faster than this never snaps (a throw to the other end of the screen); it snaps once you slow down. `snap-gap` (css px): the seam a snapped card keeps from the window / card / screen edge it snapped to.",
   "min-zoom": 0.7,
+  "idle-min-zoom": 0.4,
   "max-zoom": 2.2,
   "hover-grow": 1.25,
   "hover-small-w": 560,
@@ -27,5 +28,10 @@
   "snap-break-px": 30,
   "snap-frame-ms": 8,
   "snap-max-speed": 900,
-  "snap-gap": 12
+  "snap-gap": 12,
+  "medium.hover-delay-ms": 60,
+  "medium.reveal-ms": 220,
+  "medium.shrink-delay-ms": 3000,
+  "medium.hold-ms": 350,
+  "medium.hold-ms-control": 450
 }

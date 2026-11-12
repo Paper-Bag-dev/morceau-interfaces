@@ -78,7 +78,9 @@ html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid rgb(var(
 /* squeezed lists are narrower too: titles cut sooner, and as the card opens the width eases out so more of each title appears */
 #stage.compact .c-list { min-width: var(--compact-list-w, 220px); max-width: var(--compact-list-w, 220px); }
 #stage.compact .c-list { max-height: calc(var(--compact-rows, 4) * (var(--row-min-h, 42px) + 2px + var(--list-gap, 6px)) + var(--compact-peek, 20px)); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
-#stage.compact :is(.c-pastes, .c-check) { max-height: var(--compact-h, 190px); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
+#stage.compact .c-check { max-height: var(--compact-h, 190px); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
+/* paste lists never fold: you work down them, so they always scroll inside the card (a folded one was overflow:hidden and could not scroll; user, 11-11). Make them small with opts.idle instead. */
+#stage.compact .c-pastes { overflow-y: auto; --fade-stop: 0px; }
 /* the card's own buttons (pin, x, layer) are styled in ONE place: ui/theme.css "controls" (restyle them with --ctl-* in a preset) */
 @media (prefers-reduced-motion: reduce) { .card-plate, .card-plate::before, :is(.c-list, .c-pastes, .c-check) { transition: none; } }
 /* glass skin: the pills' inner line is a quiet neutral grey (user, 11-10: an accent line read too glowy); no outer glow on hover */

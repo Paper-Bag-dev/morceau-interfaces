@@ -8,12 +8,13 @@
   ],
   "opts": {
     "min": [
-      640,
-      380
+      300,
+      180
     ],
     "ttl": 120,
     "topic": "viz.graph",
-    "size": "large"
+    "size": "large",
+    "idle": 0.4
   },
   "components": [
     {

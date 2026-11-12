@@ -33,6 +33,10 @@ pub struct Opts {
     /// never squeezed), "large" (charts and graphs: big from the start). Omitted: a plain list starts compact, everything else full.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub size: Option<String>,
+    /// 0..1: while nobody is using the card it rests at this fraction of its size (any kind, graphs included), springs to full size on
+    /// hover and folds back after limits shrink-delay-ms. The page's zoom floor for the resting state is limits idle-min-zoom.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub idle: Option<f64>,
     /// Color theme: a name (ocean, violet, rose, ...), "random", or omitted for topic-matched + daily drift.
     pub theme: Option<String>,
     /// low | normal | high | critical (or a number): scales the surface. Capped to 1/4 of the screen's usable area.

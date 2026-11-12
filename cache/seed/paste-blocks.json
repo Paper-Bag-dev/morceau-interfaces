@@ -15,7 +15,8 @@
     "sticky": true,
     "topic": "handover.pastes",
     "max_frac": 0.8,
-    "size": "medium"
+    "size": "medium",
+    "idle": 0.5
   },
   "components": [
     {
