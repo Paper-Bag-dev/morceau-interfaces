@@ -68,6 +68,26 @@
     "widgets",
     "ephemeral",
     "claude-code",
-    "mcp"
+    "mcp",
+    "ai-agent",
+    "agent-ui",
+    "generative-ui",
+    "llm",
+    "anthropic",
+    "claude-code-plugin",
+    "claude-skills",
+    "desktop-widgets",
+    "floating-window",
+    "notifications",
+    "dashboard",
+    "charts",
+    "windows-11",
+    "fluent",
+    "acrylic",
+    "liquid-glass",
+    "preact",
+    "tailwind",
+    "tool-use",
+    "human-in-the-loop"
   ]
 }
