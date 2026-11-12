@@ -64,24 +64,24 @@
     }
   ],
   "data": {
-    "title": "Last 7 days",
+    "title": "Focus minutes, last 7 days",
     "values": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+      30,
+      45,
+      20,
+      60,
+      50,
+      15,
+      95
     ],
     "labels": [
-      "M",
-      "T",
-      "W",
-      "T",
-      "F",
-      "S",
-      "S"
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun"
     ]
   }
 }

@@ -19,15 +19,19 @@
  "components": {
   "plate": {
    "path": "components/plate",
-   "js": null,
+   "js": "plate.js",
    "css": "plate.css",
    "types": [],
    "deps": [],
    "tokens": [
+    "arrive-glow-ms",
+    "arrive-glow-r",
+    "edge-w",
+    "plate-padding",
     "plate-radius",
-    "plate-padding"
+    "title-align"
    ],
-   "description": "The shared frosted-glass material (grain + dark gradient + blur) that text, stat, progress, kv and chart titles sit on. Style only."
+   "description": "The shared frosted-glass material (grain + dark gradient + blur; on macOS a see-through tint over native Liquid Glass with a light that follows the pointer). Text, stat, progress, kv and chart titles sit on it."
   },
   "button": {
    "path": "components/button",
@@ -37,7 +41,15 @@
     "button"
    ],
    "deps": [],
-   "tokens": [],
+   "tokens": [
+    "btn-max-w",
+    "btn-min-h",
+    "btn-pad-x",
+    "btn-pad-y",
+    "btn-radius",
+    "lens-line-w",
+    "lens-shadow-small"
+   ],
    "description": "Buttons: primary, ghost, icon-only, yes/no, swatches, toggles, ripple and shine."
   },
   "asks": {
@@ -141,7 +153,20 @@
     "list"
    ],
    "deps": [],
-   "tokens": [],
+   "tokens": [
+    "lens-line-w",
+    "lens-shadow",
+    "list-gap",
+    "list-max-w",
+    "list-min-w",
+    "row-gap",
+    "row-min-h",
+    "row-pad-x",
+    "row-pad-y",
+    "row-radius",
+    "row-sub-size",
+    "row-title-size"
+   ],
    "description": "Rows of text, optionally clickable."
   },
   "paste": {
@@ -203,7 +228,13 @@
    "deps": [
     "plate"
    ],
-   "tokens": [],
+   "tokens": [
+    "stat-cols",
+    "stat-gap",
+    "stat-hero-size",
+    "stat-tile-min-w",
+    "stat-tile-pad"
+   ],
    "description": "One hero numeral with a label, unit and optional needle."
   },
   "text": {
@@ -219,10 +250,16 @@
     "plate"
    ],
    "tokens": [
+    "badge-min-h",
+    "badge-pad-x",
+    "badge-pad-y",
+    "badge-radius",
+    "lens-line-w",
+    "lens-shadow-small",
+    "text-radius",
     "text-size",
     "text-size-lg",
-    "text-size-xl",
-    "text-radius"
+    "text-size-xl"
    ],
    "description": "Text, key-value rows and badges."
   }

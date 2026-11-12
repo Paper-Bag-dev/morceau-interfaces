@@ -52,7 +52,7 @@ body { color: hsl(var(--ink)); cursor: default; }
 
 /* The stage shrink-wraps its content no matter how big the (transparent) window currently is.
    Generous padding leaves room for glows, shadows and spring overshoot inside the window shape. */
-#stage { position: absolute; left: 0; top: 0; width: max-content; max-width: 3000px; padding: 36px 44px 24px 24px; }   /* long lines are limited per component (.c-text 420px); big working surfaces (graphs) set their own size */
+#stage { position: absolute; left: 0; top: 0; width: max-content; max-width: 3000px; padding: max(36px, var(--ctl-room, 0px)) max(44px, var(--ctl-room, 0px)) 24px 24px; }   /* --ctl-room: space for the corner buttons at any zoom (core/bridge.js placeControls) */   /* long lines are limited per component (.c-text 420px); big working surfaces (graphs) set their own size */
 #surface { display: block; opacity: 0; min-width: min-content; }   /* the wrap width (max-width) can never squeeze the card below its widest rigid child, e.g. a chart canvas: min-width beats max-width */
 #surface.on { opacity: 1; }
 /* engine layout default (docs/views.md): text breaks inside its box rather than spilling out of it (a long URL, an id) */
@@ -132,7 +132,7 @@ body { color: hsl(var(--ink)); cursor: default; }
 .ctl:is(:hover, .hov) { opacity: 1 !important; background: var(--ctl-bg-hover); transform: scale(1.12) !important; transition-delay: 0ms;
   box-shadow: 0 0 0 1px var(--ctl-ring-hover), 0 2px 8px rgb(0 0 0 / .35); }
 .ctl.press { transform: scale(.8) !important; transition-duration: .08s; }   /* squeeze on press (core/bridge.js adds .press) */
-#stage.compact .ctl, #stage.dragging .ctl:not(#pin) { opacity: 0 !important; pointer-events: none !important; }
+#stage.dragging .ctl:not(#pin) { opacity: 0 !important; pointer-events: none !important; }   /* folded (compact / idle) cards show them too: reaching the corner is the ask */
 /* the icons' own states */
 #pin svg { transform: rotate(45deg); }
 #pin:is(:hover, .hov) svg { transform: rotate(35deg); }

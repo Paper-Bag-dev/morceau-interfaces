@@ -83,9 +83,12 @@
   ],
   "data": {
     "pie": {
-      "title": "Share",
+      "title": "Where the day went",
       "values": [
-        1
+        180,
+        95,
+        60,
+        45
       ],
       "labels": [
         "all"
@@ -93,13 +96,13 @@
       "unit": "M"
     },
     "bars": {
-      "title": "Per day",
+      "title": "Focus per day",
       "values": [
-        0,
-        0,
-        0,
-        0,
-        0
+        30,
+        45,
+        20,
+        60,
+        95
       ],
       "labels": [
         "a",

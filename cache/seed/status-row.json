@@ -86,14 +86,14 @@
     }
   ],
   "data": {
-    "s": "",
+    "s": "Building release",
     "a": {
-      "label": "",
-      "value": 0
+      "label": "Build",
+      "value": 64
     },
     "b": {
-      "label": "",
-      "value": 0
+      "label": "Tests",
+      "value": 30
     }
   }
 }

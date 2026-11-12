@@ -25,7 +25,7 @@ use data::{assets, cache, paths};
 use ipc::{events as ev, protocol, server, transport};
 use learning::{annoyance as prefs, engagement, literacy};
 use placement::{policy, regions, remembered as placed};
-use platform::{backdrop, foreground_watch as fgwatch, hotkeys, window_style as winstyle};
+use platform::{backdrop, foreground_watch as fgwatch, hotkeys, window_style};
 use surface::{actions as handlers, lifetime, lint};
 
 fn main() {

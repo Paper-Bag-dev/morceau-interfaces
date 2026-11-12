@@ -48,6 +48,9 @@ function placeControls() {
   const cs = getComputedStyle(stage), num = (n, d) => parseFloat(cs.getPropertyValue(n)) || d;
   const size = num('--ctl-size', 24), gap = num('--ctl-gap', 6), zone = num('--ctl-zone', 26);
   const spread = (num('--ctl-spread', 22) * Math.PI) / 180;
+  // room for the arc above and beside the plate, whatever the card's zoom: the buttons do not zoom, the card's padding does
+  const room = Math.ceil((gap + size + 4) / zoom);
+  if (stage.style.getPropertyValue('--ctl-room') !== room + 'px') stage.style.setProperty('--ctl-room', room + 'px');
   // plate corner in screen px from the stage's top-right (offset* are layout px, unaffected by transforms; x zoom = screen px)
   const z = zoom;
   let x = 0, y = 0;

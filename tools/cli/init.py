@@ -40,7 +40,11 @@ def main():
                 if '"ok":true' in r.stdout.replace(" ", ""):
                     saved.append(f[:-5])
                 else:
-                    print(f"could not save {f}: {(r.stdout or r.stderr).strip()[:120]}")
+                    # one failure means the host is not reachable, so every other seed would fail the same way: stop and say why once
+                    why = (r.stderr or r.stdout).strip().replace("morc: ", "")[:400]
+                    print(f"morc init stopped: could not save the shipped components because {why}", file=sys.stderr)
+                    print(f"Your data folder is ready at {home}. Fix the above, then run `morc init` again (it is safe to repeat).", file=sys.stderr)
+                    sys.exit(1)
         rec = os.path.join(APP, "cache", "recipes")
         for f in sorted(os.listdir(rec)) if os.path.isdir(rec) else []:     # shipped recipes become cached components too (compose without --use only saves)
             if f.endswith(".json"):

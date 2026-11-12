@@ -1,0 +1,16 @@
+{
+  "about": "Tokens for the tickable checklist. Override in your prefs/tokens/checklist.json.",
+  "check-min-w": "300px",
+  "check-pad": "10px 12px 8px",
+  "check-gap": "8px",
+  "check-size": "18px",
+  "check-track": "3px",
+  "check-count-size": "26px",
+  "check-of-size": "15px",
+  "check-text-size": "15px",
+  "check-sub-size": "12.5px",
+  "check-badge-size": "12.5px",
+  "check-row-pad": "6px 6px",
+  "check-row-gap": "10px",
+  "check-row-radius": "10px"
+}

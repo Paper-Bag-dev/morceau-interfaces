@@ -1,0 +1,7 @@
+{
+  "about": "Tokens for text plates and type sizes. Override in your prefs/tokens/text.json.",
+  "text-size": "15px",
+  "text-size-lg": "18px",
+  "text-size-xl": "26px",
+  "text-radius": "10px"
+}

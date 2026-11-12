@@ -19,7 +19,7 @@ impl Host {
             // the page streams the plate's rect during a grow/shrink, so the native glass follows the spring frame by frame
             "glass" => {
                 if let Some(s) = self.surfaces.get(&key) {
-                    winstyle::set_glass(s.hwnd(), &super::layout::px_rects(&m["glass"], s.window.scale_factor()));
+                    window_style::set_glass(s.hwnd(), &super::layout::px_rects(&m["glass"], s.window.scale_factor()));
                 }
             }
             "hover" => {
@@ -37,7 +37,6 @@ impl Host {
                 if let Some(s) = self.surfaces.get_mut(&key) {
                     s.life.on_hover(on, now);
                 }
-                self.crowd(key, on);
             }
             "pin" => {
                 if let Some(s) = self.surfaces.get_mut(&key) {
@@ -57,7 +56,7 @@ impl Host {
                     s.drag_started = Some(Instant::now());
                     // onStart: tell the agent a carry began ...
                     inbox::push(&s.id, &s.topic, "drag_start", &json!({"from": from.as_ref().map(placed::rect_json), "via": m["src"].as_str().unwrap_or("hold")}));
-                    winstyle::drag_cursor_on(); // pointer becomes the move cursor for the whole carry
+                    window_style::drag_cursor_on(); // pointer becomes the move cursor for the whole carry
                     if super::snap_setting("snap-px", 0.0) > 0.0 {
                         // magnetic carry (snap.rs): the host follows the pointer itself, so it can pull the card onto edges mid-way
                         if let Some(r) = s.rect() {
@@ -74,7 +73,7 @@ impl Host {
             "kbd" => {
                 if let Some(s) = self.surfaces.get_mut(&key) {
                     let on = m["v"].as_bool().unwrap_or(false);
-                    winstyle::set_noactivate(s.hwnd(), !on);
+                    window_style::set_noactivate(s.hwnd(), !on);
                     if on {
                         s.window.set_focus();
                     }

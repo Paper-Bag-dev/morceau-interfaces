@@ -1,2 +1,2 @@
-{"name":"nudge-card","desc":"A passive nudge: one hero number (the value that tripped a trigger) with a label and unit, and a Close. Data: /t/label /t/unit. Used by examples/triggers/minutes-nudge.json.","topic":"nudges","opts":{"min":[200,150],"ttl":14},
- "parts":[{"id":"t","frag":"trigger-stat"},{"id":"c","frag":"close-row"}],"data":{"t":{"label":"Nudge","unit":"min"}}}
+{"name":"nudge-card","desc":"A passive nudge: one hero number (the value that tripped a trigger) with a label and unit. Data: /t/label /t/unit. Used by examples/triggers/minutes-nudge.json.","topic":"nudges","opts":{"min":[200,150],"ttl":14},
+ "parts":[{"id":"t","frag":"trigger-stat"}],"data":{"t":{"label":"Nudge","unit":"min"}}}

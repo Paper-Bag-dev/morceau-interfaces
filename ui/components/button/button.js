@@ -23,6 +23,9 @@ register('button', (c, ctx) => {
   const iconOnly = !!c.icon && !showLabel;
   b.className = ['btn', c.variant || 'secondary', c.shape || '', iconOnly ? 'icon-only' : ''].join(' ').replace(/\s+/g, ' ').trim();
 
+  // tone (user, 11-11): a card picks a button's colour by name from themes.json base tone-* (green, yellow, blue, purple, red);
+  // no tone or "accent" = the accent. The colour is data, never typed here.
+  if (c.tone && c.tone !== 'accent') { b.dataset.tone = c.tone; b.style.setProperty('--btn-tone', `var(--tone-${c.tone})`); }
   if (c.swatch) { b.classList.add('swatch'); b.style.setProperty('--sw', c.swatch); }                  // a colour dot (needs a title): repaint/choose-a-colour controls
   if (c.pressed) ctx.bind(c.pressed, (v) => b.classList.toggle('on', c.pressed.eq !== undefined ? v === c.pressed.eq : !!v && v !== '0'));   // {bind, eq} = selected when the value equals eq                  // shows the state of a toggled value
   const ic = c.icon ? icon(c.icon, iconOnly ? 15 : 13) : null;

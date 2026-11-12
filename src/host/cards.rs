@@ -74,7 +74,7 @@ impl Host {
         let Some(s) = self.surfaces.get_mut(&key) else { return 0 };
         if s.phase == Phase::Visible {
             if let Some(r) = s.content_rect() {
-                s.depth = winstyle::set_depth(s.hwnd(), depth, r);
+                s.depth = window_style::set_depth(s.hwnd(), depth, r);
             }
         } else {
             s.depth = depth;   // hidden: applied when it is shown again
@@ -310,7 +310,7 @@ impl Host {
         match op {
             "hide" => {
                 if s.phase == Phase::Visible {
-                    winstyle::hide(s.hwnd());
+                    window_style::hide(s.hwnd());
                     s.phase = Phase::Hidden;
                     s.phase_since = now;
                     s.mv = None;
@@ -322,14 +322,14 @@ impl Host {
                     s.phase_since = now;
                     s.life.restart(s.opts.ttl, s.opts.sticky || s.opts.urgent, now);
                 }
-                winstyle::show_topmost_noactivate(s.hwnd());
+                window_style::show_topmost_noactivate(s.hwnd());
                 if op == "front" && s.depth > 0 {
                     s.depth = 0;   // "bring it to the front" means on top again
                     s.send(&json!({"t": "layer", "below": false, "depth": 0}));
                 }
                 if s.depth > 0 {
                     if let Some(r) = s.content_rect() {
-                        s.depth = winstyle::set_depth(s.hwnd(), s.depth, r);   // shown again, at its place in the stack
+                        s.depth = window_style::set_depth(s.hwnd(), s.depth, r);   // shown again, at its place in the stack
                     }
                 }
                 // hiding dropped the click-through shape: the page measures again and the host sets it back (layout.rs)

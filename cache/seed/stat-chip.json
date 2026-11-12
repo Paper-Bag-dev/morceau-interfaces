@@ -56,8 +56,8 @@
     }
   ],
   "data": {
-    "label": "",
-    "value": 0,
-    "unit": ""
+    "label": "Focus today",
+    "value": 95,
+    "unit": "min"
   }
 }

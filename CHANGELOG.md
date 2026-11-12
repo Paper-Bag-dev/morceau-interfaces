@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 (unreleased)
+## 0.3.0 (unreleased)
 
 The redesign: Morceau runs on macOS as well as Windows, every card is a resource you can read and change, and a check of what is on
 screen no longer needs a screenshot.

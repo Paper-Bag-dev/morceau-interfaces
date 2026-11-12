@@ -12,7 +12,7 @@ use crate::{
     protocol::{Opts, Request},
     server, sources,
     surface::{Move, Phase, Surface},
-    util, wake, winstyle,
+    util, wake, window_style,
 };
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -25,7 +25,6 @@ use tao::{
 
 mod uidata;
 mod view;
-mod crowd;
 mod ipc;
 mod layout;
 mod show;
@@ -75,7 +74,7 @@ pub fn run() -> ! {
     let listener = match crate::transport::listen() {
         Ok(l) => l,
         Err(e) => {
-            // another host owns the endpoint, or it could not be made: say which, in the log too (a detached host has no console)
+            // the CLI starts the host with no console, so the reason has to go to host.log or nobody ever sees it
             let why = if e.kind() == std::io::ErrorKind::AddrInUse { "already running".to_string() } else { format!("cannot open {}: {e}", crate::transport::describe()) };
             util::log(&format!("host not started: {why}"));
             eprintln!("morc host {why}");
@@ -109,9 +108,9 @@ pub fn run() -> ! {
         });
     }
     fgwatch::install(proxy.clone());
-    winstyle::watch_hover(proxy.clone());
+    window_style::watch_hover(proxy.clone());
     crate::hotkeys::spawn(proxy.clone());
-    winstyle::drag_cursor_off(); // in case a previous host died mid-carry with the move cursor installed
+    window_style::drag_cursor_off(); // in case a previous host died mid-carry with the move cursor installed
     cache::write_registry();
     util::log(&format!("host started ({})", crate::transport::describe()));
 
@@ -122,7 +121,7 @@ pub fn run() -> ! {
         }
         host.tick(target);
         if host.quit {
-            winstyle::drag_cursor_off(); // never leave the move cursor behind
+            window_style::drag_cursor_off(); // never leave the move cursor behind
         }
         *flow = if host.quit { ControlFlow::Exit } else { host.next_flow() };
     })
@@ -386,7 +385,7 @@ impl Host {
                 self.by_id.remove(&s.id);
                 sources::drop_surface(&s.id);
             }
-            winstyle::hide(s.hwnd());
+            window_style::hide(s.hwnd());
         }
     }
 

@@ -62,12 +62,18 @@
     }
   ],
   "data": {
-    "title": "Share",
+    "title": "Where the day went",
     "values": [
-      1
+      180,
+      95,
+      60,
+      45
     ],
     "labels": [
-      "all"
+      "Work",
+      "Study",
+      "Gym",
+      "Video"
     ]
   }
 }

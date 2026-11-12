@@ -1,0 +1,7 @@
+{
+  "about": "Tokens for the chart component. Read as CSS variables (--chart-min-w ...) and by the chart code; override in your prefs/tokens/chart.json.",
+  "chart-min-w": "200px",
+  "chart-title-size": "15px",
+  "chart-canvas-radius": "22px",
+  "chart-text-floor": "14"
+}

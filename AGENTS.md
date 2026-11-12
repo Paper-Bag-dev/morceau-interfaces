@@ -1,4 +1,4 @@
-﻿# AGENTS.md: working on Morceau (for any coding agent)
+# AGENTS.md: working on Morceau (for any coding agent)
 
 Morceau is a host for Windows and macOS that shows borderless, transparent, self-expiring UI windows ("surfaces", cards) driven by an AI agent
 through a CLI (`morc`) or MCP (`morc mcp`). Rust engine (tao + wry: WebView2 on Windows, WKWebView on macOS) + an ES-module web UI served from disk
@@ -56,8 +56,8 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
     layouts are on; the CLI (`morc summon`) always works.
 - **Known gaps (see BACKLOG.md):**
   - Clicking a card activates morc (a plain NSWindow cannot be a non-activating panel). Fixing it means turning the window into an NSPanel.
-  - The npm launcher (`bin/morc.js`), `build.cmd`, `scripts/release-build.ps1` and CI are still Windows-only. On a Mac, build with `cargo build --release`
-    and run `target/release/morc`.
+  - Builds are per platform: `scripts/windows/`, `scripts/macos/`; the npm launcher and CI release (`.github/workflows/release.yml`)
+    cover both. Gatekeeper signing for the macOS binary is still to do.
 - **Also changed on this branch (both platforms):**
   - Every card sits on ONE plate by default: `ui/core/render.js` gives a layout root (column, row, panel) the `.card-plate` class, styled in
     `ui/components/plate/plate.css`; pieces inside go flat, and an urgent ring hugs the plate. `"plate": false` on the root opts out. `layout` now

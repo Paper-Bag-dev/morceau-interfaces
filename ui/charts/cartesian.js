@@ -1,10 +1,18 @@
 ﻿// line / area / spark / bar: trends and comparisons over an ordered axis.
 import { base, palette, easeOutBack, easeOutCubic, stagger, label, fmt, ink, measure } from './util.js';
+import { limit } from '../core/bridge.js';
 
 const PAD = 10;
 
 // A bar chart is exactly as wide as its bars and labels need (a slot per bar wide enough for its label, plus padding), never a default
 // width with an empty strip that the window can cut off. Few bars make a narrow chart, many bars a wider one. Other kinds keep the default.
+// the key part of a line / area / bar chart: the same chart drawn narrower (limits chart-key-frac of its width); hovering widens it to
+// the full width and labels every value (key + detail, docs/theme-rules.md 14). Sparks are already their own key.
+export function keyWidth(s) {
+  if (s.kind === 'spark') return 0;
+  return Math.round((s.c.width || 280) * limit('chart-key-frac', 0.62));
+}
+
 export function width(s) {
   if (s.kind !== 'bar' || !(s.labels && s.labels.length)) return 0;
   const longest = Math.max(0, ...s.labels.map((l) => measure(l, 9.5)));

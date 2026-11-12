@@ -36,7 +36,7 @@
 | `main.rs`, `client.rs`, `server.rs`, `protocol.rs` | entry; the CLI; the localhost server; the request and option types |
 | `host.rs`, `surface.rs`, `lifetime.rs` | the long-lived host and its event loop; one WebView window; expiry and engagement rules |
 | `placement.rs`, `regions.rs`, `policy.rs` | scored placement; the free-region model and alignment; the data-driven placement policy |
-| `winstyle.rs`, `fgwatch.rs`, `hotkeys.rs`, `backdrop.rs` | window shape and style; active-window events; global hotkeys; backdrop sampling |
+| `src/platform/<os>/` (`window_style`, `foreground_watch`, `hotkeys`, `backdrop`) | window shape and style; active-window events; global hotkeys; backdrop sampling |
 | `lint.rs`, `handlers.rs`, `actions` | the spec linter; the action allowlist runner |
 | `cache.rs`, `prefs.rs`, `placed.rs`, `engagement.rs`, `literacy.rs` | cached components; the preference vector; remembered spots; behaviour log; what the user has learned |
 | `anticipate.rs`, `sources.rs`, `worker.rs`, `wake.rs`, `inbox.rs` | triggers and wake flags; live data sources; the chore agent settings and gates; waking an agent; the event inbox |

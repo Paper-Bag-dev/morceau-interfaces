@@ -1,5 +1,5 @@
 {
-  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes. `platforms.<os>` (mac, win) is laid over the rest on that system: its own default accent, accents, base and schemes. `skin` names a material set the CSS keys off (html[data-skin=...]): none = the default plates; `glass` = see-through tint, grain, glints and dark lens pills (on macOS over native Liquid Glass). To swap the accent: set `default` (or platforms.<os>.default, or prefs/ui.json themes.default) to any name in `accents`, or add your own; every accent-colored thing (buttons, badges, the compact edge, the pin nub, the glass lens lines and glow) follows it. `skin` can be several words, laid on in order: `\"glass\"` or `\"glass flat\"` (no texture).",
+  "about": "Colors as data. `accents` are the named accent themes (HSL), `default` the one used unless a card asks for another, `base` the CSS color variables of the dark glass look (text colors ink / foreground included), `schemes` what changes when the page behind is dark, light or mid, `chart-ink` the RGB the chart canvases draw their text in on dark or light cards. Override any key in your prefs/ui.json under \"themes\"; the host reloads this file by itself when it changes. `platforms.<os>` (mac, win) is laid over the rest on that system: its own default accent, accents, base and schemes. `skin` names a material set the CSS keys off (html[data-skin=...]): none = the default plates; `glass` = see-through tint, grain, glints and dark lens pills (on macOS over native Liquid Glass). To swap the accent: set `default` (or platforms.<os>.default, or prefs/ui.json themes.default) to any name in `accents`, or add your own; every accent-colored thing (buttons, badges, the pin nub, the glass lens lines and glow) follows it. `skin` can be several words, laid on in order: `\"glass\"` or `\"glass flat\"` (no texture). `tone-*` (base): the named colours a button can pick in its card JSON (\"tone\": \"green\"); no tone = the accent. `tone-cycle` (base): filled buttons with no tone take these in order, one per button in a card (the first stays the accent).",
   "default": "coral",
   "accents": {
     "ocean": "199 89% 58%",
@@ -38,9 +38,15 @@
     "plate-b": "33 29 27 / .86",
     "plate-edge": "255 255 255 / .08",
     "sheen": "255 255 255 / 0",
-    "compact-dim": "0 0 0 / .16",
     "ghost-btn": "255 255 255 / .14",
-    "chip-caption": "200 200 205 / .62"
+    "chip-caption": "200 200 205 / .62",
+    "compact-dim": "0 0 0 / .16",
+    "tone-green": "146 55% 46%",
+    "tone-yellow": "44 88% 56%",
+    "tone-blue": "212 82% 62%",
+    "tone-purple": "266 68% 68%",
+    "tone-red": "6 72% 58%",
+    "tone-cycle": "accent green blue purple yellow"
   },
   "schemes": {
     "mid": {},
@@ -128,9 +134,7 @@
         "lens-line": "200 200 205 / .15",
         "lens-line-hover": "215 215 220 / .26",
         "pal-deep-sat": "0.8",
-        "pal-deep-light": "6",
-        "yes-fill": "146 58% 40%",
-        "no-fill": "9 62% 50%"
+        "pal-deep-light": "6"
       },
       "chart-ink": {
         "dark": "245 240 236",

@@ -69,12 +69,32 @@ html[data-skin~="glass"] .card-plate { border: var(--edge-w, 1px) solid rgb(var(
   transition: opacity var(--compact-fade-ms, 380ms) ease; }
 #stage.compact .card-plate::before { opacity: 1; }
 /* (no accent glow inside the plate: it colored the glass; user, 11-10) */
-#stage.compact .card-plate { border: var(--compact-border-w, 1.5px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--compact-edge-a, 70%), transparent); border-radius: var(--compact-radius, 30px); }
+/* folded edge (user, 11-11): not a solid orange line but a faint accent rim with a light streak that travels slowly round it and fades
+   out at its tail, so the edge glints and disappears at a corner. Every folded card, any size. Sizes / speed: tokens/plate.json edge-shimmer-*. */
+@property --edge-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+#stage.compact .card-plate { border: var(--compact-border-w, 1.5px) solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-base-a, 14%), transparent); border-radius: var(--compact-radius, 30px); }
+.card-plate::after { content: ''; position: absolute; inset: calc(-1 * var(--compact-border-w, 1.5px)); border-radius: inherit; padding: var(--compact-border-w, 1.5px); pointer-events: none;
+  background: conic-gradient(from var(--edge-ang), transparent 0deg, transparent calc(360deg - var(--edge-shimmer-arc, 110deg)),
+    color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-shimmer-a, 55%), transparent) calc(360deg - var(--edge-shimmer-arc, 110deg) / 3),
+    color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-shimmer-a, 55%), white 25%) 352deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: edge-shimmer var(--edge-shimmer-ms, 9s) linear var(--edge-shimmer-laps, 1) forwards,
+    edge-fade var(--edge-fade-ms, 900ms) ease calc(var(--edge-shimmer-ms, 9s) * var(--edge-shimmer-laps, 1) - var(--edge-fade-ms, 900ms)) forwards; }
+/* the streak goes round a set number of laps on arrival, then fades away for good (user, 11-11: it must die after a while) */
+@keyframes edge-shimmer { to { --edge-ang: 360deg; } }
+@keyframes edge-fade { to { opacity: 0; } }
+/* the streak lives on every plate from its arrival (so folding again after a hover never restarts it) and only shows while folded */
+#stage:not(.compact) .card-plate::after { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .card-plate::after { animation: none; opacity: 0; } }
 @property --fade-stop { syntax: '<length>'; inherits: false; initial-value: 0px; }
-:is(.c-list, .c-pastes, .c-check, .c-asks) { max-height: var(--full-h, none); --fade-stop: 0px;
+:is(.c-list, .c-pastes, .c-check, .c-asks, .c-text:not(.lg)) { max-height: var(--full-h, none); --fade-stop: 0px;
   -webkit-mask-image: linear-gradient(to bottom, black calc(100% - var(--fade-stop)), transparent); mask-image: linear-gradient(to bottom, black calc(100% - var(--fade-stop)), transparent);
   transition: max-height var(--reveal-ms, 380ms) var(--ease-out), --fade-stop var(--reveal-ms, 380ms) ease, min-width var(--reveal-ms, 380ms) var(--ease-out), max-width var(--reveal-ms, 380ms) var(--ease-out); }
-:is(.c-list, .c-pastes, .c-check, .c-asks).revealing { overflow: hidden; }
+:is(.c-list, .c-pastes, .c-check, .c-asks, .c-text:not(.lg)).revealing { overflow: hidden; }
+/* folded text (user, 11-11): a long paragraph shows its first lines (compact-text-lines) and fades out; hovering slides the rest open */
+/* open, a paragraph is at most text-open-w wide; folded it is a smaller box (compact-text-w), so hovering grows it right AND down at once */
+.c-text:not(.lg) { max-width: var(--text-open-w, 560px); }
+#stage.compact .c-text:not(.lg) { max-width: var(--compact-text-w, 300px); max-height: calc(var(--compact-text-lines, 2) * 1.45em); overflow: hidden; --fade-stop: 1.1em; }
 /* squeezed lists are narrower too: titles cut sooner, and as the card opens the width eases out so more of each title appears */
 #stage.compact .c-list { min-width: var(--compact-list-w, 220px); max-width: var(--compact-list-w, 220px); }
 #stage.compact .c-list { max-height: calc(var(--compact-rows, 4) * (var(--row-min-h, 42px) + 2px + var(--list-gap, 6px)) + var(--compact-peek, 20px)); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
@@ -97,9 +117,6 @@ html[data-skin~="glass"] :is(.c-check .row, .c-pastes .paste):is(:hover, .hov) {
 /* skin word "flat" (e.g. skin "glass flat"): the same glass without texture: no grain, no glints, no pointer light */
 html[data-skin~="flat"] { --grain: none; --grain-dark: none; --specks: none; }
 html[data-skin~="flat"] .card-plate { --sheen: 0 0 0 / 0; --glass-glow: 0 0 0 / 0; }
-/* the accent edge marks a compact LIST card only (squeezed: thick and glowing; grown: thin). Chips, working cards and charts stay neutral. */
-html[data-skin~="glass"] #stage[data-size="compact"] .card-plate, html[data-skin~="glass"] #stage:not([data-size]) .card-plate:has(.c-list) {
-  border-color: color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--edge-a, 28%), transparent); }
 /* chips (opts.size "chip": stats, short status): simple and rectangular, fit anywhere. Several stats run in ONE row, plain on the plate
    (no tiles): a grey caption under a white hero numeral. */
 #stage[data-size="chip"] .row:has(> .stat + .stat) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(var(--chip-stat-min-w, 92px), 1fr); gap: var(--chip-stat-gap, 4px); }
@@ -126,12 +143,10 @@ html[data-skin~="glass"] .c-check .row:nth-child(4n+3).done .box { background: h
 #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+2) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-3) / .8); }
 #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+3) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-5) / .8); }
 #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat:nth-child(4n+4) { box-shadow: inset 0 calc(-1 * var(--chip-line-w, 2px)) 0 hsl(var(--pal-2) / .8); }
-/* yes / no: a rich deep green and a deep coral-red from the theme (yes-fill, no-fill; user, 11-10: deeper green, not dimmed lime), black text (as specific as the flat-accent button rule, and later, so it wins) */
-html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--yes-fill, var(--pal-3-deep))); color: hsl(var(--fill-ink, 220 30% 6%)); }
-html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { background: hsl(var(--no-fill, var(--pal-1-deep))); color: hsl(var(--fill-ink, 220 30% 6%)); border: 0; }
-/* yes / no stand out a little: a rim a shade DARKER in their own color (user, 11-11), a top highlight, a small shadow (still flat) */
-html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) { border: 1px solid color-mix(in oklab, hsl(var(--yes-fill, 146 58% 40%)) 62%, black); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 3px rgb(0 0 0 / .35); }
-html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { border: 1px solid color-mix(in oklab, hsl(var(--no-fill, 9 62% 50%)) 62%, black); box-shadow: inset 0 1px 0 rgb(255 255 255 / .2), 0 1px 3px rgb(0 0 0 / .35); }
+/* yes / no follow the ACCENT (user, 11-11): yes is the accent fill (button.css, filled buttons), no is a quiet dark lens
+   button with light text and a faint accent rim. Swapping the accent recolors both. */
+html[data-skin~="glass"] .btn.bad:not(.swatch):not(.on):not(.destructive) { background: rgb(var(--lens-center, 6 8 12 / .05)); color: hsl(var(--foreground, 0 0% 98%));
+  border: 1px solid color-mix(in oklab, hsl(var(--accent, var(--ring))) var(--no-rim-a, 35%), transparent); box-shadow: inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)); }
 /* long cards (asks): compact like lists until hovered */
 #stage.compact .c-asks { max-height: var(--compact-h, 190px); overflow: hidden; --fade-stop: var(--compact-fade, 64px); }
 /* sideways fold (.fold-x, key + detail): compact shows the key width (--key-w), opening slides the detail out to the right */

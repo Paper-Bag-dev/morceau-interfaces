@@ -13,10 +13,18 @@ pub(super) fn send(req: Value) -> Result<Value, String> {
     serde_json::from_str(&line).map_err(|e| format!("bad reply: {e}"))
 }
 
-/// Make sure a host is up, starting a hidden detached one if needed.
+/// Make sure a host is up, starting a hidden detached one if needed. Every failure says why and where the log is.
 pub(super) fn ensure_host() -> Result<(), String> {
     if crate::transport::alive() && paths::token_file().exists() {
         return Ok(());
+    }
+    if crate::transport::alive() {
+        // something answers on the endpoint but it is not a morc we can talk to (no token in this runtime folder)
+        return Err(format!(
+            "{} is held by another program (or a morc host for another runtime folder {}). Close it, or run `morc stop` from that setup, then try again",
+            crate::transport::describe(),
+            paths::runtime_dir().display()
+        ));
     }
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let mut cmd = std::process::Command::new(exe);
@@ -24,12 +32,18 @@ pub(super) fn ensure_host() -> Result<(), String> {
     crate::platform::os::process::detach(&mut cmd); // detached, windowless, no inherited handles (platform/<os>/process.rs)
     cmd.spawn().map_err(|e| e.to_string())?;
     let t0 = Instant::now();
-    while t0.elapsed() < Duration::from_secs(6) {
+    while t0.elapsed() < Duration::from_secs(10) {
         if crate::transport::alive() && paths::token_file().exists() {
             return Ok(());
         }
         std::thread::sleep(Duration::from_millis(100));
     }
-    Err("host did not start".into())
+    let log = paths::runtime_dir().join("host.log");
+    let last = std::fs::read_to_string(&log).ok().and_then(|s| s.lines().last().map(|l| l.to_string())).unwrap_or_default();
+    Err(format!(
+        "the host did not start within 10 s. Last line of {}: {}",
+        log.display(),
+        if last.is_empty() { "(empty: the host could not even write its log)".to_string() } else { last }
+    ))
 }
 

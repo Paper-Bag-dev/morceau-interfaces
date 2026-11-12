@@ -53,7 +53,10 @@ npm i -g morceau          # adds `morc` (and `morceau`) to your PATH
 morc init                 # creates your data folder, caches the shipped components
 morc use ask-permission   # check it works: a small card should appear
 ```
-or without installing: `npx morceau use ask-permission`.
+The installer downloads that platform's engine from the GitHub release of the same version, puts the app files and your data in their own
+folders (`%LOCALAPPDATA%\morc`, or `~/Library/Application Support/morc` on a Mac), checks Python and starts Morceau once. After that,
+`npx morceau` shows a short list of what to do next. `npm i -g morceau` adds `morc` to your PATH; `morc install` updates the engine and app
+files and never touches your data. `--platform windows|mac` skips the question. The installer lives in `bin/launcher/` (README there).
 
 **Then connect your agent** (it does everything from here on):
 - **Claude Code**: merge `integrations/claude-code/settings.example.json` into your settings (the hooks pass your clicks back to it) and copy
@@ -75,7 +78,9 @@ cd morceau-interfaces
 cargo build --release                 # target\release\morc.exe (macOS: target/release/morc)
 .\target\release\morc.exe init
 ```
-`build.cmd` builds and installs to `%LOCALAPPDATA%\morc\bin\morc.exe`. Put that folder on your PATH, or use the npm install.
+Windows: `scripts\windows\build.cmd` builds and installs to `%LOCALAPPDATA%\morc\bin\morc.exe`. macOS: `sh scripts/macos/build.sh` installs
+to `~/.local/bin/morc`. Put that folder on your PATH, or use the npm install. Releases: push a tag `v<version>` and CI
+(`.github/workflows/release.yml`) builds every platform, makes the GitHub release and publishes npm (`scripts/README.md`).
 
 ## Full setup, step by step
 1. **Install** as above, then run `morc status`. The first command starts the host (hidden, detached) in about 3 seconds. `morc stop` ends it.

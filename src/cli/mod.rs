@@ -28,7 +28,7 @@
 //!   morc inbox [--peek]                    unread UI interactions meant for the agent (JSON lines)
 //!   morc hook <EventName>                  for Claude Code hooks: prints additionalContext JSON if there is anything unread
 //!   morc commands                          list the CLI plugins (tools/cli) with one-line descriptions
-//!   morc <plugin> ...                      any script in tools/cli: init, compose, cache, wake, place, free, sketchfab, bike
+//!   morc <plugin> ...                      any script in tools/cli (`morc commands` lists them), e.g. init, compose, free, place
 
 use crate::{cache, inbox, paths};
 use serde_json::{json, Map, Value};

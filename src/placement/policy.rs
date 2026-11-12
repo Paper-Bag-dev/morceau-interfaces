@@ -95,9 +95,6 @@ pub struct Policy {
     pub step: i32,
     /// bottom-right zone where Windows toasts appear: [width, height] physical px
     pub toast_zone: [i32; 2],
-    /// When the screen is crowded (the learned `crowd` limit in the annoyance vector, a share of the free room) and the user is on one card, the
-    /// OTHERS shrink to this fraction of their size (never below the page's zoom floor); they come back when the pointer leaves.
-    pub crowd_yield: f64,
     /// anchors that mean "I chose where": they override sibling pull and toast avoidance
     pub explicit_anchors: Vec<String>,
     pub anchors: BTreeMap<String, Anchor>,
@@ -127,7 +124,6 @@ impl Default for Policy {
             gap: 6,
             step: 20,
             toast_zone: [420, 380],
-            crowd_yield: 1.0, // off: hovering one card leaves the others alone (user, 11-10)
             explicit_anchors: ["right_bottom", "left_bottom", "bottom", "corner", "below"].iter().map(|s| s.to_string()).collect(),
             anchors: serde_json::from_str(DEFAULT_ANCHORS).unwrap_or_default(),
         }

@@ -86,24 +86,24 @@
   ],
   "data": {
     "a": {
-      "label": "A",
-      "value": 0,
-      "unit": ""
+      "label": "Focus today",
+      "value": 95,
+      "unit": "min"
     },
     "b": {
-      "label": "B",
-      "value": 0,
-      "unit": ""
+      "label": "Tasks done",
+      "value": 4,
+      "unit": "tasks"
     },
     "c": {
-      "label": "C",
-      "value": 0,
-      "unit": ""
+      "label": "Breaks",
+      "value": 3,
+      "unit": "breaks"
     },
     "d": {
-      "label": "D",
-      "value": 0,
-      "unit": ""
+      "label": "Streak",
+      "value": 4,
+      "unit": "days"
     }
   }
 }

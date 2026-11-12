@@ -11,8 +11,10 @@ Short, so an agent or contributor can read it before touching the UI or the wake
   without `width()` keeps the default. New chart kinds must export `width()` if their content can be wider than the default.
 - **Never:** absolute positions for content, fractions of a fixed width for text, a default width that pads a card out.
 - **Hover:** growth is a smooth scale from the old size to the new one, and the window is resized to the final size first, so nothing is cut off mid-way.
-- **Check before calling a card done:** a long label, a narrow box, a hover. Hover can be played without touching the mouse:
-  `morc patch <id> /__hover true` (and `false`).
+- **Check before calling a card done:** a long label, a narrow box, a hover. (Hover scaling was removed 11-11; cards keep one size.)
+- **Arrival was invisible (11-11):** the page measured the card mid-arrival (scaled to 8%) and the window shape was cut to those tiny
+  rects, so the whole spring was clipped and the card popped in. While any finite animation runs, the window shape stays the full
+  window; the tight shape comes back once everything rests (`bridge.js` measure).
 - **Also:** hover shadows must stay inside the 8 px window margin, or they clip on light cards.
 
 ## Metrics are a dashboard, not a story
@@ -70,3 +72,5 @@ Look first (`morc free`). Biggest free area first, as a side, not a corner: rear
   and run `node --check` / `cargo build`.
 - **Push `main` from a separate worktree** (`git worktree add <dir> main`), not by switching branches in the working folder; switching moves
   untracked personal files such as `prefs/` and can silently turn features off.
+
+- **A trailing // comment inside a condition broke every card (11-11):** a comment typed mid-line swallowed the rest of an `if (...) {`; `node --check` still passed because it parses the file as a script. Check UI modules as modules: `node --input-type=module -e "import('file:///…/ui/core/bridge.js')"` (a `matchMedia is not defined` error means it parsed fine), and never put a comment in the middle of a condition.

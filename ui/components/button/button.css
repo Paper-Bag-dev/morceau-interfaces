@@ -30,3 +30,12 @@
    Hover brightens the color a touch; the ripple stays. Toggles, swatches and destructive keep their own look. */
 html[data-skin~="glass"] .btn:not(.swatch):not(.on):not(.destructive) { background: color-mix(in oklab, color-mix(in oklab, hsl(var(--accent, 206 58% 48%)) 85%, white) var(--fill-alpha, 80%), transparent); color: hsl(var(--fill-ink, 220 30% 6%)); font-weight: 650; text-shadow: none; border-color: transparent; box-shadow: none; }
 html[data-skin~="glass"] .btn:not(.swatch):not(.on):not(.destructive):is(:hover, .hov) { filter: brightness(1.08); box-shadow: none; }
+/* tone (card JSON "tone": "green|yellow|blue|purple|red"): the button is a flat fill in that colour with dark ink and a darker rim of
+   its own colour, whatever its variant (themes.json base tone-*). Later and as specific as the glass yes / no rules, so it wins. */
+/* filled buttons (a tone, or the accent Yes) are FLAT (user, 11-11): the fill plus one dark INNER rim of their own colour (btn-rim-w /
+   btn-rim-mix, lower mix = darker). No drop shadow, no highlight, no gradient. */
+html .btn[data-tone]:not(.swatch):not(.on):not(.ghost), html[data-skin~="glass"] .btn.good:not(.swatch):not(.on):not(.destructive) {
+  --fill-c: var(--btn-tone, var(--accent, var(--ring)));
+  background: hsl(var(--fill-c)); color: hsl(var(--fill-ink, 220 30% 6%)); border: 0;
+  box-shadow: inset 0 0 0 var(--btn-rim-w, 1.5px) color-mix(in oklab, hsl(var(--fill-c)) var(--btn-rim-mix, 45%), black); }
+html .btn.ghost[data-tone] { color: hsl(var(--btn-tone)); }
