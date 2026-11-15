@@ -1,0 +1,4 @@
+{
+ "about": "Tokens for the circle visualizer. Override in your prefs/tokens/beatring.json.",
+ "br-size": "300px", "br-title-size": "12.5px"
+}

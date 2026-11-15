@@ -1,0 +1,19 @@
+{
+  "name": "inspector",
+  "description": "The workbench's editor pane: open tabs, back/forward, breadcrumb, then the selected entity's note, reference sections and code peek; every reference opens its entity.",
+  "types": [
+    "inspector"
+  ],
+  "js": "inspector.js",
+  "css": "inspector.css",
+  "deps": [
+    "nav"
+  ],
+  "tokens": [
+    "ins-w",
+    "ins-max-h",
+    "ins-title-size",
+    "ins-code-size",
+    "ins-min-h"
+  ]
+}

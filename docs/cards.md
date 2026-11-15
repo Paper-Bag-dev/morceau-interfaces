@@ -21,6 +21,7 @@ and centred" are operations on a card that exists, never a second pop. Code: `sr
 | step through the stack by hand | hover the card, press Down (lower, as far as it goes) / Up (higher, to the top) | |
 | pull onto the nearest edge from where it is | `morc card <id> move --snap` | |
 | close | `morc close <id>` | `set: {"state": "closed"}` |
+| the card's expand button (fourth on the corner arc) | wakes the agent with `{ask: "expand"|"shrink"}` and the card as `surface` (the session if one is live, else the background agent); the agent answers with `size --frac` / `move`; `morc expand watch` answers at once for a whole session (shrink restores the cap and the spot) | |
 
 `set` takes the state you want and applies what it needs: `{"state": "shown", "frac": 0.9, "center": true}` shows, resizes, then centres
 once the new size is measured. `frac` is a cap (fraction of the work area): content smaller than it stays its own size.

@@ -1,0 +1,21 @@
+{
+  "name": "skyline",
+  "description": "The day as a 2D city: one building per hour, as tall as its minutes, floors lit by category (cats, default study / video / games), a sun or moon over the current hour; buildings rise in and grow live from any per-hour data.",
+  "types": [
+    "skyline"
+  ],
+  "js": "skyline.js",
+  "css": "skyline.css",
+  "deps": [
+    "plate"
+  ],
+  "tokens": [
+    "sk-w",
+    "sk-gap",
+    "sk-title-size",
+    "sk-hero-size",
+    "sk-unit-size",
+    "sk-radius",
+    "sk-sky"
+  ]
+}

@@ -105,7 +105,7 @@ body { color: hsl(var(--ink)); cursor: default; }
 /* inside the page, too: carrying shows the move cursor */
 #stage.dragging, #stage.dragging * { cursor: move !important; }
 
-/* ---------- controls: the card's own buttons (pin, x, layer) ----------
+/* ---------- controls: the card's own buttons (pin, x, layer, expand) ----------
    ONE place for their look (nothing else may style them), ONE size whatever the card's zoom (core/bridge.js applyZoom cancels it).
    Laid on an ARC around the card's top-right corner, following its rounded edge: pin on the top edge, x on the diagonal, layer on the
    right edge. Hidden until the pointer reaches the CORNER: #controls is a generous invisible hot zone there (not the whole card).
@@ -126,6 +126,7 @@ body { color: hsl(var(--ink)); cursor: default; }
   transition: opacity .16s ease, transform .32s var(--spring), background .25s ease, box-shadow .25s ease; }
 #dismiss { transition-delay: 30ms; }
 #layer { transition-delay: 60ms; }
+#expand { transition-delay: 90ms; }
 .ctl svg { width: calc(var(--ctl-size) * .55); height: calc(var(--ctl-size) * .55); transition: transform .35s var(--spring), fill .2s; }
 /* the corner reached: spring in, one after another */
 #controls:is(:hover, .hov) .ctl { opacity: var(--ctl-rest); transform: scale(1); pointer-events: auto; }
@@ -141,4 +142,5 @@ body { color: hsl(var(--ink)); cursor: default; }
 #stage.pinned #pin svg { transform: rotate(0deg); fill: hsl(var(--accent, var(--ring)) / .4); }
 #stage.below #layer { opacity: 1; transform: scale(1); pointer-events: auto; }
 #stage.below #layer svg rect { fill: hsl(var(--accent, var(--ring)) / .45); }
+#stage.expanded #expand { opacity: 1; transform: scale(1); pointer-events: auto; }
 @media (prefers-reduced-motion: reduce) { .ctl { transition: opacity .1s; transform: none !important; } }

@@ -134,6 +134,7 @@ the pointer is on a card and handed back the moment it leaves.
 | pin (first button) | keep the card open; hold it to carry the card |
 | x (second) | dismiss this card |
 | layer (third) | send the card one level down the window stack; click again to bring it back on top |
+| expand (fourth, under layer) | asks the agent to make the card big and centred (a wake: the live session, else the background agent, runs `morc card <id> set {frac, center}`); click again to ask it back |
 | right-click | dismiss this card |
 | hover | pauses the lifetime; a compact card springs open |
 | click anything | extends the lifetime and teaches the annoyance vector what you engage with |

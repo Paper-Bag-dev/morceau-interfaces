@@ -1,0 +1,5 @@
+{
+ "name": "beatring",
+ "description": "A circle visualizer: 64 RGB radial bars from @/beat bands, a core that pulses on the beat, and what is playing from @/media (the video card).",
+ "types": ["beatring"], "js": "beatring.js", "css": "beatring.css", "deps": ["plate"], "tokens": ["br-size", "br-title-size"]
+}

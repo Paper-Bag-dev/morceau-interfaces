@@ -1,0 +1,68 @@
+{
+ "t": "save",
+ "name": "video-card",
+ "desc": "A 16:9 video player with a title. Pass /title and /src (a YouTube link or id, or a direct media URL). /vars/w sets the player width (px), used by expand. /playback {state, title, src, at} is kept (playing, paused, ended); also mirrored to @/media.",
+ "params": [
+  "/title",
+  "/src"
+ ],
+ "opts": {
+  "min": [
+   320,
+   220
+  ],
+  "ttl": 600,
+  "topic": "media.video",
+  "importance": "1.0",
+  "size": "large",
+  "actions": {
+   "play": [
+    {
+     "do": "set",
+     "path": "/src",
+     "value": "$.src"
+    },
+    {
+     "do": "set",
+     "path": "/title",
+     "value": "$.title"
+    }
+   ]
+  },
+  "persist": true,
+  "expand_vars": {
+   "w": 1150
+  }
+ },
+ "components": [
+  {
+   "id": "root",
+   "type": "column",
+   "gap": 6,
+   "children": [
+    "v"
+   ]
+  },
+  {
+   "id": "v",
+   "type": "video",
+   "title": "{/title}",
+   "src": {
+    "bind": "/src"
+   },
+   "w": {
+    "bind": "/vars/w"
+   }
+  }
+ ],
+ "data": {
+  "title": "Bad Apple!! (shadow art PV)",
+  "src": "https://www.youtube.com/watch?v=FtutLA63Cp8",
+  "vars": {
+   "w": null
+  },
+  "playback": {
+   "state": "idle"
+  }
+ }
+}

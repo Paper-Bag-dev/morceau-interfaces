@@ -1,0 +1,23 @@
+{
+  "name": "timer",
+  "description": "A small ring sprint timer: the arc fills toward the goal, elapsed time inside (seconds under it), end time below, one pause / resume icon. Counts on past the goal. State in the card data (start, paused_at, paused_ms), kept by opts.persist.",
+  "types": [
+    "timer"
+  ],
+  "js": "timer.js",
+  "css": "timer.css",
+  "deps": [
+    "plate",
+    "button"
+  ],
+  "tokens": [
+    "tm-ring",
+    "tm-stroke",
+    "tm-hero-size",
+    "tm-sec-size",
+    "tm-pad",
+    "tm-gap",
+    "tm-rest-opacity",
+    "tm-fade-ms"
+  ]
+}

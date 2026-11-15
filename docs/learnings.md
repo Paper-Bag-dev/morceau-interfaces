@@ -74,3 +74,46 @@ Look first (`morc free`). Biggest free area first, as a side, not a corner: rear
   untracked personal files such as `prefs/` and can silently turn features off.
 
 - **A trailing // comment inside a condition broke every card (11-11):** a comment typed mid-line swallowed the rest of an `if (...) {`; `node --check` still passed because it parses the file as a script. Check UI modules as modules: `node --input-type=module -e "import('file:///…/ui/core/bridge.js')"` (a `matchMedia is not defined` error means it parsed fine), and never put a comment in the middle of a condition.
+
+## The workbench session (11-14): reuse first, reload right, never touch a game
+- **Check what exists before building (cost me most of a day).** I wrote a placing command, a screen-geometry helper, a merge rule, a
+  file-write engine path and hand-drawn flow curves; morc already had `morc card`/`push`, `morc card <id> set|move|size`, `morc tree`/`space`,
+  the ladder's merge rung, `opts.persist` + `actions.json` (file in / out with fixed argv), `data-nodrag`, and a vendored Cytoscape. Rule:
+  read every md here and run code-graph first; then vendored library -> npm package -> only then your own code. Never touch `src/` or
+  `ui/core` for a feature without asking.
+- **New components and open cards.** A card page (and the warm spare) loads `components.json` once. After `morc ui build` adds a type,
+  open pages draw "unknown type"; `morc refresh <name>` re-imports the JS but does NOT add a new stylesheet, and other modules keep
+  importing the old copy of a shared module (`../nav/nav.js` without the new export). New component or changed shared module = `morc stop`,
+  then `morc card <id> show` for each card (they come back with their data) and `morc card <id> move` into place.
+- **A laid-out card keeps its width.** `morc patch <id> /vars {...}` changes the tokens but the width stays locked; a same-id
+  `morc use <chip> --id <id> --data @file` re-measures in place (no new window). Sizes per slot: chip `/vars` (`xp-w`, `ce-h`, `fm-w` ...).
+- **Vendored bundles: pin by hash in the import URL** (`reactflow.bundle.js?v=<sha8>`): a page caches a failed module by URL forever.
+  Build bundles from a script (`vendor/reactflow/build.mjs`), not a shell one-liner: PowerShell ate the quotes in esbuild's
+  `--define:process.env.NODE_ENV="production"` and every card threw `production is not defined`.
+- **Git Bash rewrites `/paths`.** `morc patch @shared /nav ...` from Git Bash wrote the key `C:/Program Files/Git/nav`. Prefix
+  `MSYS_NO_PATHCONV=1`.
+- **Clicks reach a session only on the next prompt.** An `emit` is just an inbox row; the hooks inject it when the user types. For a button that
+  must answer now (expand), keep a Monitor on `%LOCALAPPDATA%/morc/inbox.jsonl` while a session is live, and use `wake` (not `emit`) so the
+  background agent answers when no session is.
+- **Layout like an app, in place, animated.** Slots from `morc tree` (work area, active window), sizes from `/vars`, then
+  `morc card <id> move --at X,Y` (glides). Users liked it; close + show (a pop-in) reads as a glitch.
+- **Never touch the screen while a game runs** (any exe under a configured games folder). Videos and the browser are fine. Hold the screen
+  part until the game exits; hide (never show or move) cards that a job already put over it.
+
+## 11-15: video, expand, music
+- **The expand button needs someone listening.** It only wakes the agent, and a session reads the wake on its next prompt, so the button
+  looked broken. `morc expand watch` (tools/cli/expand.py) answers expand / shrink at once; run it in the background for every session.
+- **Shrink: a smaller content does not shrink a locked card.** The engine locks a card's width after layout, so putting `/vars` back left
+  a big empty card. Set a new cap (`morc card <id> size --frac <the cap from before>`): a new size unlocks, re-measures and locks again;
+  then move it back to where it was.
+- **Grow the content, not just the cap.** A chip whose content has a fixed size (a 16:9 player) declares `opts.expand_vars` in its seed
+  (video-card: `{"w": 1150}`); expand sets them, shrink clears them.
+- **A component may own an element `el` refuses.** `el` never makes an iframe; the `video` component makes its own YouTube embed. That is
+  a component, not an engine change.
+- **Playback climbs the tree.** The video component writes `/playback` into its card's data (persisted, visible in `morc tree`), mirrors it
+  to `@/media` for other cards, then tells the agent: playing / paused as `emit` rows (no wake), `ended` as the one wake.
+- **CSS motion on a plate is clipped by the window.** The window shape is cut from the plate's rect, so a bounce or an outer glow on
+  `.card-plate` barely shows. Glow inward (`inset` box-shadow) and move the WINDOW (`morc card <id> move`) for a real dance (`morc beat --dance`).
+- **System audio is per OS.** Windows: WASAPI loopback (`pyaudiowpatch`). macOS has no system loopback: route output through BlackHole and
+  read it with `sounddevice`. Without either, `morc beat --demo` is a synthetic beat and says so.
+- **Flags are not names.** `morc ui new --help` created a component called `--help`; `ui new` now rejects anything but `[a-z][a-z0-9-]*`.

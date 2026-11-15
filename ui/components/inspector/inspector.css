@@ -1,0 +1,44 @@
+/* inspector: the workbench's editor pane. Sizes are tokens (ui/tokens/inspector.json). */
+.c-inspector { display: flex; flex-direction: column; gap: 8px; width: var(--ins-w, 460px); min-width: 0; }
+.c-inspector button { all: unset; box-sizing: border-box; cursor: pointer; }
+.c-inspector button:focus-visible { outline: 2px solid hsl(var(--accent, var(--primary)) / .7); border-radius: 6px; }
+
+.c-inspector .ins-tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgb(255 255 255 / .08); }
+.c-inspector .ins-tab { display: flex; align-items: center; flex: none; max-width: 160px; border-radius: 8px 8px 0 0; color: rgb(255 255 255 / .65); }
+.c-inspector .ins-tab.on { background: rgb(255 255 255 / .07); color: inherit; box-shadow: inset 0 -2px 0 hsl(var(--accent, var(--primary))); }
+.c-inspector .ins-tab .go { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 5px 2px 6px 9px; font-size: 12.5px; }
+.c-inspector .ins-tab .go .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.c-inspector .ins-tab .x { display: grid; place-items: center; width: 18px; height: 18px; margin: 0 4px; border-radius: 5px; opacity: .45; }
+.c-inspector .ins-tab .x:is(:hover, .hov) { opacity: 1; background: rgb(255 255 255 / .1); }
+.c-inspector svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+
+.c-inspector .ins-bar { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: 12px; color: rgb(255 255 255 / .6); }
+.c-inspector .nb { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; }
+.c-inspector .nb:is(:hover, .hov) { background: rgb(255 255 255 / .1); }
+.c-inspector .nb[disabled] { opacity: .3; pointer-events: none; }
+.c-inspector .crumb { display: flex; align-items: center; gap: 5px; min-width: 0; overflow: hidden; white-space: nowrap; margin-left: 4px; }
+.c-inspector .crumb .sep { opacity: .4; }
+.c-inspector .crumb .here { color: inherit; color: rgb(255 255 255 / .92); overflow: hidden; text-overflow: ellipsis; }
+
+.c-inspector .ins-body { display: flex; flex-direction: column; gap: 12px; max-height: var(--ins-max-h, 560px); min-height: var(--ins-min-h, 0px); overflow-y: auto; padding-right: 4px; }
+.c-inspector .ins-title { display: flex; align-items: baseline; gap: 9px; min-width: 0; }
+.c-inspector .ins-title .nav-dot { align-self: center; }
+.c-inspector .ins-title .t { font-size: var(--ins-title-size, 22px); font-weight: 600; letter-spacing: -.01em; min-width: 0; overflow-wrap: anywhere; }
+.c-inspector .ins-title .s { flex: none; font-size: 12.5px; color: rgb(255 255 255 / .6); }
+.c-inspector .ins-note { margin: 0; font-size: 13px; line-height: 1.45; padding: 8px 10px; border-radius: 10px; background: rgb(255 255 255 / .05); border-left: 2px solid rgb(255 255 255 / .3); }
+.c-inspector .ins-note.bad { border-left-color: hsl(6 92% 68%); background: hsl(6 92% 68% / .08); }
+.c-inspector .ins-note.warn { border-left-color: hsl(42 88% 63%); background: hsl(42 88% 63% / .07); }
+
+.c-inspector .ins-sec { display: flex; flex-direction: column; gap: 6px; }
+.c-inspector .ins-sec > .h { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: rgb(255 255 255 / .75); }
+.c-inspector .ins-sec > .h .n { font-weight: 400; color: rgb(255 255 255 / .5); font-variant-numeric: tabular-nums; }
+.c-inspector .refs { display: flex; flex-wrap: wrap; gap: 5px; min-width: 0; }
+
+.c-inspector .ins-peek { display: flex; flex-direction: column; border-radius: 10px; background: rgb(0 0 0 / .22); padding: 6px 0; }
+.c-inspector .ln { display: flex; gap: 10px; padding: 4px 10px 4px 0; min-width: 0; }
+.c-inspector .ln:is(:hover, .hov) { background: rgb(255 255 255 / .04); }
+.c-inspector .ln .num { flex: none; width: 3.2em; text-align: right; font-family: 'Cascadia Mono', Consolas, monospace; font-size: 11.5px; color: rgb(255 255 255 / .35); padding-top: 1px; }
+.c-inspector .ln .src { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.c-inspector .ins-code { font-family: 'Cascadia Mono', Consolas, monospace; font-size: var(--ins-code-size, 12px); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; color: rgb(255 255 255 / .82); }
+.c-inspector .ins-code .str { color: hsl(var(--accent, var(--primary))); }
+.c-inspector .ins-empty { padding: 28px 8px; text-align: center; }

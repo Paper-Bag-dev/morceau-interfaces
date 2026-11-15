@@ -1,0 +1,22 @@
+/* nav: the look every workbench part shares: the status dot and the reference chip. Sizes are tokens (ui/tokens/nav.json). */
+.nav-dot { flex: none; display: inline-block; width: var(--nav-dot, 7px); height: var(--nav-dot, 7px); border-radius: 50%; background: rgb(255 255 255 / .35); }
+.nav-dot.ok { background: hsl(var(--accent, var(--primary)) / .85); }
+.nav-dot.warn { background: hsl(42 88% 63%); }
+.nav-dot.bad { background: hsl(6 92% 68%); box-shadow: 0 0 0 3px hsl(6 92% 68% / .18); }
+
+.nav-ref { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; padding: var(--nav-ref-pad, 3px 9px 3px 7px);
+  border-radius: 99px; border: 1px solid rgb(255 255 255 / .1); background: rgb(255 255 255 / .05); color: inherit; font: inherit;
+  font-size: var(--nav-ref-size, 12.5px); cursor: pointer; transition: background .15s, border-color .15s; }
+.nav-ref:is(:hover, .hov) { background: rgb(255 255 255 / .11); border-color: rgb(255 255 255 / .2); }
+.nav-ref:focus-visible { outline: 2px solid hsl(var(--accent, var(--primary)) / .7); outline-offset: 1px; }
+.nav-ref .t { min-width: 0; overflow-wrap: anywhere; }
+.nav-ref .n { color: rgb(255 255 255 / .5); font-variant-numeric: tabular-nums; }
+.nav-ref.dense { padding: 1px 7px 1px 5px; font-size: var(--nav-ref-dense-size, 11.5px); }
+.nav-ref.missing { opacity: .55; }
+
+/* the shared pane head: a title on the left, small counts or controls on the right */
+.nav-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+.nav-head .ttl { font-size: var(--text-size-md, 15px); font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-head .meta { flex: none; font-size: 12px; color: rgb(255 255 255 / .6); font-variant-numeric: tabular-nums; }
+.nav-empty { font-size: 12.5px; color: rgb(255 255 255 / .6); padding: 6px 2px; }
+.nav-head .end { display: flex; align-items: center; gap: 6px; flex: none; }

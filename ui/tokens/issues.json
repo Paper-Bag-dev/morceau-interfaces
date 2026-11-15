@@ -1,0 +1,6 @@
+{
+  "about": "Tokens for the problems panel. Override in your prefs/tokens/issues.json.",
+  "is-w": "300px",
+  "is-max-h": "170px",
+  "is-min-h": "0px"
+}

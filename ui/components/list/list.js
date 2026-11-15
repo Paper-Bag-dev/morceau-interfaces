@@ -10,11 +10,12 @@ registerView('list', ({ c, useBind, act, host }) => {
     if (!reduced) [...host.children].forEach((row, i) => enter(row, (first.current ? 60 : 0) + i * 35));
     first.current = false;
   }, [JSON.stringify(items)]);
+  const cut = c.wrap ? '' : ' truncate';                 // wrap:true = a wide list whose rows show their whole text (no ellipsis)
   return items.map((it, i) => html`
-    <div key=${i} class=${'item flex items-center gap-2' + (it.action ? ' act' : '')} data-hit=""
+    <div key=${i} class=${'item flex items-center gap-2' + (it.action ? ' act' : '') + (c.wrap ? ' wrap' : '')} data-hit=""
       title=${it.tip ?? [it.text, it.sub].filter(Boolean).join('\n')}
       onClick=${it.action ? (e) => { rippleAt(e.currentTarget, e); act(it.action); } : undefined}>
-      <div class="txt min-w-0 flex-1"><div class="ttl truncate">${it.text ?? ''}</div>${it.sub ? html`<div class="sub truncate">${it.sub}</div>` : null}</div>
+      <div class="txt min-w-0 flex-1"><div class=${'ttl' + cut}>${it.text ?? ''}</div>${it.sub ? html`<div class=${'sub' + cut}>${it.sub}</div>` : null}</div>
       ${it.badge ? html`<span class="badge shrink-0">${it.badge}</span>` : null}
     </div>`);
 }, { cls: 'c-list', hit: false });

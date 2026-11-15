@@ -1,0 +1,64 @@
+{
+  "t": "save",
+  "name": "workbench-problems",
+  "desc": "Workbench problems and route in one card: what is broken or worth checking, and an ordered route to walk. Pass /entities, /route, /route_title. /vars sets its size tokens (morc workbench fills them per slot).",
+  "params": [
+    "/entities",
+    "/route",
+    "/route_title",
+    "/vars"
+  ],
+  "opts": {
+    "min": [
+      300,
+      180
+    ],
+    "ttl": 3600,
+    "topic": "wb.problems",
+    "size": "large"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 14,
+      "children": [
+        "p",
+        "s"
+      ],
+      "vars": {
+        "bind": "/vars"
+      }
+    },
+    {
+      "id": "p",
+      "type": "issues",
+      "entities": {
+        "bind": "/entities"
+      }
+    },
+    {
+      "id": "s",
+      "type": "steps",
+      "entities": {
+        "bind": "/entities"
+      },
+      "route": {
+        "bind": "/route"
+      },
+      "title": {
+        "bind": "/route_title"
+      },
+      "when": {
+        "path": "/route",
+        "truthy": true
+      }
+    }
+  ],
+  "data": {
+    "entities": [],
+    "route": [],
+    "route_title": "Route",
+    "vars": {}
+  }
+}

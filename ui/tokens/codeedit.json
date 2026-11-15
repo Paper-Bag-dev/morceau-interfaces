@@ -1,0 +1,5 @@
+{
+  "about": "Tokens for the code editor. Override in your prefs/tokens/codeedit.json.",
+  "ce-w": "560px",
+  "ce-h": "360px"
+}

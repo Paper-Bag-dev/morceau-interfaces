@@ -3,8 +3,13 @@
   "plate",
   "button",
   "asks",
+  "beatring",
   "chart",
   "checklist",
+  "nav",
+  "codeedit",
+  "explorer",
+  "flowmap",
   "list",
   "text",
   "stat",
@@ -14,8 +19,14 @@
   "fluent",
   "graph",
   "input",
+  "inspector",
+  "issues",
   "skeleton",
-  "spinner"
+  "skyline",
+  "spinner",
+  "steps",
+  "timer",
+  "video"
  ],
  "components": {
   "plate": {
@@ -95,6 +106,22 @@
    "tokens": [],
    "description": "Several yes/no questions answered in any order, then one Send: a single wake with every answer."
   },
+  "beatring": {
+   "path": "components/beatring",
+   "js": "beatring.js",
+   "css": "beatring.css",
+   "types": [
+    "beatring"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "br-size",
+    "br-title-size"
+   ],
+   "description": "A circle visualizer: 64 RGB radial bars from @/beat bands, a core that pulses on the beat, and what is playing from @/media (the video card)."
+  },
   "chart": {
    "path": "components/chart",
    "js": "chart.js",
@@ -132,6 +159,73 @@
    ],
    "description": "A tickable to-do list: a count and hairline progress up top, round checkboxes, clock-time badges, a coral ring on what is due. A tick answers at once, then runs the allowlisted tick-<id> action that stores the state as JSON."
   },
+  "nav": {
+   "path": "components/nav",
+   "js": "nav.js",
+   "css": "nav.css",
+   "types": [],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "nav-dot",
+    "nav-ref-pad",
+    "nav-ref-size",
+    "nav-ref-dense-size"
+   ],
+   "description": "The shared navigation model for workbench parts: selection, tabs, back/forward at a shared-store path; entity lookup; the reference chip and status dot. No component of its own."
+  },
+  "codeedit": {
+   "path": "components/codeedit",
+   "js": "codeedit.js",
+   "css": "codeedit.css",
+   "types": [
+    "codeedit"
+   ],
+   "deps": [
+    "nav"
+   ],
+   "tokens": [
+    "ce-w",
+    "ce-h"
+   ],
+   "description": "The whole file of the open entity in Monaco (vendored): highlighting, VS Code keys, Ctrl+S saves. Opens and saves through allowlisted actions that read the card's persisted state; no engine path of its own."
+  },
+  "explorer": {
+   "path": "components/explorer",
+   "js": "explorer.js",
+   "css": "explorer.css",
+   "types": [
+    "explorer"
+   ],
+   "deps": [
+    "nav"
+   ],
+   "tokens": [
+    "xp-w",
+    "xp-max-h",
+    "xp-row-pad",
+    "xp-row-size",
+    "xp-min-h"
+   ],
+   "description": "A grouped, searchable list of entities (files, messages, goals...). A click opens the entity through the shared nav, so the other workbench parts follow."
+  },
+  "flowmap": {
+   "path": "components/flowmap",
+   "js": "flowmap.js",
+   "css": "flowmap.css",
+   "types": [
+    "flowmap"
+   ],
+   "deps": [
+    "nav"
+   ],
+   "tokens": [
+    "fm-w",
+    "fm-h"
+   ],
+   "description": "The whole entity graph on React Flow (vendored bundle with React and dagre): pan, scroll, zoom, minimap, drag nodes; click a node to open it through nav, the open one's links animate."
+  },
   "list": {
    "path": "components/list",
    "js": "list.js",
@@ -146,15 +240,20 @@
     "list-gap",
     "list-max-w",
     "list-min-w",
+    "list-wide-max-w",
+    "list-wide-min-w",
     "row-gap",
     "row-min-h",
     "row-pad-x",
     "row-pad-y",
+    "row-pad-y-wrap",
     "row-radius",
     "row-sub-size",
-    "row-title-size"
+    "row-sub-size-wrap",
+    "row-title-size",
+    "row-title-size-wrap"
    ],
-   "description": "Rows of text, optionally clickable."
+   "description": "Rows of text, optionally clickable. wrap:true = a wide list that shows each row's full text."
   },
   "text": {
    "path": "components/text",
@@ -305,6 +404,42 @@
    "tokens": [],
    "description": "A text field."
   },
+  "inspector": {
+   "path": "components/inspector",
+   "js": "inspector.js",
+   "css": "inspector.css",
+   "types": [
+    "inspector"
+   ],
+   "deps": [
+    "nav"
+   ],
+   "tokens": [
+    "ins-w",
+    "ins-max-h",
+    "ins-title-size",
+    "ins-code-size",
+    "ins-min-h"
+   ],
+   "description": "The workbench's editor pane: open tabs, back/forward, breadcrumb, then the selected entity's note, reference sections and code peek; every reference opens its entity."
+  },
+  "issues": {
+   "path": "components/issues",
+   "js": "issues.js",
+   "css": "issues.css",
+   "types": [
+    "issues"
+   ],
+   "deps": [
+    "nav"
+   ],
+   "tokens": [
+    "is-w",
+    "is-max-h",
+    "is-min-h"
+   ],
+   "description": "A problems panel: every entity whose status is not ok, grouped by level (broken, check), with its note as the reason; a click opens it through nav."
+  },
   "skeleton": {
    "path": "components/skeleton",
    "js": "skeleton.js",
@@ -316,6 +451,27 @@
    "tokens": [],
    "description": "Shimmering placeholder shapes."
   },
+  "skyline": {
+   "path": "components/skyline",
+   "js": "skyline.js",
+   "css": "skyline.css",
+   "types": [
+    "skyline"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "sk-w",
+    "sk-gap",
+    "sk-title-size",
+    "sk-hero-size",
+    "sk-unit-size",
+    "sk-radius",
+    "sk-sky"
+   ],
+   "description": "The day as a 2D city: one building per hour, as tall as its minutes, floors lit by category (cats, default study / video / games), a sun or moon over the current hour; buildings rise in and grow live from any per-hour data."
+  },
   "spinner": {
    "path": "components/spinner",
    "js": "spinner.js",
@@ -326,6 +482,63 @@
    "deps": [],
    "tokens": [],
    "description": "The building indicator (system blue)."
+  },
+  "steps": {
+   "path": "components/steps",
+   "js": "steps.js",
+   "css": "steps.css",
+   "types": [
+    "steps"
+   ],
+   "deps": [
+    "nav"
+   ],
+   "tokens": [
+    "st-w",
+    "st-max-h"
+   ],
+   "description": "An ordered route through entities (a user flow, a request path) on a rail; previous/next walk it through nav so the other parts follow each step."
+  },
+  "timer": {
+   "path": "components/timer",
+   "js": "timer.js",
+   "css": "timer.css",
+   "types": [
+    "timer"
+   ],
+   "deps": [
+    "plate",
+    "button"
+   ],
+   "tokens": [
+    "tm-ring",
+    "tm-stroke",
+    "tm-hero-size",
+    "tm-sec-size",
+    "tm-pad",
+    "tm-gap",
+    "tm-rest-opacity",
+    "tm-fade-ms"
+   ],
+   "description": "A small ring sprint timer: the arc fills toward the goal, elapsed time inside (seconds under it), end time below, one pause / resume icon. Counts on past the goal. State in the card data (start, paused_at, paused_ms), kept by opts.persist."
+  },
+  "video": {
+   "path": "components/video",
+   "js": "video.js",
+   "css": "video.css",
+   "types": [
+    "video"
+   ],
+   "deps": [
+    "plate"
+   ],
+   "tokens": [
+    "vd-w",
+    "vd-gap",
+    "vd-title-size",
+    "vd-radius"
+   ],
+   "description": "A 16:9 video player: a YouTube link or id plays in YouTube's embedded player, any other URL in a <video> with controls. Sizes are tokens."
   }
  }
 }

@@ -1,0 +1,9 @@
+{
+  "name": "steps",
+  "description": "An ordered route through entities (a user flow, a request path) on a rail; previous/next walk it through nav so the other parts follow each step.",
+  "types": ["steps"],
+  "js": "steps.js",
+  "css": "steps.css",
+  "deps": ["nav"],
+  "tokens": ["st-w", "st-max-h"]
+}

@@ -1,0 +1,80 @@
+{
+  "t": "save",
+  "name": "sprint-timer",
+  "desc": "A small ring sprint timer that stays up: arc toward the goal, elapsed time inside, end time, pause / resume. Pass /title, /start (epoch ms), /goal_min. Persisted, sticky.",
+  "params": [
+    "/title",
+    "/start",
+    "/goal_min"
+  ],
+  "opts": {
+    "min": [
+      130,
+      150
+    ],
+    "sticky": true,
+    "persist": true,
+    "topic": "focus.timer",
+    "size": "chip",
+    "compact": 1,
+    "actions": {
+      "goal": [
+        {
+          "do": "set",
+          "path": "/goal_min",
+          "value": "$.min"
+        }
+      ],
+      "restart": [
+        {
+          "do": "set",
+          "path": "/start",
+          "value": "$now"
+        },
+        {
+          "do": "set",
+          "path": "/paused_at",
+          "value": 0
+        },
+        {
+          "do": "set",
+          "path": "/paused_ms",
+          "value": 0
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "children": [
+        "t"
+      ]
+    },
+    {
+      "id": "t",
+      "type": "timer",
+      "title": "{/title}",
+      "start": {
+        "bind": "/start"
+      },
+      "goal_min": {
+        "bind": "/goal_min"
+      },
+      "paused_at": {
+        "bind": "/paused_at"
+      },
+      "paused_ms": {
+        "bind": "/paused_ms"
+      }
+    }
+  ],
+  "data": {
+    "title": "Deep work sprint",
+    "start": 1763200000000,
+    "goal_min": 90,
+    "paused_at": 0,
+    "paused_ms": 0
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "issues",
+  "description": "A problems panel: every entity whose status is not ok, grouped by level (broken, check), with its note as the reason; a click opens it through nav.",
+  "types": [
+    "issues"
+  ],
+  "js": "issues.js",
+  "css": "issues.css",
+  "deps": [
+    "nav"
+  ],
+  "tokens": [
+    "is-w",
+    "is-max-h",
+    "is-min-h"
+  ]
+}

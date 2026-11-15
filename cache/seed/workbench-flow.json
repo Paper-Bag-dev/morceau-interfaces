@@ -1,0 +1,47 @@
+{
+  "t": "save",
+  "name": "workbench-flow",
+  "desc": "Workbench flow: the whole entity graph on React Flow (pan, scroll, zoom, minimap, drag); click a node to open it in every workbench card. Pass /entities, /title, /vars (fm-w, fm-h).",
+  "params": [
+    "/entities",
+    "/title",
+    "/vars"
+  ],
+  "opts": {
+    "min": [
+      360,
+      260
+    ],
+    "ttl": 3600,
+    "topic": "wb.wire",
+    "size": "large"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 6,
+      "children": [
+        "w"
+      ],
+      "vars": {
+        "bind": "/vars"
+      }
+    },
+    {
+      "id": "w",
+      "type": "flowmap",
+      "entities": {
+        "bind": "/entities"
+      },
+      "title": {
+        "bind": "/title"
+      }
+    }
+  ],
+  "data": {
+    "entities": [],
+    "title": "Flow",
+    "vars": {}
+  }
+}

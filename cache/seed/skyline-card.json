@@ -1,0 +1,72 @@
+{
+ "t": "save",
+ "name": "skyline-card",
+ "desc": "Today as a 2D city: one building per hour, floors lit by category minutes (default study, video, games), sun or moon over now. Bind /day with `sources` to any per-hour JSON ({hours:[{h, <cat>: min}], now_h}). Moves to `morc beat`.",
+ "params": [
+  "/title",
+  "/day"
+ ],
+ "opts": {
+  "min": [
+   360,
+   260
+  ],
+  "ttl": 900,
+  "topic": "viz.skyline",
+  "importance": "1.0",
+  "size": "large"
+ },
+ "components": [
+  {
+   "id": "root",
+   "type": "column",
+   "gap": 6,
+   "children": [
+    "s"
+   ]
+  },
+  {
+   "id": "s",
+   "type": "skyline",
+   "title": "{/title}",
+   "day": {
+    "bind": "/day"
+   },
+   "beat": {
+    "bind": "@/beat"
+   }
+  }
+ ],
+ "data": {
+  "title": "Today as a city",
+  "day": {
+   "hours": [
+    {
+     "h": 9,
+     "study": 40,
+     "video": 0,
+     "games": 0
+    },
+    {
+     "h": 10,
+     "study": 25,
+     "video": 20,
+     "games": 0
+    },
+    {
+     "h": 11,
+     "study": 0,
+     "video": 0,
+     "games": 0
+    },
+    {
+     "h": 12,
+     "study": 10,
+     "video": 30,
+     "games": 15
+    }
+   ],
+   "now_h": 3
+  }
+ }
+}

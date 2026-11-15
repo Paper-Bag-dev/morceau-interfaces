@@ -144,6 +144,11 @@ export class Renderer {
       el.dataset.cid = id;
       // "class": Tailwind utilities written on the fly, on any component (core/view.js loads the generator on first use)
       if (c.class) { el.classList.add(...String(c.class).split(/\s+/).filter(Boolean)); import('./view.js').then((v) => v.ensureTailwind()); }
+      // "vars": per-card design tokens ({"row-title-size-wrap": "17px"}) set as CSS variables on this node; they cascade to its children
+      // (a literal object, or {bind: "/vars"} so one cached card takes its sizes per push)
+      if (c.vars && typeof c.vars === 'object') this.ctx(c).bind(c.vars, (vs) => {
+        if (vs && typeof vs === 'object') for (const [k, v] of Object.entries(vs)) el.style.setProperty('--' + k.replace(/^--/, ''), String(v));
+      });
       if (c.when) this.applyWhen(el, c.when);
       return el;
     } catch (e) {

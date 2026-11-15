@@ -61,6 +61,9 @@ function placeControls() {
   const cx = right + R, cy = top + R;                  // corner curve centre, measured from the stage's top-right
   const at = (deg) => [cx - r * Math.cos(deg) - size / 2, cy - r * Math.sin(deg) - size / 2];   // [right, top] of a button
   const spots = { pin: at(Math.PI / 2 + spread), dismiss: at(Math.PI / 4), layer: at(-spread) };
+  // the bottom of the arc: straight under layer, down the right edge, as far from layer as the arc buttons are from each other (user, 11-15)
+  const step = 2 * r * Math.sin((Math.PI / 4 + spread) / 2);
+  spots.expand = [spots.layer[0], spots.layer[1] + Math.max(step, size + 6)];
   let w = 0, h = 0;
   for (const [id, [rr, tt]] of Object.entries(spots)) {
     const b = document.getElementById(id);
@@ -251,7 +254,7 @@ function measure() {
     });
     const p = pin.getBoundingClientRect();
     rects.push([p.left - sr.left - 3, p.top - sr.top - 3, p.width + 6, p.height + 6, p.width / 2 + 3]);
-    for (const id of ['dismiss', 'layer']) {
+    for (const id of ['dismiss', 'layer', 'expand']) {
       const d = document.getElementById(id).getBoundingClientRect();
       rects.push([d.left - sr.left - 3, d.top - sr.top - 3, d.width + 6, d.height + 6, d.width / 2 + 3]);
     }
@@ -355,6 +358,19 @@ for (const b of document.querySelectorAll('#controls .ctl')) {
   for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) b.addEventListener(ev, () => b.classList.remove('press'));
 }
 layerBtn.addEventListener('click', () => send({ t: 'layer', below: !stage.classList.contains('below') }));
+// Expand: an ask, not a resize. morc has no page action that sizes a card, so the click is a wake ({ask:"expand"|"shrink"}, the host adds
+// the card as `surface`): a live session gets it (hooks, or its inbox monitor), otherwise the background agent wakes; either answers with
+// `morc card <id> set {frac, center}`. The button keeps its state showing.
+const expandBtn = document.getElementById('expand');
+const MAXI = '<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>', MINI = '<path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/>';
+expandBtn.addEventListener('click', () => {
+  const big = !stage.classList.contains('expanded');
+  stage.classList.toggle('expanded', big);
+  expandBtn.querySelector('svg').innerHTML = big ? MINI : MAXI;
+  expandBtn.title = big ? 'Make it small again' : 'Make this big';
+  expandBtn.setAttribute('aria-label', expandBtn.title);
+  send({ t: 'act', action: { do: 'wake', payload: { ask: big ? 'expand' : 'shrink' } }, comp: 'expand' });
+});
 export function setLayer(below) {
   stage.classList.toggle('below', !!below);
   layerBtn.title = below ? 'Bring back on top' : 'Send behind the active window';

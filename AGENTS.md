@@ -138,6 +138,8 @@ Putting something on screen = **use a chip** (`docs/chips/INDEX.md`: pick the ch
 exports `width()` so a card is exactly as wide as its content).
 
 ## Pitfalls we already hit
+- **New component, open cards:** `morc refresh` does not add a new stylesheet or update other modules' imports; after `morc ui build` adds a type, `morc stop` then `morc card <id> show` (docs/learnings.md, 11-14).
+- **`morc patch @shared /x` from Git Bash** writes the key `C:/Program Files/Git/x`: prefix `MSYS_NO_PATHCONV=1`.
 - **Ids sent to a page must stay under 2^53** (JS numbers): a random u64 reply id came back rounded and matched nothing (cards "did not answer").
 - **macOS `windowNumberAtPoint` skips windows that ignore the mouse**: a card ignores it until the hit test says the pointer is on it, so using
   it for "is something in front" made every card unclickable. Lowered cards check the window list instead (platform/macos/window_style.rs).

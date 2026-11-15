@@ -1,0 +1,73 @@
+{
+ "t": "save",
+ "name": "list-open",
+ "components": [
+  {
+   "children": [
+    "t",
+    "l"
+   ],
+   "gap": 8,
+   "id": "root",
+   "type": "column",
+   "vars": {
+    "bind": "/vars"
+   }
+  },
+  {
+   "id": "t",
+   "size": "lg",
+   "text": "{/title}",
+   "type": "text"
+  },
+  {
+   "id": "l",
+   "items": {
+    "bind": "/items"
+   },
+   "max": 8,
+   "type": "list",
+   "wrap": true
+  }
+ ],
+ "data": {
+  "title": "Release notes",
+  "items": [
+   {
+    "text": "Faster cold start",
+    "sub": "The host is up in about 2.5 s on a cold machine",
+    "badge": "2.5 s"
+   },
+   {
+    "text": "Charts keep their units",
+    "sub": "Every chart draws its unit beside the value",
+    "badge": "fix"
+   },
+   {
+    "text": "Cards remember their spot",
+    "sub": "A card you dragged opens there next time",
+    "badge": "new"
+   },
+   {
+    "text": "Smaller installer",
+    "sub": "The npm package dropped the 3D model assets",
+    "badge": "-40%"
+   }
+  ]
+ },
+ "desc": "A wide pill list that shows every row in full (wrapped text, no ellipsis, no fold, size large): for dense information meant to be read in full. Data: /title, /items [{text, sub, badge}] (max 8), optional /vars (size tokens, e.g. row-title-size-wrap).",
+ "opts": {
+  "min": [
+   500,
+   460
+  ],
+  "size": "large",
+  "topic": "reading.list",
+  "ttl": 90
+ },
+ "params": [
+  "/title",
+  "/items",
+  "/vars"
+ ]
+}

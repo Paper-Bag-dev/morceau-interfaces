@@ -1,0 +1,16 @@
+{
+  "name": "codeedit",
+  "description": "The whole file of the open entity in Monaco (vendored): highlighting, VS Code keys, Ctrl+S saves. Opens and saves through allowlisted actions that read the card's persisted state; no engine path of its own.",
+  "types": [
+    "codeedit"
+  ],
+  "js": "codeedit.js",
+  "css": "codeedit.css",
+  "deps": [
+    "nav"
+  ],
+  "tokens": [
+    "ce-w",
+    "ce-h"
+  ]
+}

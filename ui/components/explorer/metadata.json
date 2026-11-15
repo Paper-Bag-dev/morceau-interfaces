@@ -1,0 +1,19 @@
+{
+  "name": "explorer",
+  "description": "A grouped, searchable list of entities (files, messages, goals...). A click opens the entity through the shared nav, so the other workbench parts follow.",
+  "types": [
+    "explorer"
+  ],
+  "js": "explorer.js",
+  "css": "explorer.css",
+  "deps": [
+    "nav"
+  ],
+  "tokens": [
+    "xp-w",
+    "xp-max-h",
+    "xp-row-pad",
+    "xp-row-size",
+    "xp-min-h"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "about": "Tokens for the shared workbench look (reference chips, status dots). Override in your prefs/tokens/nav.json.",
+  "nav-dot": "7px",
+  "nav-ref-pad": "3px 9px 3px 7px",
+  "nav-ref-size": "12.5px",
+  "nav-ref-dense-size": "11.5px"
+}

@@ -1,0 +1,25 @@
+/* steps: an ordered route through entities; a rail with a pin per step. Sizes are tokens (ui/tokens/steps.json). */
+.c-steps { display: flex; flex-direction: column; gap: 8px; width: var(--st-w, 300px); min-width: 0; }
+.c-steps button { all: unset; box-sizing: border-box; cursor: pointer; }
+.c-steps svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.c-steps .st-nav { display: flex; align-items: center; gap: 4px; flex: none; }
+.c-steps .nb { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; }
+.c-steps .nb:is(:hover, .hov) { background: rgb(255 255 255 / .1); }
+.c-steps .nb[disabled] { opacity: .3; pointer-events: none; }
+.c-steps .st-list { list-style: none; margin: 0; padding: 0 0 0 4px; display: flex; flex-direction: column; max-height: var(--st-max-h, 200px); overflow-y: auto; }
+.c-steps .st-step { position: relative; }
+.c-steps .st-step::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 1.5px; background: rgb(255 255 255 / .14); }
+.c-steps .st-step:first-child::before { top: 50%; }
+.c-steps .st-step:last-child::before { bottom: 50%; }
+.c-steps .st-step.past::before, .c-steps .st-step.on::before { background: hsl(var(--accent, var(--primary)) / .6); }
+.c-steps .st-step > button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 4px 8px 4px 0; border-radius: 8px; font-size: 13px; min-width: 0; }
+.c-steps .st-step > button:is(:hover, .hov) { background: rgb(255 255 255 / .06); }
+.c-steps .st-step > button:focus-visible { outline: 2px solid hsl(var(--accent, var(--primary)) / .7); }
+.c-steps .pin { position: relative; z-index: 1; flex: none; width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid rgb(255 255 255 / .4); background: hsl(220 14% 14%);
+  transition: transform .22s var(--spring, cubic-bezier(.16, 1, .3, 1)), background .2s, border-color .2s; }
+.c-steps .st-step.past .pin { border-color: hsl(var(--accent, var(--primary))); background: hsl(var(--accent, var(--primary)) / .4); }
+.c-steps .st-step.on .pin { border-color: hsl(var(--accent, var(--primary))); background: hsl(var(--accent, var(--primary))); transform: scale(1.2); }
+.c-steps .st-step .t { min-width: 0; overflow-wrap: anywhere; }
+.c-steps .st-step.on .t { font-weight: 600; }
+.c-steps .st-step .s { flex: none; margin-left: auto; font-size: 11.5px; color: rgb(255 255 255 / .5); }
+@media (prefers-reduced-motion: reduce) { .c-steps .pin { transition: none; } }

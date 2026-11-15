@@ -1,0 +1,63 @@
+{
+  "t": "save",
+  "name": "workbench-editor",
+  "desc": "Workbench editor: tabs, back/forward, breadcrumb, the open item (note, links, code peek) and the whole file, editable (Ctrl+S saves through the wb-open / wb-save actions). Pass /entities, /groups, /empty, /vars.",
+  "params": [
+    "/entities",
+    "/groups",
+    "/empty",
+    "/vars"
+  ],
+  "opts": {
+    "min": [
+      320,
+      200
+    ],
+    "ttl": 3600,
+    "topic": "wb.inspector",
+    "size": "large",
+    "persist": true
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 6,
+      "children": [
+        "i",
+        "e"
+      ],
+      "vars": {
+        "bind": "/vars"
+      }
+    },
+    {
+      "id": "i",
+      "type": "inspector",
+      "entities": {
+        "bind": "/entities"
+      },
+      "groups": {
+        "bind": "/groups"
+      },
+      "empty": {
+        "bind": "/empty"
+      }
+    },
+    {
+      "id": "e",
+      "type": "codeedit",
+      "entities": {
+        "bind": "/entities"
+      },
+      "open": "wb-open",
+      "save": "wb-save"
+    }
+  ],
+  "data": {
+    "entities": [],
+    "groups": [],
+    "empty": "Pick something in a list to open it here.",
+    "vars": {}
+  }
+}

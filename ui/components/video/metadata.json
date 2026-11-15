@@ -1,0 +1,9 @@
+{
+  "name": "video",
+  "description": "A 16:9 video player: a YouTube link or id plays in YouTube's embedded player, any other URL in a <video> with controls. Sizes are tokens.",
+  "types": ["video"],
+  "js": "video.js",
+  "css": "video.css",
+  "deps": ["plate"],
+  "tokens": ["vd-w", "vd-gap", "vd-title-size", "vd-radius"]
+}

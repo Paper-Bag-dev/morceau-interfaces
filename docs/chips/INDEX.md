@@ -24,6 +24,8 @@ when it has: its layout JSON, a short md in `docs/chips/`, a line in this index,
 separate card (`donut-card`, `week-chart`). Never mix a picture and a text list in one card, never stack everything as one long vertical story, never
 one big blocker. Several small cards spread into the free space (`--region auto`), sized in between (about importance 1.0; text cards 0.85 to 1.0).
 
+- **workbench** ([workbench.md](workbench.md)): a multi-card app (explorer, editor, flow, problems) over any entity file; open the panes as cards, lay out with `morc card move`.
+
 ## THE LADDER (always follow it, in this order, every time you put cards on screen)
 1. **Need.** List the cards you want and their kind: text/numbers or a picture (chart). Rank them: what matters most goes first.
 2. **Look.** `morc space` (or `morc free`): the `mode` and the free regions with their sizes. `mode` is `around-active` (the active window is the centre of the 3x3 grid and the free sides and corners are around it) or `screen-thirds` (a FULLSCREEN app is active: no window to dock beside, the screen is split into left, mid and right thirds). In `screen-thirds` the host HOLDS every push that is not urgent or `--force` (`morc push` prints `held <name>: ...`); report what is waiting and push when the fullscreen app is gone. Never push over a game or a video.
@@ -119,6 +121,7 @@ Skipping a rung is how we got 12 oversized cards piled on the terminal. Do not s
 |---|---|---|---|
 | `tokens-dashboard` | Claude token usage: `morc tokens` pushes SEVERAL SMALL cards into free space (default); the one big card only with `--one-card` | total, today, reuse, replies, models, days | [tokens-dashboard.md](tokens-dashboard.md) |
 | `stat-chip` | ONE number as a small rectangular chip (hero numeral, unit, grey caption); several numbers = several chips | label, value, unit | [stat-chip.md](stat-chip.md) |
+| `list-open` | the READING card: dense facts in full (wrapped, no ellipsis, zoom 1), size A = the user's pick (13 / 11.5 px, theme-rules 12c) | title, items, vars | [list-open.md](list-open.md) |
 | `donut-card` | a share-of-a-whole donut | title, values, labels | [donut-card.md](donut-card.md) |
 | `chart-stack` | two charts in ONE window (donut over bars) for a tall free side | pie, bars | [chart-stack.md](chart-stack.md) |
 | `stat-strip` | four numbers in ONE flex row for the strip above or below the active window | a, b, c, d | [stat-strip.md](stat-strip.md) |
@@ -148,3 +151,7 @@ Every seed ships realistic sample `data` (labels, values, units), never zeros, b
 Buttons follow the accent; to colour one by meaning set `"tone": "green|yellow|blue|purple|red"` on it in the card JSON (theme-rules 5).
 Long text folds to a narrow 4-line box and grows mostly DOWN on hover (tokens compact-text-*, text-open-w), never wide.
 
+| `sprint-timer` | a small ring sprint timer that stays up: arc toward the goal, elapsed inside, end time, pause icon | title, start (epoch ms), goal_min | [sprint-timer.md](sprint-timer.md) |
+| `skyline-card` | today as a 2D city per hour (live from any per-hour JSON), dances to `morc beat` | title, day | [skyline-card.md](skyline-card.md) |
+| `beatring-card` | a circle music visualizer (RGB radial bars, pulsing core, now playing) | none (binds @/beat, @/media) | [beatring-card.md](beatring-card.md) |
+| `video-card` | a 16:9 video player (YouTube link or id, or a media URL) | title, src | [video-card.md](video-card.md) |

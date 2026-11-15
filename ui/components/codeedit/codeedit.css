@@ -1,0 +1,12 @@
+/* codeedit: the whole file, editable, with line numbers. Sizes are tokens (ui/tokens/codeedit.json). */
+.c-codeedit { display: flex; flex-direction: column; gap: 6px; width: var(--ce-w, 560px); min-width: 0; }
+.c-codeedit .ce-bar { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 12.5px; }
+.c-codeedit .ce-bar .path { min-width: 0; overflow-wrap: anywhere; color: rgb(255 255 255 / .8); }
+.c-codeedit .ce-bar .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: hsl(var(--accent, var(--primary))); }
+.c-codeedit .ce-bar .msg { flex: 1; min-width: 0; text-align: right; color: rgb(255 255 255 / .55); font-size: 12px; }
+.c-codeedit .ce-btn { all: unset; flex: none; cursor: pointer; padding: 3px 11px; border-radius: 99px; font-size: 12.5px; background: rgb(255 255 255 / .08); }
+.c-codeedit .ce-btn:is(:hover, .hov) { background: rgb(255 255 255 / .15); }
+.c-codeedit .ce-btn.primary { background: hsl(var(--accent, var(--primary))); color: var(--fill-ink, #111); font-weight: 600; }
+.c-codeedit .ce-btn[disabled] { opacity: .35; pointer-events: none; }
+.c-codeedit .ce-btn:focus-visible { outline: 2px solid hsl(var(--accent, var(--primary)) / .7); }
+.c-codeedit .ce-body { min-width: 0; height: var(--ce-h, 360px); border-radius: 10px; overflow: hidden; }   /* Monaco fills it (automaticLayout) */

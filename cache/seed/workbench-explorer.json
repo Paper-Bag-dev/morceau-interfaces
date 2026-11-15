@@ -1,0 +1,62 @@
+{
+  "t": "save",
+  "name": "workbench-explorer",
+  "desc": "Workbench list: entities grouped and searchable; a click opens one in every workbench card on the same nav. Pass /title, /entities, /groups, /only (a field filter), /folded. /vars sets its size tokens (morc workbench fills them per slot).",
+  "params": [
+    "/title",
+    "/entities",
+    "/groups",
+    "/only",
+    "/folded",
+    "/vars"
+  ],
+  "opts": {
+    "min": [
+      280,
+      200
+    ],
+    "ttl": 3600,
+    "topic": "wb.explorer",
+    "size": "large"
+  },
+  "components": [
+    {
+      "id": "root",
+      "type": "column",
+      "gap": 6,
+      "children": [
+        "x"
+      ],
+      "vars": {
+        "bind": "/vars"
+      }
+    },
+    {
+      "id": "x",
+      "type": "explorer",
+      "title": {
+        "bind": "/title"
+      },
+      "entities": {
+        "bind": "/entities"
+      },
+      "groups": {
+        "bind": "/groups"
+      },
+      "only": {
+        "bind": "/only"
+      },
+      "folded": {
+        "bind": "/folded"
+      }
+    }
+  ],
+  "data": {
+    "title": "Explorer",
+    "entities": [],
+    "groups": [],
+    "only": null,
+    "folded": [],
+    "vars": {}
+  }
+}

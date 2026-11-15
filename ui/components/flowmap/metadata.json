@@ -1,0 +1,9 @@
+{
+  "name": "flowmap",
+  "description": "The whole entity graph on React Flow (vendored bundle with React and dagre): pan, scroll, zoom, minimap, drag nodes; click a node to open it through nav, the open one's links animate.",
+  "types": ["flowmap"],
+  "js": "flowmap.js",
+  "css": "flowmap.css",
+  "deps": ["nav"],
+  "tokens": ["fm-w", "fm-h"]
+}

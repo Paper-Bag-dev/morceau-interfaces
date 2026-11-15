@@ -1,0 +1,4 @@
+{
+  "about": "Tokens for the skyline (the day as a city). Override in your prefs/tokens/skyline.json.",
+  "sk-w": "520px", "sk-gap": "8px", "sk-title-size": "15px", "sk-hero-size": "32px", "sk-unit-size": "12.5px", "sk-radius": "12px", "sk-sky": "#0e1020"
+}

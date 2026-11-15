@@ -1,0 +1,8 @@
+{
+  "about": "Tokens for the inspector (editor) pane. Override in your prefs/tokens/inspector.json.",
+  "ins-w": "460px",
+  "ins-max-h": "300px",
+  "ins-title-size": "22px",
+  "ins-code-size": "12px",
+  "ins-min-h": "0px"
+}

@@ -6,6 +6,7 @@ things it depends on) and writes the two files everyone starts from:
   ui/COMPONENTS.md     the index: where everything is. Read it first, then fetch only the folder you need.
 Nothing is merged into a big file: change a component by editing its folder, then run `morc ui build`."""
 import json
+import re
 import os
 import sys
 
@@ -112,6 +113,9 @@ def new(name, deps, types):
 
 def main(argv):
     cmd = argv[0] if argv else "list"
+    if cmd in ("-h", "--help", "help") or "--help" in argv[:2] or "-h" in argv[:2]:
+        print(__doc__ or "morc ui build | list | map | show NAME | new NAME [--deps a,b] [--types t1,t2]")
+        return 0
     if cmd == "build":
         return build()
     if cmd == "map":  # the component map from the running host's memory (hot-reloaded), with absolute paths
@@ -141,6 +145,10 @@ def main(argv):
         print(json.dumps(m, indent=1))
         return 0
     if cmd == "new" and len(argv) > 1:
+        # a name is a folder: letters, digits and dashes, never a flag (`morc ui new --help` once made a component called "--help")
+        if not re.fullmatch(r"[a-z][a-z0-9-]*", argv[1]):
+            print(f"bad component name {argv[1]!r}: use lowercase letters, digits and dashes, starting with a letter")
+            return 2
         def flag(k):
             return argv[argv.index(k) + 1].split(",") if k in argv else []
         return new(argv[1], flag("--deps"), flag("--types"))

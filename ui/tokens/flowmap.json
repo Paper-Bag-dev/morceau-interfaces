@@ -1,0 +1,5 @@
+{
+  "about": "Tokens for the flow map canvas. Override in your prefs/tokens/flowmap.json.",
+  "fm-w": "480px",
+  "fm-h": "420px"
+}

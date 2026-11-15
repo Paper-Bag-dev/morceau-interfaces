@@ -1,0 +1,9 @@
+{
+  "name": "nav",
+  "description": "The shared navigation model for workbench parts: selection, tabs, back/forward at a shared-store path; entity lookup; the reference chip and status dot. No component of its own.",
+  "types": [],
+  "js": "nav.js",
+  "css": "nav.css",
+  "deps": ["plate"],
+  "tokens": ["nav-dot", "nav-ref-pad", "nav-ref-size", "nav-ref-dense-size"]
+}

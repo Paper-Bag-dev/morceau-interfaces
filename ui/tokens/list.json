@@ -1,5 +1,5 @@
 {
-  "about": "list rows (ui/components/list): sizes as CSS variables. Rows are one even pill each: title and sub line on one line apiece, cut with an ellipsis, full text in the tooltip.",
+  "about": "list rows (ui/components/list): sizes as CSS variables. Rows are one even pill each: title and sub line on one line apiece, cut with an ellipsis, full text in the tooltip. wrap:true rows (dense reading): wider, text wraps in full, title 13px and sub 11.5px: size A, the user's pick on 11-13 (docs/theme-rules.md 12c; min 12.5/11.5, max 17/14).",
   "list-min-w": "230px",
   "list-max-w": "250px",
   "list-gap": "6px",
@@ -9,5 +9,10 @@
   "row-gap": "10px",
   "row-radius": "14px",
   "row-title-size": "12.5px",
-  "row-sub-size": "11.5px"
+  "row-sub-size": "11.5px",
+  "list-wide-min-w": "300px",
+  "list-wide-max-w": "320px",
+  "row-pad-y-wrap": "7px",
+  "row-title-size-wrap": "13px",
+  "row-sub-size-wrap": "11.5px"
 }

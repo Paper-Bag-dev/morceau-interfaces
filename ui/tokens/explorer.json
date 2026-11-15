@@ -1,0 +1,8 @@
+{
+  "about": "Tokens for the explorer list. Override in your prefs/tokens/explorer.json.",
+  "xp-w": "260px",
+  "xp-max-h": "260px",
+  "xp-row-pad": "4px 8px",
+  "xp-row-size": "13px",
+  "xp-min-h": "0px"
+}

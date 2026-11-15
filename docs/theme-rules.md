@@ -44,6 +44,21 @@ The why behind each rule is in `design.md` (the dated notes); this page is the c
       caption line. Over budget: fold it into a pill list (`list-long`), trim it or split it into another card; never shrink the type.
     - Min: every card has a title, and every number has a unit and a label (`387 GB`, "Disk use"). A caption is not required.
     - Type sizes stay at the floors (card text 15 px, charts 13 px, hero 32 to 36 px); no maximum.
+12c. **Reading-card size, picked by the user from three on screen (11-13). HARD RULE, the default for every info-dense list.**
+    The user compared A small, B medium and C large side by side and chose **A**. Use the `list-open` chip (list `wrap: true`); the
+    defaults are in `ui/tokens/list.json`:
+    | | min (never below) | default = A (the user's pick) | max (only on request) |
+    |---|---|---|---|
+    | row title | 12.5 px | **13 px** (`row-title-size-wrap`) | 17 px |
+    | row detail line | 11.5 px | **11.5 px** (`row-sub-size-wrap`) | 14 px |
+    | list width | 300 px | **300 to 320 px** (`list-wide-min-w` / `list-wide-max-w`) | 420 px |
+    | row padding (vertical) | 7 px | **7 px** (`row-pad-y-wrap`) | 10 px |
+    | card zoom | **1** (`large.min-zoom`) | 1 | `max-zoom` |
+    - Whole text, no ellipsis: rows wrap onto two lines rather than cut. The card is about 410 css px wide (510 physical at 125 %).
+    - The zoom never goes under 1, so the floors hold on screen too. Check `zoom` in `morc tree <card>` after every push; under 1 = split
+      the card or narrow it, never scale it down.
+    - Per-card sizes are data: `vars` on any component sets its tokens (`"vars": {"row-title-size-wrap": "15px"}`, or `{bind: "/vars"}`).
+    - Placing several reading cards: one per third, left to right in reading order, no overlap (verify the rects in `morc status`).
 
 ## Size by purpose
 13. Every chip says what it is in its seed `opts.size` (user, 11-11):

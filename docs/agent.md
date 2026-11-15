@@ -125,3 +125,6 @@ A button can ask the chore agent to build more while the user waits: action `[{d
 - **Change a card in place, never show it twice:** `morc card <id> hide|show|front|lower|raise|move|size|set` (docs/cards.md), `morc patch`,
   `morc do <id> <action> '{...}'`. `morc cards` lists every card, including hidden and closed ones that `show` can bring back.
 - **Several cards showing one value:** bind them to `@/name`, set it once with `morc patch @shared /name value`.
+- **Expand button.** A wake `{ask: "expand", surface: <card>}` comes from the card's corner arc: answer at once with
+  `morc card <card> set '{"frac":0.92,"center":true}'` and `morc card <card> front` (a chip's `opts.expand_vars` grow its content first);
+  `{ask: "shrink"}` puts the cap and the spot back. `morc expand watch` does both for a whole session; start it in the background.

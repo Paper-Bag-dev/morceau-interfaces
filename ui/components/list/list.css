@@ -5,6 +5,12 @@
 .c-list .item.act { position: relative; overflow: hidden; cursor: pointer; } .c-list .item.act:is(:hover, .hov) { transform: translateX(3px); background: hsl(var(--secondary)); }
 .c-list .txt { flex: 1 1 auto; min-width: 0; }
 .c-list .ttl, .c-list .sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* wrap:true: a wide list for dense reading; rows grow to show the whole title and sub line instead of cutting them */
+.c-list:has(> .item.wrap) { min-width: var(--list-wide-min-w, 300px); max-width: var(--list-wide-max-w, 320px); }
+.c-list .item.wrap .ttl, .c-list .item.wrap .sub { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.35; }
+.c-list .item.wrap { padding-top: var(--row-pad-y-wrap, 7px); padding-bottom: var(--row-pad-y-wrap, 7px); }
+.c-list .item.wrap .ttl { font-size: var(--row-title-size-wrap, 13px); }
+.c-list .item.wrap .sub { font-size: var(--row-sub-size-wrap, 11.5px); }
 .c-list .sub { color: hsl(var(--muted-foreground)); font-size: var(--row-sub-size, 11.5px); }
 .c-list .badge { flex: none; }
 /* macOS: each row is a dark pill-shaped lens on the glass plate: a dark fill, deeper toward the edges (an inset shadow, so it follows the

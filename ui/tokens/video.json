@@ -1,0 +1,7 @@
+{
+  "about": "Tokens for the video player. Override in your prefs/tokens/video.json.",
+  "vd-w": "560px",
+  "vd-gap": "8px",
+  "vd-title-size": "15px",
+  "vd-radius": "12px"
+}

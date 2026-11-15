@@ -1,0 +1,11 @@
+{
+  "about": "timer: the ring's size and stroke, the elapsed time inside it (hours:minutes) and the seconds under it, the card padding, the gap between ring and foot. tm-rest-opacity / tm-fade-ms: how see-through the card rests when not hovered and how fast it fades.",
+  "tm-ring": "104px",
+  "tm-stroke": "5",
+  "tm-hero-size": "26px",
+  "tm-sec-size": "12.5px",
+  "tm-pad": "6px 8px 6px",
+  "tm-gap": "4px",
+  "tm-rest-opacity": ".35",
+  "tm-fade-ms": "260ms"
+}

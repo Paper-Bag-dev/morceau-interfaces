@@ -1,0 +1,11 @@
+{
+ "t": "save", "name": "beatring-card",
+ "desc": "A circle visualizer for the music: RGB radial bars from @/beat (fed by `morc beat`), pulsing core, the playing title from @/media.",
+ "params": [],
+ "opts": {"min": [260, 260], "ttl": 900, "topic": "media.visualizer", "importance": "1.0", "size": "medium"},
+ "components": [
+  {"id": "root", "type": "column", "gap": 0, "children": ["r"]},
+  {"id": "r", "type": "beatring", "beat": {"bind": "@/beat"}, "media": {"bind": "@/media"}}
+ ],
+ "data": {}
+}
