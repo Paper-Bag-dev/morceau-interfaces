@@ -1,6 +1,6 @@
 {
   "t": "save", "name": "ask-permission",
-  "desc": "Urgent yes/no ask routed back to Claude (wake). Check/x icon buttons (label dropped once the user has learned the icons). Sticky, ringed, parked if ignored; `morc summon` brings it back.",
+  "desc": "Urgent yes/no ask routed back to Claude (wake). Check/x icon buttons (label dropped once the user has learned the icons). Pinned, ringed, parked if ignored; `morc summon` brings it back.",
   "params": ["/title", "/body", "/yes", "/no", "/ctx"],
   "opts": { "min": [260,130], "urgent": true, "topic": "agent.ask", "anchor": "near_focus" },
   "components": [

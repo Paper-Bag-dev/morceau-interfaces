@@ -111,7 +111,7 @@ impl Surface {
             ready: false,
             init: None,
             last_init: Value::Null,
-            life: Life::new(None, false, now),
+            life: Life::new(None, false, false, now),
             user_moved: false,
             inset: (0, 0, 0, 0),
             recenter: false,

@@ -15,7 +15,7 @@
       280,
       120
     ],
-    "sticky": true,
+    "pinned": true,
     "topic": "agent.run",
     "size": "medium"
   },

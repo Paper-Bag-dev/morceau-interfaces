@@ -51,7 +51,7 @@ impl Host {
             state::restore(&id, &mut data);   // the last snapshot wins over the spec's starting data
         }
         let mut payload = json!({"t": "init", "id": id, "components": components, "data": data,
-                             "opts": {"urgent": opts.urgent, "pulse": matches!(opts.importance.as_deref(), Some("high") | Some("critical")), "sticky": opts.sticky || opts.urgent, "topic": topic, "theme": opts.theme, "align": opts.align, "size": opts.size, "idle": opts.idle, "actions": opts.actions, "persist": opts.persist}, "literacy": literacy::snapshot()});
+                             "opts": {"urgent": opts.urgent, "pulse": matches!(opts.importance.as_deref(), Some("high") | Some("critical")), "pinned": opts.pinned, "topic": topic, "theme": opts.theme, "align": opts.align, "size": opts.size, "idle": opts.idle, "actions": opts.actions, "persist": opts.persist}, "literacy": literacy::snapshot()});
         if self.root.is_none() {
             payload["shared"] = self.shared.clone();   // unlinked cards start from the host's copy of the shared store
         }
@@ -70,7 +70,7 @@ impl Host {
                 s.send(&payload);
                 s.last_init = payload;
                 s.opts = opts.clone();
-                s.life.restart(opts.ttl, opts.sticky || opts.urgent, Instant::now());
+                s.life.restart(opts.ttl, opts.urgent, opts.pinned, Instant::now());
                 return json!({"ok": true, "status": "shown", "id": id, "note": "refreshed"});
             }
             self.destroy(k);
@@ -91,7 +91,7 @@ impl Host {
         s.phase = Phase::Waiting;
         s.phase_since = Instant::now();
         s.user_moved = false;
-        s.life = Life::new(opts.ttl, opts.sticky || opts.urgent, Instant::now());
+        s.life = Life::new(opts.ttl, opts.urgent, opts.pinned, Instant::now());
         payload["view"] = view_for(s, &opts, &prefs, &topic, &widgets);
         s.last_init = payload.clone();
         if s.ready {

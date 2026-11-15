@@ -1,7 +1,7 @@
 // Entry point. Registers the catalog, then answers the host.
 
 import { Renderer } from './render.js';
-import { send, measureSoon, dropped, setLayer, setView, setViewSmooth, setLimits, limit, followGlass } from './bridge.js';
+import { send, measureSoon, dropped, setLayer, showPinned, setView, setViewSmooth, setLimits, limit, followGlass } from './bridge.js';
 import { working } from './working.js';
 import { enter, arrive, leave, pulse, reduced, setReduced } from './motion.js';
 import { pick as pickTheme, apply as applyTheme, adaptToBackdrop, setBoldness, setThemes } from './theme.js';
@@ -101,6 +101,7 @@ window.morc = {
     switch (m.t) {
       case 'init':
         stage.classList.toggle('urgent', !!(m.opts && m.opts.urgent));
+        showPinned(m.opts && m.opts.pinned);
         stage.classList.toggle('pulse', !!(m.opts && m.opts.pulse));
         stage.dataset.size = (m.opts && m.opts.size) || '';   // compact | medium | large (core/bridge.js COMPACT)
         stage.dataset.idle = (m.opts && m.opts.idle) || '';   // 0..1: rest at this fraction when not in use (core/bridge.js IDLE)
@@ -164,7 +165,8 @@ window.morc = {
         break;
       }
       case 'refresh': refresh(m.names); break;
-      case 'layer': setLayer(m.below); break;   // the host moved this card behind / in front of the active window
+      case 'layer': setLayer(m.below); break;
+      case 'pinned': showPinned(m.v); break;   // the agent pinned / unpinned this card (`morc card <id> set {pinned}`)   // the host moved this card behind / in front of the active window
       case 'shared': applyRemote(m.path, m.value); break;   // unlinked cards: another card (or morc patch @shared) changed the shared store
       case 'backdrop': lastRgb = m.rgb; adaptToBackdrop(stage, m.rgb); break;   // sampled just before the window appears
       case 'enter': {

@@ -15,7 +15,7 @@ fn tools() -> Value {
          "inputSchema": obj(json!({"all": {"type": "boolean"}, "depth": {"type": "integer", "description": "card tree depth when all=true"}}), &[])},
         {"name": "card_tree", "description": "One card's tree: its components with ids, types, rects (css px) and flags (cut = text cut off, clipped = content hidden without a scroll, scrolls, offcard, hidden), its data keys and named actions.",
          "inputSchema": obj(json!({"card": {"type": "string"}, "depth": {"type": "integer"}, "node": {"type": "string", "description": "start at this component id"}}), &["card"])},
-        {"name": "show_chip", "description": "Show a cached chip (morc use): name, data to merge over its defaults, optional id and opts (ttl, sticky, region, size, persist, actions ...).",
+        {"name": "show_chip", "description": "Show a cached chip (morc use): name, data to merge over its defaults, optional id and opts (ttl, pinned, region, size, persist, actions ...).",
          "inputSchema": obj(json!({"name": {"type": "string"}, "id": {"type": "string"}, "data": {"type": "object"}, "opts": {"type": "object"}}), &["name"])},
         {"name": "patch", "description": "Change data on a live card without re-showing it: data = {\"/pointer\": value}. card \"@shared\" = the store all linked cards can bind to.",
          "inputSchema": obj(json!({"card": {"type": "string"}, "data": {"type": "object"}}), &["card", "data"])},

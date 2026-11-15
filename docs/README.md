@@ -26,8 +26,8 @@
 1. `morc show` / `use` -> the host claims a hidden warm window, the page renders, reports its size and clickable shapes.
 2. The host sizes the window to the content, clips it to the shapes (the rest is click-through), picks a spot (regions, then scored placement), shows it without
    taking focus, and the page springs in.
-3. It stays about 15 s with no interaction (hover pauses; interaction extends; pin holds; sticky skips the timer), then fades out. Ignored, glanced or engaged is
-   logged. Urgent surfaces are ringed and sticky; if untouched they are parked, not lost: `morc summon`.
+3. It stays about 15 s with no interaction (hover pauses; interaction extends; pin holds, set by the user or the agent), then fades out. Ignored, glanced or engaged is
+   logged. Urgent surfaces are ringed and have no timer; if untouched they are parked, not lost: `morc summon`.
 4. You can hold the left button ~0.1 s on it to pick it up and carry it; the spot is remembered per topic.
 
 ## Map of the engine (`src/`)

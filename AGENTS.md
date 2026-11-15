@@ -95,7 +95,7 @@ Windows and macOS are both maintained from the same source; nothing Windows-only
   plugins parse, shipped JSON is valid, the platform rule, no secrets or local machine paths). Check Windows from a Mac before pushing:
   `rustup target add x86_64-pc-windows-msvc` once, then `cargo check --release --target x86_64-pc-windows-msvc`.
 - **Motion only when important:** `urgent` gives a still ring and parks an ignored card; the pulse (ring animation + button shimmer) needs
-  `importance` high or critical too (host sends `opts.pulse`). Routine cards (`confirm-run`, `ask-many`) are sticky, not urgent.
+  `importance` high or critical too (host sends `opts.pulse`). Routine cards (`confirm-run`, `ask-many`) are pinned, not urgent.
 - **Before pushing a platform change:** build on both systems (`cargo build --release` on Windows and on macOS), or at least `cargo check` for the other
   target. A cfg mistake only shows up when that target is compiled.
 

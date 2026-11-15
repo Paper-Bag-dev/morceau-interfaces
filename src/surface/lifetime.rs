@@ -1,6 +1,8 @@
 //! When does a surface go away? Pure logic (no windows), so it is unit-testable.
 //! Default: vanish quietly after ~15s of no interaction. Hover or interaction buys time.
-//! Sticky/urgent surfaces skip the timer but are still removed (quietly) if stale; urgent ones are parked, not lost.
+//! Pinned surfaces never go: the agent pins with `opts.pinned` (or `morc card <id> set {"pinned": true}`), the user with the pin button,
+//! and either can unpin; an unpinned card then runs its ttl from that moment.
+//! Urgent surfaces skip the timer but are parked (not lost) once untouched for 10 min.
 
 use std::time::{Duration, Instant};
 
@@ -38,7 +40,8 @@ pub struct Life {
     pub deadline: Instant,
     pub last_touch: Instant,
     pub ttl: f64,
-    pub sticky: bool,
+    /// Urgent: no timer, parked (Outcome::Stale) once untouched for STALE_AFTER.
+    pub urgent: bool,
     pub pinned: bool,
     pub hover: bool,
     pub dragging: bool,
@@ -47,9 +50,18 @@ pub struct Life {
 }
 
 impl Life {
-    pub fn new(ttl: Option<f64>, sticky: bool, now: Instant) -> Life {
+    pub fn new(ttl: Option<f64>, urgent: bool, pinned: bool, now: Instant) -> Life {
         let ttl = ttl.unwrap_or(DEFAULT_TTL).max(2.0);
-        Life { shown: now, deadline: now + Duration::from_secs_f64(ttl), last_touch: now, ttl, sticky, pinned: false, hover: false, dragging: false, engaged: false, glanced: false }
+        Life { shown: now, deadline: now + Duration::from_secs_f64(ttl), last_touch: now, ttl, urgent, pinned, hover: false, dragging: false, engaged: false, glanced: false }
+    }
+
+    /// Pin or unpin (the user's button or the agent). Unpinning starts the ttl again from now, so the card does not vanish at once.
+    pub fn set_pinned(&mut self, v: bool, now: Instant) {
+        if self.pinned && !v {
+            self.deadline = now + Duration::from_secs_f64(self.ttl.max(AFTER_INTERACT));
+            self.last_touch = now;
+        }
+        self.pinned = v;
     }
 
     fn extend(&mut self, now: Instant, secs: f64) {
@@ -81,9 +93,11 @@ impl Life {
     }
 
     /// A fresh show/replace on the same id restarts the clock.
-    pub fn restart(&mut self, ttl: Option<f64>, sticky: bool, now: Instant) {
+    /// A pin survives a re-push (only an unpin takes it away); `pinned` here can only add one.
+    pub fn restart(&mut self, ttl: Option<f64>, urgent: bool, pinned: bool, now: Instant) {
         self.ttl = ttl.unwrap_or(DEFAULT_TTL).max(2.0);
-        self.sticky = sticky;
+        self.urgent = urgent;
+        self.pinned |= pinned;
         self.deadline = now + Duration::from_secs_f64(self.ttl);
         self.last_touch = now;
     }
@@ -110,7 +124,7 @@ impl Life {
         if self.pinned || self.hover || self.dragging {
             return None;
         }
-        if self.sticky {
+        if self.urgent {
             return if now.duration_since(self.last_touch) >= STALE_AFTER { Some(Outcome::Stale) } else { None };
         }
         if now >= self.deadline {
@@ -127,7 +141,7 @@ mod tests {
     #[test]
     fn expires_ignored() {
         let t0 = Instant::now();
-        let l = Life::new(Some(10.0), false, t0);
+        let l = Life::new(Some(10.0), false, false, t0);
         assert_eq!(l.due(t0 + Duration::from_secs(5)), None);
         assert_eq!(l.due(t0 + Duration::from_secs(11)), Some(Outcome::Ignored));
     }
@@ -135,7 +149,7 @@ mod tests {
     #[test]
     fn hover_pauses_then_grants_grace() {
         let t0 = Instant::now();
-        let mut l = Life::new(Some(10.0), false, t0);
+        let mut l = Life::new(Some(10.0), false, false, t0);
         l.on_hover(true, t0 + Duration::from_secs(8));
         assert_eq!(l.due(t0 + Duration::from_secs(30)), None);
         l.on_hover(false, t0 + Duration::from_secs(30));
@@ -146,17 +160,29 @@ mod tests {
     #[test]
     fn interaction_means_engaged_and_pin_holds() {
         let t0 = Instant::now();
-        let mut l = Life::new(Some(10.0), false, t0);
+        let mut l = Life::new(Some(10.0), false, false, t0);
         l.on_interact(t0 + Duration::from_secs(3));
         assert_eq!(l.due(t0 + Duration::from_secs(20)), Some(Outcome::Engaged));
-        l.pinned = true;
+        l.set_pinned(true, t0 + Duration::from_secs(20));
         assert_eq!(l.due(t0 + Duration::from_secs(9999)), None);
     }
 
     #[test]
-    fn sticky_goes_stale_quietly() {
+    fn pinned_from_the_start_stays_until_unpinned() {
         let t0 = Instant::now();
-        let l = Life::new(None, true, t0);
+        let mut l = Life::new(Some(15.0), false, true, t0);
+        assert_eq!(l.due(t0 + Duration::from_secs(86_400)), None);   // a day later, still up
+        l.restart(Some(15.0), false, false, t0 + Duration::from_secs(100));
+        assert!(l.pinned, "a re-push without the pin keeps it");
+        l.set_pinned(false, t0 + Duration::from_secs(200));
+        assert_eq!(l.due(t0 + Duration::from_secs(205)), None);   // the ttl starts at the unpin
+        assert!(l.due(t0 + Duration::from_secs(216)).is_some());
+    }
+
+    #[test]
+    fn urgent_goes_stale_quietly() {
+        let t0 = Instant::now();
+        let l = Life::new(None, true, false, t0);
         assert_eq!(l.due(t0 + Duration::from_secs(300)), None);
         assert_eq!(l.due(t0 + Duration::from_secs(601)), Some(Outcome::Stale));
     }
@@ -164,12 +190,12 @@ mod tests {
     #[test]
     fn away_time_does_not_count() {
         let t0 = Instant::now();
-        let mut l = Life::new(Some(15.0), false, t0);
+        let mut l = Life::new(Some(15.0), false, false, t0);
         l.hold(Duration::from_secs(300)); // the user was away for 5 minutes
         assert_eq!(l.due(t0 + Duration::from_secs(20)), None);
         assert_eq!(l.due(t0 + Duration::from_secs(316)), Some(Outcome::Ignored));
-        let mut st = Life::new(None, true, t0);
-        st.hold(Duration::from_secs(900)); // a sticky card survives a long absence
+        let mut st = Life::new(None, true, false, t0);
+        st.hold(Duration::from_secs(900)); // an urgent card survives a long absence
         assert_eq!(st.due(t0 + Duration::from_secs(700)), None);
     }
 }

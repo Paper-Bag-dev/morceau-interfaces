@@ -140,7 +140,7 @@ fn rand_u64() -> u64 {
 fn merge_opts(over: &Opts, base: &Opts) -> Opts {
     Opts {
         ttl: over.ttl.or(base.ttl),
-        sticky: over.sticky || base.sticky,
+        pinned: over.pinned || base.pinned,
         urgent: over.urgent || base.urgent,
         anchor: over.anchor.clone().or_else(|| base.anchor.clone()),
         at: over.at.or(base.at),

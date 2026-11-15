@@ -1,7 +1,7 @@
 {
   "t": "save",
   "name": "paste-blocks",
-  "desc": "Paste blocks to hand over in order (prompts, tool configs, bodies): a title, then one numbered row per block with its size and a Copy button; a click on a row shows the exact text. Rows stay marked Copied. Pass /title, /body (one line: where to paste) and /items [{title, text, note?}]. Long text: write a JSON file and use --data @file.json. Sticky until closed.",
+  "desc": "Paste blocks to hand over in order (prompts, tool configs, bodies): a title, then one numbered row per block with its size and a Copy button; a click on a row shows the exact text. Rows stay marked Copied. Pass /title, /body (one line: where to paste) and /items [{title, text, note?}]. Long text: write a JSON file and use --data @file.json. Pinned until closed.",
   "params": [
     "/title",
     "/body",
@@ -12,7 +12,7 @@
       340,
       120
     ],
-    "sticky": true,
+    "pinned": true,
     "topic": "handover.pastes",
     "max_frac": 0.8,
     "size": "medium",

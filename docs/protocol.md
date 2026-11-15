@@ -4,7 +4,7 @@ One JSON object per line over `127.0.0.1:47831`; envelope `{"token": "...", "req
 
 ## Spec (what `show` takes)
 ```json
-{"id": "cpu", "opts": {"ttl": 15, "sticky": false, "urgent": false, "anchor": "near_focus",
+{"id": "cpu", "opts": {"ttl": 15, "pinned": false, "urgent": false, "anchor": "near_focus",
                        "topic": "pc.cpu", "theme": "ocean", "auto": false, "force": false},
  "components": [ {"id": "root", "type": "column", "children": ["a", "b"]},
                  {"id": "a", "type": "text", "text": "CPU {/cpu:0}%"},
@@ -17,12 +17,12 @@ One JSON object per line over `127.0.0.1:47831`; envelope `{"token": "...", "req
 - Same `id` shown again = refresh in place (restarts the clock), no stacking.
 
 ## Opts
-`ttl` seconds idle (default 15) | `sticky` no timer (still quietly removed if untouched 10 min) | `urgent` sticky + ring + beep, parked
+`ttl` seconds idle (default 15) | `pinned` stays until unpinned (the pin button, or `morc card <id> set {"pinned": false}`) | `urgent` no timer + ring + beep, parked
 if ignored | `anchor` near_focus (default) / corner / center / side / bottom | `topic` engagement bucket | `theme` name, `random`, or
 omit for topic-matched + daily drift | `auto` set by triggers: throttled by engagement, deferred while a fullscreen app is up | `force` skip that.
 
 ## Commands
-`show`, `use <name> [--data JSON] [--id] [--ttl] [--sticky] [--urgent] [--anchor] [--topic] [--theme] [--auto]`,
+`show`, `use <name> [--data JSON] [--id] [--ttl] [--pin] [--urgent] [--anchor] [--topic] [--theme] [--auto]`,
 `patch <id> <pointer> <value> ...`, `close <id>`, `save`, `summon`, `list`, `status`, `stop`, `registry`, `inbox [--peek]`, `hook <Event>`.
 `--data` on PowerShell: pass a file via `show`/`save` instead (quote mangling), or use single-quoted here-strings.
 

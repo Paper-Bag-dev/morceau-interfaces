@@ -13,7 +13,7 @@
 use crate::placement::R;
 
 #[derive(Clone, Copy, Default, Debug)]
-pub struct Sticky {
+pub struct EdgeHold {
     pub x: Option<i32>,
     pub y: Option<i32>,
 }
@@ -21,7 +21,7 @@ pub struct Sticky {
 pub struct Grab {
     /// pointer minus window top-left when the carry began
     pub offset: (i32, i32),
-    pub sticky: Sticky,
+    pub hold: EdgeHold,
     /// last pointer spot and when, and the smoothed pointer speed (physical px / s): a fast throw across the screen never snaps
     pub last: Option<((i32, i32), std::time::Instant)>,
     pub speed: f64,
@@ -29,7 +29,7 @@ pub struct Grab {
 
 impl Grab {
     pub fn new(offset: (i32, i32)) -> Grab {
-        Grab { offset, sticky: Sticky::default(), last: None, speed: 0.0 }
+        Grab { offset, hold: EdgeHold::default(), last: None, speed: 0.0 }
     }
     /// Feed the pointer; returns the smoothed speed. Smoothing (0.35 new / 0.65 old) keeps one jittery frame from deciding.
     pub fn track(&mut self, p: (i32, i32)) -> f64 {
@@ -94,30 +94,30 @@ fn candidates(raw: &R, m: &Magnets) -> (Vec<i32>, Vec<i32>) {
 fn axis(raw: i32, cands: &[i32], held: Option<i32>, m: &Magnets) -> Option<i32> {
     if let Some(h) = held {
         if cands.contains(&h) && near(raw, h, m.breakaway) {
-            return Some(h);   // sticky: slide along it until pulled past the breakaway
+            return Some(h);   // hold: slide along it until pulled past the breakaway
         }
     }
     cands.iter().copied().filter(|c| near(raw, *c, m.radius)).min_by_key(|c| (raw - c).abs())
 }
 
-/// The content's snapped top-left for a wanted content rect, and the new sticky state. `fast` = the pointer is being thrown (a long
+/// The content's snapped top-left for a wanted content rect, and the new hold state. `fast` = the pointer is being thrown (a long
 /// drag to the other side): nothing new snaps and a held edge lets go, so the card simply follows the hand.
-pub fn apply_moving(raw: &R, m: &Magnets, st: Sticky, fast: bool) -> ((i32, i32), Sticky) {
+pub fn apply_moving(raw: &R, m: &Magnets, st: EdgeHold, fast: bool) -> ((i32, i32), EdgeHold) {
     if fast {
-        return ((raw.l, raw.t), Sticky::default());
+        return ((raw.l, raw.t), EdgeHold::default());
     }
     apply(raw, m, st)
 }
 
-/// The content's snapped top-left for a wanted content rect, and the new sticky state.
-pub fn apply(raw: &R, m: &Magnets, st: Sticky) -> ((i32, i32), Sticky) {
+/// The content's snapped top-left for a wanted content rect, and the new hold state.
+pub fn apply(raw: &R, m: &Magnets, st: EdgeHold) -> ((i32, i32), EdgeHold) {
     let (xs, ys) = candidates(raw, m);
     let x = axis(raw.l, &xs, st.x, m);
     // the y candidates depend on where x ended up (lined up only once docked beside): recompute with the snapped x
     let moved = R { l: x.unwrap_or(raw.l), t: raw.t, r: x.unwrap_or(raw.l) + raw.w(), b: raw.b };
     let (_, ys2) = candidates(&moved, m);
     let y = axis(raw.t, if x.is_some() { &ys2 } else { &ys }, st.y, m);
-    ((x.unwrap_or(raw.l), y.unwrap_or(raw.t)), Sticky { x, y })
+    ((x.unwrap_or(raw.l), y.unwrap_or(raw.t)), EdgeHold { x, y })
 }
 
 #[cfg(test)]
@@ -136,7 +136,7 @@ mod tests {
         let win = [rect(100, 100, 1000, 800)];
         let mm = m(&win);
         // 20 px off the window's right side: docks at r + gap
-        let ((x, _), st) = apply(&rect(1126, 300, 400, 300), &mm, Sticky::default());
+        let ((x, _), st) = apply(&rect(1126, 300, 400, 300), &mm, EdgeHold::default());
         assert_eq!(x, 1106);
         // pulled 60 px away (inside the breakaway): still docked, and it slides down freely
         let ((x, y), st) = apply(&rect(1166, 420, 400, 300), &mm, st);
@@ -149,16 +149,16 @@ mod tests {
     #[test]
     fn lines_up_with_the_top_once_docked() {
         let win = [rect(100, 100, 1000, 800)];
-        let ((x, y), _) = apply(&rect(1120, 125, 400, 300), &m(&win), Sticky::default());
+        let ((x, y), _) = apply(&rect(1120, 125, 400, 300), &m(&win), EdgeHold::default());
         assert_eq!((x, y), (1106, 100));
     }
 
     #[test]
     fn stacks_under_another_card_and_far_away_is_free() {
         let cards = [rect(2000, 200, 500, 300)];
-        let ((x, y), _) = apply(&rect(2010, 520, 500, 200), &m(&cards), Sticky::default());
+        let ((x, y), _) = apply(&rect(2010, 520, 500, 200), &m(&cards), EdgeHold::default());
         assert_eq!((x, y), (2000, 506));   // below it (b + gap), left edges lined up
-        let ((x, y), st) = apply(&rect(1500, 1100, 300, 200), &m(&cards), Sticky::default());
+        let ((x, y), st) = apply(&rect(1500, 1100, 300, 200), &m(&cards), EdgeHold::default());
         assert_eq!((x, y), (1500, 1100));
         assert!(st.x.is_none() && st.y.is_none());
     }
@@ -166,14 +166,14 @@ mod tests {
     #[test]
     fn a_fast_throw_never_snaps() {
         let win = [rect(100, 100, 1000, 800)];
-        let ((x, _), st) = apply_moving(&rect(1120, 300, 400, 300), &m(&win), Sticky { x: Some(1106), y: None }, true);
+        let ((x, _), st) = apply_moving(&rect(1120, 300, 400, 300), &m(&win), EdgeHold { x: Some(1106), y: None }, true);
         assert_eq!(x, 1120);
         assert!(st.x.is_none());
     }
 
     #[test]
     fn screen_edges() {
-        let ((x, y), _) = apply(&rect(2600, 30, 380, 200), &m(&[]), Sticky::default());
+        let ((x, y), _) = apply(&rect(2600, 30, 380, 200), &m(&[]), EdgeHold::default());
         assert_eq!((x, y), (3000 - 14 - 380, 14));
     }
 }

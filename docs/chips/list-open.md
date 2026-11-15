@@ -8,5 +8,5 @@ facts the user asked to read (an analysis, a verdict, a breakdown). Layout: `cac
 
 **Data:** `{"title": "...", "items": [{"text": "headline", "sub": "detail line", "badge": "tag"}], "vars": {}}` (max 8 rows; `vars`
 overrides size tokens for this card only, e.g. `{"row-title-size-wrap": "15px"}`).
-**Push:** `morc use list-open --id <id> --force --sticky --data @file.json --region left|mid|right` (asked-for cards are forced).
+**Push:** `morc use list-open --id <id> --force --pin --data @file.json --region left|mid|right` (asked-for cards are forced).
 **Several:** one per third, left to right in reading order; verify no overlap in `morc status`.

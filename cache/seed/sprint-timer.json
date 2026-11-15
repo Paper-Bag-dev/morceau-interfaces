@@ -1,7 +1,7 @@
 {
   "t": "save",
   "name": "sprint-timer",
-  "desc": "A small ring sprint timer that stays up: arc toward the goal, elapsed time inside, end time, pause / resume. Pass /title, /start (epoch ms), /goal_min. Persisted, sticky.",
+  "desc": "A small ring sprint timer that stays up: arc toward the goal, elapsed time inside, end time, pause / resume. Pass /title, /start (epoch ms), /goal_min. Persisted, pinned.",
   "params": [
     "/title",
     "/start",
@@ -12,7 +12,7 @@
       130,
       150
     ],
-    "sticky": true,
+    "pinned": true,
     "persist": true,
     "topic": "focus.timer",
     "size": "chip",

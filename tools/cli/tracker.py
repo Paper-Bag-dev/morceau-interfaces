@@ -5,7 +5,7 @@ name under `<MORC_HOME>/trackers` (e.g. `sprint`). The file carries its own card
   {"todo": [{"id","text","sub","badge","done",...}],            # the checklist rows (tick-<id> actions rewrite them)
    "progress": {"any_key": 3, ...},                              # free-form numbers the strip reads by pointer
    "views": {"todo":  {"title": "To do today", "id": "sprint-todo", "run": "tick-", "list": "/todo",
-                       "show": {"region": "right", "ttl": 7200, "sticky": true}},
+                       "show": {"region": "right", "ttl": 7200, "pinned": true}},
              "strip": {"id": "stat-strip", "cells": [{"label": "Lectures done", "value": "/progress/lectures_done",
                                                       "unit": "of {/progress/lectures_total}"}],   # up to 4; label/unit may use {/pointer}
                        "show": {"region": "above", "align": "left", "importance": 0.6, "ttl": 7200}}}}
@@ -51,8 +51,8 @@ def flags(show):
     for k in ("region", "align", "importance", "ttl", "dx", "dy"):
         if k in show:
             out += [f"--{k}", str(show[k])]
-    if show.get("sticky"):
-        out.append("--sticky")
+    if show.get("pinned"):
+        out.append("--pin")
     return out
 
 

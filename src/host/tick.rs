@@ -69,8 +69,8 @@ impl Host {
             let seam = px("snap-gap", 12.0);
             let m = super::snap::Magnets { targets: &targets, work, radius, breakaway, gap: seam, margin: pol.margin };
             let fast = g.track((cx, cy)) > super::snap_setting("snap-max-speed", 900.0) * scale;
-            let ((x, y), st) = super::snap::apply_moving(&raw, &m, g.sticky, fast);
-            g.sticky = st;
+            let ((x, y), st) = super::snap::apply_moving(&raw, &m, g.hold, fast);
+            g.hold = st;
             if (x - il, y - it) != (r.l, r.t) {
                 s.window.set_outer_position(PhysicalPosition::new(x - il, y - it));
             }

@@ -46,7 +46,7 @@
                          ],
                  "prefetch":  null,
                  "region":  null,
-                 "sticky":  false,
+                 "pinned":  false,
                  "theme":  null,
                  "topic":  "recap",
                  "ttl":  40.0,

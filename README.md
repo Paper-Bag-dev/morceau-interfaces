@@ -178,7 +178,7 @@ morc cache stats                             # LFU: what is used, what will fade
 A spec is JSON: a flat list of `{id, type, ...props, children?}` plus a data model. Any prop can be a literal, `{"bind":"/path"}`, or a template string `"CPU {/cpu:0}%"`.
 
 ## Concepts
-- **Surface**: one window with a lifetime (default ~15 s, hover pauses, interaction extends, pin holds, sticky skips the timer, urgent is ringed and parked if ignored).
+- **Surface**: one window with a lifetime (default ~15 s, hover pauses, interaction extends, pin holds (the user or the agent pins), urgent is ringed and parked if ignored).
 - **Component / fragment / recipe**: a spec you saved; a reusable sub-tree with `{{params}}`; a recipe that composes fragments, cached by structure.
 - **Region**: a free rectangle around the active window. `morc use X --region right|below|left|above|top-right|...|auto --align ... --dx --dy`.
 - **Context scope**: the topic prefix (`stats.minutes` -> `stats`). Surfaces of one scope line up; a different scope goes to the opposite side.

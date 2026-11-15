@@ -138,7 +138,7 @@ impl Host {
             }
             s.phase = Phase::Visible;
             s.phase_since = Instant::now();
-            s.life.restart(s.opts.ttl, s.opts.sticky || s.opts.urgent, Instant::now());
+            s.life.restart(s.opts.ttl, s.opts.urgent, s.opts.pinned, Instant::now());
             s.send(&json!({"t": "enter"}));
         }
     }

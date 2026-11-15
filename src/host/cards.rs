@@ -7,7 +7,7 @@
 //!                   layer button toggles 0 <-> 1; Up / Down while the pointer is on the card step it too); `layer` = top | below
 //!   move   --at X,Y (visible content's top-left, physical px), --center (its display's work area) or --snap (nearest edge); glides there
 //!   size   --frac F: the size cap as a fraction of the work area (fill), the page re-fits; --center centres it once measured
-//!   get / set   the card as a resource: read its state, or set the state you want ({"state","at","center","frac"})
+//!   get / set   the card as a resource: read its state, or set the state you want ({"state","at","center","frac","pinned"})
 //!
 //! Records (every card the host knows, live, hidden or closed: state, spot, chip, spec, last data) live in memory and go to
 //! <runtime>/cards.json with a FALLOFF: a change only marks them dirty; the tick writes once things are quiet for WRITE_QUIET, and at
@@ -264,6 +264,18 @@ impl Host {
                 None => return json!({"ok": false, "err": format!("no card '{id}' on screen")}),
             }
         }
+        // "pinned": the agent's side of the same pin the user's button sets; the page shows it, either side can undo it
+        if let Some(v) = want["pinned"].as_bool() {
+            match self.by_id.get(id).copied().and_then(|k| self.surfaces.get_mut(&k)) {
+                Some(s) => {
+                    s.life.set_pinned(v, Instant::now());
+                    s.opts.pinned = v;
+                    s.send(&json!({"t": "pinned", "v": v}));
+                    last = json!({"ok": true, "id": id, "pinned": v});
+                }
+                None => return json!({"ok": false, "err": format!("no card '{id}' on screen")}),
+            }
+        }
         match want["state"].as_str() {
             Some("hidden") => return self.card_op(id, "hide", None, false, None, target),
             Some("shown") => last = self.card_op(id, "show", None, false, None, target),
@@ -320,7 +332,7 @@ impl Host {
                 if s.phase == Phase::Hidden {
                     s.phase = Phase::Visible;
                     s.phase_since = now;
-                    s.life.restart(s.opts.ttl, s.opts.sticky || s.opts.urgent, now);
+                    s.life.restart(s.opts.ttl, s.opts.urgent, s.opts.pinned, now);
                 }
                 window_style::show_topmost_noactivate(s.hwnd());
                 if op == "front" && s.depth > 0 {

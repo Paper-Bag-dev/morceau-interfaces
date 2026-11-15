@@ -9,9 +9,9 @@ use serde_json::Value;
 pub struct Opts {
     /// Seconds the surface stays with no interaction (default 15).
     pub ttl: Option<f64>,
-    /// Never auto-expire by timer (still removed quietly if stale for 10 min).
-    pub sticky: bool,
-    /// Needs the user: sticky, pulses, and goes to the pending list instead of vanishing.
+    /// Stays on screen until unpinned (the card's pin button or `morc card <id> set {"pinned": false}`); the page shows it pinned.
+    pub pinned: bool,
+    /// Needs the user: no timer, a ring, and parked (pending list) instead of vanishing when left untouched.
     pub urgent: bool,
     /// right (default: the right edge, upper-middle) | near_focus | corner | center | side | bottom
     pub anchor: Option<String>,

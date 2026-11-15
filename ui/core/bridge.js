@@ -340,11 +340,15 @@ pin.addEventListener('pointerup', pinRelease);
 pin.addEventListener('pointerleave', pinRelease);
 pin.addEventListener('click', () => {
   if (pinHeld) { pinHeld = false; return; }   // that was a carry, not a tap
-  pinned = !pinned;
-  stage.classList.toggle('pinned', pinned);
-  pin.title = pinned ? 'Pinned. Click to unpin' : 'Keep this open';
+  showPinned(!pinned);
   send({ t: 'pin', v: pinned });
 });
+/** The one pin, shown on the card: set by the user's tap (above) or by the agent (opts.pinned, `morc card <id> set {pinned}`). */
+export function showPinned(v) {
+  pinned = !!v;
+  stage.classList.toggle('pinned', pinned);
+  pin.title = pinned ? 'Pinned. Click to unpin' : 'Keep this open';
+}
 
 // Dismiss just this one (counts as "not interested"). Ctrl+Alt+X dismisses everything (host hotkey).
 document.getElementById('dismiss').addEventListener('click', () => send({ t: 'dismiss' }));

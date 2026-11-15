@@ -63,7 +63,7 @@ Look first (`morc free`). Biggest free area first, as a side, not a corner: rear
 - **Prefetch:** a card with a show-more declares `opts.prefetch`; the host wakes the agent when the card opens so the extra popups are cached before the click.
 - **Placeholders:** when the result opens in a new popup, open empty `skeleton-card` popups first under the ids the real cards will use, then build the
   real ones with the same ids; they replace the placeholders in place. Skeletons inside a card are only for content that lands in that same card.
-- **Cards the agent opens expire** (short `ttl`, never sticky).
+- **Cards the agent opens expire** (short `ttl`, never pinned unless asked).
 
 ## Tooling
 - **JSON files written by PowerShell carry a BOM.** The cache loader strips it; keep it that way.

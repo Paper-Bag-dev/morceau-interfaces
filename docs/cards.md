@@ -52,3 +52,9 @@ on the way; it snaps once you slow down where you are going. Settings in `ui/lim
 `snap-px` 15 (0 = off: the OS drag instead), `snap-break-px` 30, `snap-gap` 12, `snap-max-speed` 900 px/s, `snap-frame-ms` 8. Code: `src/host/snap.rs`
 (the magnets are a pure function with tests), followed in `host/tick.rs follow_grabs`. Same on Windows and macOS (the pointer comes from
 `platform/<os>/sys.rs cursor`).
+
+## Pin (one flag, two hands)
+A pinned card never expires. The agent pins with `opts.pinned` (`morc use <chip> --pin`, a seed's `"pinned": true`) or on a live card
+with `morc card <id> set {"pinned": true}`; the user pins with the pin button. The page shows the same state either way, so either side can
+unpin (the button, or `set {"pinned": false}`); an unpinned card then runs its `ttl` from that moment. The record keeps the pin, so a card
+brought back with `morc card <id> show` returns pinned. Every other card just gets a `ttl`.

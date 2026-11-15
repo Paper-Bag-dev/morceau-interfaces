@@ -40,8 +40,10 @@ impl Host {
             }
             "pin" => {
                 if let Some(s) = self.surfaces.get_mut(&key) {
-                    s.life.pinned = m["v"].as_bool().unwrap_or(false);
+                    let v = m["v"].as_bool().unwrap_or(false);
                     s.life.on_interact(now);
+                    s.life.set_pinned(v, now);
+                    s.opts.pinned = v;   // the record keeps it, so a card brought back (`morc card <id> show`) comes back pinned
                 }
             }
             "drag" => {
