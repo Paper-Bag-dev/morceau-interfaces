@@ -329,6 +329,7 @@ impl Host {
                 }
             }
             "show" | "front" => {
+                let first_reveal = s.phase == Phase::Hidden && s.opts.hidden;   // started --hidden: the user has never seen it enter
                 if s.phase == Phase::Hidden {
                     s.opts.hidden = false;   // a card started --hidden is out now: its record must not bring it back hidden
                     s.phase = Phase::Visible;
@@ -336,6 +337,9 @@ impl Host {
                     s.life.restart(s.opts.ttl, s.opts.urgent, s.opts.pinned, now);
                 }
                 window_style::show_topmost_noactivate(s.hwnd());
+                if first_reveal {
+                    s.send(&json!({"t": "enter"}));   // play the spring-in now that it is seen (no pop-in; user 11-16)
+                }
                 if op == "front" && s.depth > 0 {
                     s.depth = 0;   // "bring it to the front" means on top again
                     s.send(&json!({"t": "layer", "below": false, "depth": 0}));

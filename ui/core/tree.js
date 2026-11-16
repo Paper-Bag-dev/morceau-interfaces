@@ -43,7 +43,7 @@ function check(el, b, vw, vh) {
     // "min max text sizes aint obeyed some places". Only the element's own text nodes count, so a parent is not blamed for a child.
     if (own) {
       const floor = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--type-floor')) || 11.5;
-      const px = parseFloat(cs.fontSize) * (window.__baseZoom || window.__zoom || 1);   // a resting fold shrinks on purpose (it springs open on hover): judge the base size
+      const px = parseFloat(cs.fontSize) * (window.__zoom || 1);   // what is on screen now, resting fold included (11-16: folded cards were unreadably small)
       fonts.add(`${Math.round(px * 2) / 2}/${cs.fontWeight}`);
       if (px < floor - 0.05) { flags.add('tiny'); if (issues.length < 3) issues.push({ flag: 'tiny', text: `${px.toFixed(1)}px < ${floor}px: ${snippet(e)}` }); }
     }
