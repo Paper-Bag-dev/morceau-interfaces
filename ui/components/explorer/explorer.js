@@ -29,7 +29,7 @@ registerView('explorer', (props) => {
     <div class="nav-head"><span class="ttl">${title ?? 'Explorer'}</span><span class="end"><span class="meta">${rows.length} items</span></span></div>
     ${c.search !== false && html`<input class="xp-search" placeholder="Filter" value=${q} onInput=${(e) => setQ(e.currentTarget.value)} data-hit="" />`}
     <div class="xp-list" role="tree">
-      ${keys.length === 0 && html`<div class="nav-empty">Nothing matches "${q}". Clear the filter to see everything.</div>`}
+      ${keys.length === 0 && html`<div class="nav-empty">${q ? `Nothing matches "${q}". Clear the filter to see everything.` : 'No items yet.'}</div>`}
       ${keys.map((k) => {
         const open = q || !shut.has(k);
         const items = byGroup.get(k);

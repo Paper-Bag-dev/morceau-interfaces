@@ -11,6 +11,9 @@ pub struct Opts {
     pub ttl: Option<f64>,
     /// Stays on screen until unpinned (the card's pin button or `morc card <id> set {"pinned": false}`); the page shows it pinned.
     pub pinned: bool,
+    /// Lay the card out and place it but keep its window hidden (Phase::Hidden): `morc tree <id>` can check it before anyone sees it, and
+    /// `morc card <id> show` brings it out in its final state, no pop-in. Audits and "test before showing" use it (user, 11-16).
+    pub hidden: bool,
     /// Needs the user: no timer, a ring, and parked (pending list) instead of vanishing when left untouched.
     pub urgent: bool,
     /// right (default: the right edge, upper-middle) | near_focus | corner | center | side | bottom

@@ -128,6 +128,14 @@ impl Host {
                 let right = region_name.as_deref().map(|n| n.contains("left")).unwrap_or(false);
                 s.send(&json!({"t": "align", "right": right}));
             }
+            if s.opts.hidden {
+                // started hidden (--hidden): fully laid out and placed, the page alive for `morc tree`, the window never shown;
+                // `morc card <id> show` brings it out where it already sits, so there is no pop-in
+                s.phase = Phase::Hidden;
+                s.phase_since = Instant::now();
+                s.send(&json!({"t": "enter"}));
+                return;
+            }
             window_style::show_topmost_noactivate(s.hwnd());
             if s.depth > 0 {
                 // a card brought back from its record keeps its place in the stack

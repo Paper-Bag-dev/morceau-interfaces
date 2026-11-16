@@ -1,7 +1,8 @@
 /* beatring: a circle visualizer. Size is a token (ui/tokens/beatring.json). */
-.c-beatring { position: relative; width: var(--br-size, 300px); aspect-ratio: 1; display: grid; place-items: center; }
+.c-beatring { min-width: var(--br-size, 300px); aspect-ratio: 1; display: grid; place-items: center; }
+.c-beatring > * { grid-area: 1 / 1; }   /* ring + text stacked in one cell: grows to its text (11-16) */
 .c-beatring .br-svg { width: 100%; height: 100%; transition: transform 90ms ease-out; filter: drop-shadow(0 0 10px rgb(255 255 255 / .15)); }
-.c-beatring .br-mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; pointer-events: none; }
-.c-beatring .br-title { max-width: 42%; font-size: var(--br-title-size, 12.5px); font-weight: 600; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.c-beatring .br-state { font-size: 11.5px; opacity: .65; }
+.c-beatring .br-mid { padding: var(--br-in-pad, 22%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; pointer-events: none; }
+.c-beatring .br-title { font-size: var(--type-label); font-weight: var(--type-label-weight); text-align: center; text-wrap: balance; }   /* wraps inside the ring, never cut (11-16) */
+.c-beatring .br-state { font-size: var(--type-caption); opacity: .65; font-weight: var(--type-caption-weight); }
 @media (prefers-reduced-motion: reduce) { .c-beatring .br-svg { transition: none; } }

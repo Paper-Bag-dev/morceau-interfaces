@@ -3,7 +3,7 @@
 .c-issues button { all: unset; box-sizing: border-box; cursor: pointer; }
 .c-issues .is-list { display: flex; flex-direction: column; gap: 10px; max-height: var(--is-max-h, 300px); min-height: var(--is-min-h, 0px); overflow-y: auto; padding-right: 4px; }
 .c-issues .is-level { display: flex; flex-direction: column; gap: 2px; }
-.c-issues .is-lh { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; padding: 0 6px 2px; }
+.c-issues .is-lh { display: flex; align-items: center; gap: 7px; font-size: var(--type-label); font-weight: var(--type-label-weight); padding: 0 6px 2px; }
 .c-issues .is-lh.bad { color: hsl(6 92% 76%); }
 .c-issues .is-lh.warn { color: hsl(42 88% 70%); }
 .c-issues .is-lh .n { margin-left: auto; font-weight: 400; color: rgb(255 255 255 / .5); font-variant-numeric: tabular-nums; }
@@ -11,6 +11,6 @@
 .c-issues .is-row:is(:hover, .hov) { background: rgb(255 255 255 / .07); }
 .c-issues .is-row.sel { background: hsl(var(--accent, var(--primary)) / .2); }
 .c-issues .is-row:focus-visible { outline: 2px solid hsl(var(--accent, var(--primary)) / .7); }
-.c-issues .is-row .t { display: flex; align-items: baseline; gap: 8px; font-size: 13px; overflow-wrap: anywhere; }
-.c-issues .is-row .s { font-size: 11.5px; color: rgb(255 255 255 / .5); flex: none; }
-.c-issues .is-row .why { font-size: 12px; line-height: 1.4; color: rgb(255 255 255 / .65); overflow-wrap: anywhere; }
+.c-issues .is-row .t { display: flex; align-items: baseline; gap: 8px; font-size: var(--type-unit); overflow-wrap: anywhere; font-weight: var(--type-unit-weight); }
+.c-issues .is-row .s { font-size: var(--type-caption); color: rgb(255 255 255 / .5); flex: none; font-weight: var(--type-caption-weight); }
+.c-issues .is-row .why { font-size: var(--type-unit); line-height: 1.4; color: rgb(255 255 255 / .65); overflow-wrap: anywhere; font-weight: var(--type-unit-weight); }

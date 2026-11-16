@@ -11,6 +11,7 @@ and centred" are operations on a card that exists, never a second pop. Code: `sr
 | what is there | `morc cards` | `{}` |
 | one card's state | `morc card <id> get` | `{"card": id}` |
 | put it away (page and data stay alive, clock stopped) | `morc card <id> hide` | `set: {"state": "hidden"}` |
+| start it hidden: laid out and placed, never shown, so `morc tree` can check it first (no pop-in when it comes out) | `morc use <chip> --hidden`, then `morc card <id> show` | `opts.hidden: true` |
 | back (where it was; a closed card comes back from its record) | `morc card <id> show` | `set: {"state": "shown"}` |
 | in front, no focus taken | `morc card <id> front` | `set: {"state": "shown"}` |
 | move (visible content's top-left, physical px) | `morc card <id> move --at X,Y` | `set: {"at": [x, y]}` |

@@ -141,6 +141,7 @@ fn merge_opts(over: &Opts, base: &Opts) -> Opts {
     Opts {
         ttl: over.ttl.or(base.ttl),
         pinned: over.pinned || base.pinned,
+        hidden: over.hidden,   // per call only: a cached spec never starts hidden by itself
         urgent: over.urgent || base.urgent,
         anchor: over.anchor.clone().or_else(|| base.anchor.clone()),
         at: over.at.or(base.at),

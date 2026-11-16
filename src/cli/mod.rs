@@ -120,6 +120,7 @@ pub fn run(args: Vec<String>) -> i32 {
             let mut opts = Map::new();
             if let Some(t) = flag(rest, "--ttl").and_then(|t| t.parse::<f64>().ok()) { opts.insert("ttl".into(), json!(t)); }
             if has(rest, "--pin") { opts.insert("pinned".into(), json!(true)); }
+            if has(rest, "--hidden") { opts.insert("hidden".into(), json!(true)); }   // laid out and placed, window not shown: check it, then `morc card <id> show`
             if has(rest, "--urgent") { opts.insert("urgent".into(), json!(true)); }
             if has(rest, "--auto") { opts.insert("auto".into(), json!(true)); }
             if has(rest, "--force") { opts.insert("force".into(), json!(true)); }   // show even over a fullscreen app (the held message names this flag)

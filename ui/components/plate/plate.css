@@ -116,9 +116,10 @@ html[data-skin~="flat"] { --grain: none; --grain-dark: none; --specks: none; }
 html[data-skin~="flat"] .card-plate { --sheen: 0 0 0 / 0; --glass-glow: 0 0 0 / 0; }
 /* chips (opts.size "chip": stats, short status): simple and rectangular, fit anywhere. Several stats run in ONE row, plain on the plate
    (no tiles): a grey caption under a white hero numeral. */
-#stage[data-size="chip"] .row:has(> .stat + .stat) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(var(--chip-stat-min-w, 92px), 1fr); gap: var(--chip-stat-gap, 4px); }
+#stage[data-size="chip"] .row:has(> .stat + .stat) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(max-content, 1fr); gap: var(--chip-stat-gap, 4px); }
+#stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { min-width: var(--chip-stat-min-w, 92px); } /* floor as a token; the column still grows to its text (11-16) */
 #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { background: none; border: 0; box-shadow: none; padding: var(--chip-stat-pad, 4px 8px); }   /* numbers sit straight on the glass */
-#stage[data-size="chip"] .stat .num { font-size: var(--chip-hero-size, 28px); color: hsl(0 0% 96%); }
+#stage[data-size="chip"] .stat .num { font-size: var(--type-hero); color: hsl(0 0% 96%); font-weight: var(--type-hero-weight); }
 #stage[data-size="chip"] .stat :is(.lbl, .unit) { color: rgb(var(--chip-caption, 200 200 205 / .62)); }
 #stage[data-size="chip"] .card-plate { padding: var(--chip-pad, 10px 14px); }
 /* a single stat chip is a rectangle: the numeral and unit on the left, the grey caption beside it */

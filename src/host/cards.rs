@@ -330,6 +330,7 @@ impl Host {
             }
             "show" | "front" => {
                 if s.phase == Phase::Hidden {
+                    s.opts.hidden = false;   // a card started --hidden is out now: its record must not bring it back hidden
                     s.phase = Phase::Visible;
                     s.phase_since = now;
                     s.life.restart(s.opts.ttl, s.opts.urgent, s.opts.pinned, now);

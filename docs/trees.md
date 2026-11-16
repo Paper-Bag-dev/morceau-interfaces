@@ -37,6 +37,8 @@ Rects are css px inside the card. **Flags** are what a screenshot would have sho
 | flag | means | the card rule it breaks |
 |---|---|---|
 | `cut` | text cut off sideways (ellipsis / overflow hidden) | everything reachable |
+| `spills` | text shown outside its box, or a piece poking past the component's edge (visible overflow) | everything inside its box |
+| `tiny` | text drawn below the type floor (token `type-floor`, card zoom included) | text at or above the floor |
 | `clipped` | content hidden below with no way to scroll to it | everything reachable |
 | `scrolls` | content continues, reachable by scrolling | fine (rule 2 allows it) |
 | `folded` | a compact card resting small hides rows; it opens on hover | fine (rule 3: rests small when unused) |

@@ -1,9 +1,9 @@
 /* stat: one hero numeral with a hairline needle showing where it sits against its limit (the surface's one memorable thing). Plate look: `plate` component. */
-.stat { display: flex; flex-direction: column; gap: 2px; min-width: 170px; padding: 7px 14px 8px; }
+.stat { display: flex; flex-direction: column; gap: 2px; min-width: var(--stat-min-w, 170px); padding: 7px 14px 8px; }
 .stat .row1 { display: flex; align-items: baseline; gap: 5px; }
-.stat .num { font-size: 32px; font-weight: 600; line-height: 1; font-family: var(--font-display); font-variation-settings: "wdth" 92; letter-spacing: -.005em; font-variant-numeric: tabular-nums; }
-.stat .unit { font-size: 13px; }
-.stat .lbl { font-size: 12.5px; }
+.stat .num { font-size: var(--type-hero); font-weight: var(--type-hero-weight); line-height: 1; font-family: var(--font-display); font-variation-settings: "wdth" 92; letter-spacing: -.005em; font-variant-numeric: tabular-nums; }
+.stat .unit { font-size: var(--type-unit); font-weight: var(--type-unit-weight); }
+.stat .lbl { font-size: var(--type-label); font-weight: var(--type-label-weight); }
 .stat .needle { position: relative; height: 12px; margin-top: 5px; }
 .stat .rail { position: absolute; left: 0; right: 0; top: 5px; height: 1.5px; border-radius: 2px; background: hsl(var(--ink) / .4); }
 .stat .fill { position: absolute; left: 0; top: 4.5px; height: 2.5px; width: 100%; border-radius: 2px; transform-origin: left center; transform: scaleX(0); background: hsl(var(--accent, var(--ring))); transition: transform .8s var(--spring), background .3s; }
@@ -12,11 +12,11 @@
 
 /* hero tiles: several stats side by side become an even grid (2 per row by default, token stat-cols), each centered: big numeral, small
    muted unit beside it, a one-line caption under it. Theme rules: one line + tooltip, even shapes, sizes from tokens/stat.json. */
-.row:has(> .stat + .stat) { display: grid; grid-template-columns: repeat(var(--stat-cols, 2), minmax(var(--stat-tile-min-w, 118px), 1fr)); gap: var(--stat-gap, 8px); width: 100%; }
-.row:has(> .stat + .stat) > .stat { min-width: 0; align-items: center; text-align: center; padding: var(--stat-tile-pad, 10px 12px); }
+.row:has(> .stat + .stat) { display: grid; grid-template-columns: repeat(var(--stat-cols, 2), minmax(max-content, 1fr)); gap: var(--stat-gap, 8px); width: 100%; }
+.row:has(> .stat + .stat) > .stat { min-width: var(--stat-tile-min-w, 118px); align-items: center; text-align: center; padding: var(--stat-tile-pad, 10px 12px); }
 .row:has(> .stat + .stat) > .stat .row1 { justify-content: center; }
-.row:has(> .stat + .stat) > .stat .num { font-size: var(--stat-hero-size, 34px); }
-.row:has(> .stat + .stat) > .stat :is(.lbl, .unit) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.row:has(> .stat + .stat) > .stat .num { font-size: var(--type-hero); font-weight: var(--type-hero-weight); }
+.row:has(> .stat + .stat) > .stat :is(.lbl, .unit) { white-space: nowrap; } /* never cut or ellipsized: the max-content column grows to fit it (11-16) */
 /* glass skin: each tile is a dark lens like the rows */
 html[data-skin~="glass"] .card-plate .row:has(> .stat + .stat) > .stat { background: rgb(var(--lens-center, 6 8 12 / .05)); border: 1px solid rgb(var(--lens-rim, 0 0 0 / .62)); border-radius: var(--row-radius, 14px);
   box-shadow: inset 0 0 0 var(--lens-line-w, 1px) var(--lens-line-c), inset 0 0 var(--lens-shadow, 14px 3px) rgb(var(--lens-edge, 0 0 0 / .58)); }

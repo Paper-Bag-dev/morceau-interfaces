@@ -1,6 +1,6 @@
 // This card's tree (docs/trees.md), built on request from the component list and the DOM: what the host's scene tree mounts under the card.
 //   {card, size, zoom, data, shared, actions, root: {id, type, rect [x,y,w,h] css px, flags?, issues?, text?, children? | more}}
-// Flags say what a screenshot would have shown: cut (text cut off sideways), clipped (content hidden with no scroll), scrolls (reachable
+// Flags say what a screenshot would have shown: cut (text cut off sideways), spills (text shown outside its box or past the component's edge), clipped (content hidden with no scroll), scrolls (reachable
 // by scrolling), folded (a compact card resting small; opens on hover), offcard (sticks out of the window), hidden (not shown now,
 // e.g. a `when`), empty (a leaf that shows nothing: no text, picture or painted background),
 // not-rendered (in the spec, not in the DOM).
@@ -17,9 +17,9 @@ function snippet(e) {
 
 // Checks this component's own elements (not those of nested components, which get their own node).
 function check(el, b, vw, vh) {
-  const flags = new Set(), issues = [];
+  const flags = new Set(), issues = [], fonts = new Set();
   const cs0 = getComputedStyle(el);
-  if (cs0.display === 'none' || cs0.visibility === 'hidden' || (b.width === 0 && b.height === 0)) return { flags: ['hidden'], issues };
+  if (cs0.display === 'none' || cs0.visibility === 'hidden' || (b.width === 0 && b.height === 0)) return { flags: ['hidden'], issues, fonts: [] };
   if (b.right > vw + 1 || b.bottom > vh + 1 || b.left < -1 || b.top < -1) flags.add('offcard');
   for (const e of [el, ...el.querySelectorAll('*')]) {
     if (e !== el && e.closest('[data-cid]') !== el) continue;
@@ -28,6 +28,24 @@ function check(el, b, vw, vh) {
     const text = () => (e.textContent || '').trim();
     if (e.scrollWidth > e.clientWidth + 1 && (HIDE.has(cs.overflowX) || cs.textOverflow === 'ellipsis') && text()) {
       flags.add('cut'); if (issues.length < 3) issues.push({ flag: 'cut', text: snippet(e) });
+    }
+    // spills: content shown OUTSIDE its box (visible overflow, or a piece poking past the component's own edge): a screenshot shows
+    // text running over the tile or plate edge, and nothing else flags it (11-16: "20.5 k tok read" ran past its stat tile)
+    const visX = !HIDE.has(cs.overflowX) && !SCROLL.has(cs.overflowX) && cs.textOverflow !== 'ellipsis';
+    // vertical: a tight line-height lets glyphs poke out of their own line box, which is normal, so only past the component's edge counts
+    const r = e.getBoundingClientRect();
+    const past = e !== el && (r.right > b.right + 1 || r.left < b.left - 1 || r.bottom > b.bottom + 1 || r.top < b.top - 1);
+    const own = [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());   // text this element draws itself
+    if (own && ((visX && e.scrollWidth > e.clientWidth + 1) || past)) {   // a container widened by layout tricks (negative margins, transforms) is not a spill
+      flags.add('spills'); if (issues.length < 3) issues.push({ flag: 'spills', text: snippet(e) });
+    }
+    // tiny: text this element draws itself, on screen below the type floor (token `type-floor`, times the card's zoom); 11-16, user:
+    // "min max text sizes aint obeyed some places". Only the element's own text nodes count, so a parent is not blamed for a child.
+    if (own) {
+      const floor = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--type-floor')) || 11.5;
+      const px = parseFloat(cs.fontSize) * (window.__zoom || 1);
+      fonts.add(`${Math.round(px * 2) / 2}/${cs.fontWeight}`);
+      if (px < floor - 0.05) { flags.add('tiny'); if (issues.length < 3) issues.push({ flag: 'tiny', text: `${px.toFixed(1)}px < ${floor}px: ${snippet(e)}` }); }
     }
     if (e.scrollHeight > e.clientHeight + 1) {
       if (SCROLL.has(cs.overflowY)) flags.add('scrolls');
@@ -38,7 +56,7 @@ function check(el, b, vw, vh) {
       }
     }
   }
-  return { flags: [...flags], issues };
+  return { flags: [...flags], issues, fonts: [...fonts] };
 }
 
 // shows something without text or a picture: a painted background (a colour swatch, a skeleton bar) on it or inside it
@@ -77,7 +95,8 @@ export function cardTree(r, { depth, node } = {}) {
       n.view = el.dataset.view || 'dom';
       const b = el.getBoundingClientRect();
       n.rect = [b.x, b.y, b.width, b.height].map(Math.round);
-      const { flags, issues } = check(el, b, vw, vh);
+      const { flags, issues, fonts } = check(el, b, vw, vh);
+      if (fonts && fonts.length) n.fonts = fonts; // ["13/400", "34/600"]: on-screen px / weight of the text it draws (morc audit compares them)
       if (flags.length) n.flags = flags;
       if (issues.length) n.issues = issues;
       if (!(c.children || []).length) {

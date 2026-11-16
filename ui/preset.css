@@ -17,6 +17,21 @@
   --radius-card: var(--radius);
   --font-body: var(--font-body);
   --font-display: var(--font-display);
+  /* the type scale (ui/tokens/type.json): text-hero, text-lead, text-title, text-body, text-label, text-unit, text-caption = size + weight in one class, never under the floor after zoom */
+  --text-hero: var(--type-hero);
+  --text-hero--font-weight: var(--type-hero-weight);
+  --text-lead: var(--type-lead);
+  --text-lead--font-weight: var(--type-lead-weight);
+  --text-title: var(--type-title);
+  --text-title--font-weight: var(--type-title-weight);
+  --text-body: var(--type-body);
+  --text-body--font-weight: var(--type-body-weight);
+  --text-label: var(--type-label);
+  --text-label--font-weight: var(--type-label-weight);
+  --text-unit: var(--type-unit);
+  --text-unit--font-weight: var(--type-unit-weight);
+  --text-caption: var(--type-caption);
+  --text-caption--font-weight: var(--type-caption-weight);
 }
 
 /* The card's own buttons (pin, x, layer): set any of these to restyle them, e.g. square and solid:

@@ -6,17 +6,17 @@
 
 .nav-ref { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; padding: var(--nav-ref-pad, 3px 9px 3px 7px);
   border-radius: 99px; border: 1px solid rgb(255 255 255 / .1); background: rgb(255 255 255 / .05); color: inherit; font: inherit;
-  font-size: var(--nav-ref-size, 12.5px); cursor: pointer; transition: background .15s, border-color .15s; }
+  font-size: var(--type-unit); cursor: pointer; transition: background .15s, border-color .15s; font-weight: var(--type-unit-weight); }
 .nav-ref:is(:hover, .hov) { background: rgb(255 255 255 / .11); border-color: rgb(255 255 255 / .2); }
 .nav-ref:focus-visible { outline: 2px solid hsl(var(--accent, var(--primary)) / .7); outline-offset: 1px; }
 .nav-ref .t { min-width: 0; overflow-wrap: anywhere; }
 .nav-ref .n { color: rgb(255 255 255 / .5); font-variant-numeric: tabular-nums; }
-.nav-ref.dense { padding: 1px 7px 1px 5px; font-size: var(--nav-ref-dense-size, 11.5px); }
+.nav-ref.dense { padding: 1px 7px 1px 5px; font-size: var(--type-caption); font-weight: var(--type-caption-weight); }
 .nav-ref.missing { opacity: .55; }
 
 /* the shared pane head: a title on the left, small counts or controls on the right */
 .nav-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
-.nav-head .ttl { font-size: var(--text-size-md, 15px); font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nav-head .meta { flex: none; font-size: 12px; color: rgb(255 255 255 / .6); font-variant-numeric: tabular-nums; }
-.nav-empty { font-size: 12.5px; color: rgb(255 255 255 / .6); padding: 6px 2px; }
+.nav-head .ttl { font-size: var(--type-title); font-weight: var(--type-title-weight); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-head .meta { flex: none; font-size: var(--type-unit); color: rgb(255 255 255 / .6); font-variant-numeric: tabular-nums; font-weight: var(--type-unit-weight); }
+.nav-empty { font-size: var(--type-unit); color: rgb(255 255 255 / .6); padding: 6px 2px; font-weight: var(--type-unit-weight); white-space: normal; overflow-wrap: anywhere; }
 .nav-head .end { display: flex; align-items: center; gap: 6px; flex: none; }

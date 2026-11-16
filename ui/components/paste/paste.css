@@ -5,11 +5,11 @@
 .c-pastes .paste.copied { background: rgb(255 255 255 / .02); }
 .c-pastes .head { display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 10px; cursor: pointer; }
 .c-pastes .head:is(:hover, .hov) { background: rgb(255 255 255 / .05); }
-.c-pastes .num { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12.5px; font-weight: 600;
+.c-pastes .num { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: var(--type-label); font-weight: var(--type-label-weight);
   background: hsl(var(--accent, var(--ring)) / .9); color: #fff; font-variant-numeric: tabular-nums; }
 .c-pastes .copied .num { background: rgb(255 255 255 / .18); }
-.c-pastes .name { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; color: hsl(0 0% 97%); overflow-wrap: anywhere; }
-.c-pastes .size { font-size: 12.5px; font-weight: 400; color: rgb(255 255 255 / .62); }
+.c-pastes .name { flex: 1; min-width: 0; font-size: var(--type-title); font-weight: var(--type-title-weight); color: hsl(0 0% 97%); overflow-wrap: anywhere; }
+.c-pastes .size { font-size: var(--type-unit); font-weight: var(--type-unit-weight); color: rgb(255 255 255 / .62); }
 .c-pastes .copy { flex: none; }
 .c-pastes .copied .copy { opacity: .75; }
 .c-pastes .body { display: none; margin: 0 8px 8px; padding: 8px 10px; border-radius: 10px; background: rgb(0 0 0 / .35); color: hsl(0 0% 92%);

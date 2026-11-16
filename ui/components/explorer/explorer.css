@@ -1,22 +1,22 @@
 /* explorer: a grouped, searchable list that drives the shared nav. Sizes are tokens (ui/tokens/explorer.json). */
 .c-explorer { display: flex; flex-direction: column; gap: 8px; width: var(--xp-w, 260px); min-width: 0; }
 .c-explorer .xp-search { width: 100%; box-sizing: border-box; padding: 6px 10px; border-radius: 10px; border: 1px solid rgb(255 255 255 / .12);
-  background: rgb(0 0 0 / .18); color: inherit; font: inherit; font-size: 13px; outline: none; }
+  background: rgb(0 0 0 / .18); color: inherit; font: inherit; font-size: var(--type-unit); outline: none; font-weight: var(--type-unit-weight); }
 .c-explorer .xp-search:focus { border-color: hsl(var(--accent, var(--primary)) / .7); }
 .c-explorer .xp-list { display: flex; flex-direction: column; gap: 2px; max-height: var(--xp-max-h, 520px); min-height: var(--xp-min-h, 0px); overflow-y: auto; margin-right: -4px; padding-right: 4px; }
 .c-explorer button { all: unset; box-sizing: border-box; cursor: pointer; }
-.c-explorer .xp-gh { display: flex; align-items: center; gap: 6px; width: 100%; padding: 5px 6px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.c-explorer .xp-gh { display: flex; align-items: center; gap: 6px; width: 100%; padding: 5px 6px; border-radius: 8px; font-size: var(--type-label); font-weight: var(--type-label-weight); }
 .c-explorer .xp-gh:is(:hover, .hov) { background: rgb(255 255 255 / .06); }
 .c-explorer .xp-gh .chev { width: 12px; height: 12px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; opacity: .7; transition: transform .2s var(--spring, cubic-bezier(.16, 1, .3, 1)); }
 .c-explorer .xp-gh.open .chev { transform: rotate(90deg); }
 .c-explorer .xp-gh .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.c-explorer .xp-gh .n { flex: none; font-weight: 400; font-size: 12px; color: rgb(255 255 255 / .55); font-variant-numeric: tabular-nums; }
-.c-explorer .xp-gh .bad { flex: none; font-weight: 500; font-size: 11.5px; color: hsl(6 92% 72%); }
+.c-explorer .xp-gh .n { flex: none; font-weight: var(--type-unit-weight); font-size: var(--type-unit); color: rgb(255 255 255 / .55); font-variant-numeric: tabular-nums; }
+.c-explorer .xp-gh .bad { flex: none; font-weight: var(--type-caption-weight); font-size: var(--type-caption); color: hsl(6 92% 72%); }
 .c-explorer .xp-rows { display: flex; flex-direction: column; padding-left: 12px; border-left: 1px solid rgb(255 255 255 / .08); margin-left: 11px; }
-.c-explorer .xp-row { display: flex; align-items: baseline; gap: 8px; width: 100%; min-width: 0; padding: var(--xp-row-pad, 4px 8px); border-radius: 8px; font-size: var(--xp-row-size, 13px); }
+.c-explorer .xp-row { display: flex; align-items: baseline; gap: 8px; width: 100%; min-width: 0; padding: var(--xp-row-pad, 4px 8px); border-radius: 8px; font-size: var(--type-unit); font-weight: var(--type-unit-weight); }
 .c-explorer .xp-row:is(:hover, .hov) { background: rgb(255 255 255 / .07); }
 .c-explorer .xp-row.sel { background: hsl(var(--accent, var(--primary)) / .2); box-shadow: inset 2px 0 0 hsl(var(--accent, var(--primary))); }
 .c-explorer .xp-row:focus-visible, .c-explorer .xp-gh:focus-visible { outline: 2px solid hsl(var(--accent, var(--primary)) / .7); }
 .c-explorer .xp-row .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.c-explorer .xp-row .s { flex: none; margin-left: auto; font-size: 11.5px; color: rgb(255 255 255 / .5); }
+.c-explorer .xp-row .s { flex: none; margin-left: auto; font-size: var(--type-caption); color: rgb(255 255 255 / .5); font-weight: var(--type-caption-weight); }
 @media (prefers-reduced-motion: reduce) { .c-explorer * { transition: none !important; } }

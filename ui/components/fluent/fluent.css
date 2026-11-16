@@ -15,23 +15,23 @@ html[data-skin~="fluent"] .card-plate { background: linear-gradient(rgb(var(--pl
   box-shadow: 0 8px 16px rgb(var(--fl-shadow)); font-family: var(--font-body); }
 html[data-skin~="fluent"] #stage.compact .card-plate { border-radius: var(--fl-card-radius, 8px); }
 html[data-skin~="fluent"] #stage[data-size="chip"] .card-plate { border-radius: var(--fl-card-radius, 8px); corner-shape: round; }
-html[data-skin~="fluent"] .card-plate > .c-text.lg:first-child { font-family: var(--font-display); font-size: var(--fl-title-size, 16px); font-weight: 600; letter-spacing: 0; }
+html[data-skin~="fluent"] .card-plate > .c-text.lg:first-child { font-family: var(--font-display); letter-spacing: 0; }
 html[data-skin~="fluent"] :is(.stat .unit, .stat .lbl, .c-kv .k, .c-prog .lbl, .tone-muted, .c-list .sub, .c-check .sub) { color: rgb(var(--fl-text-2)); }
-html[data-skin~="fluent"] .stat .num { font-family: var(--font-display); font-weight: 600; }
+html[data-skin~="fluent"] .stat .num { font-family: var(--font-display); }
 
 /* ---------- buttons ---------- */
 /* standard: quiet fill, hairline stroke a touch lighter on top, white text, no lift, no shine */
 html[data-skin~="fluent"] .btn:not(.swatch):not(.on):not(.destructive):not(.icon-only) {
   background: rgb(var(--fl-control)); color: hsl(0 0% 100%); border: 1px solid rgb(var(--fl-control-stroke)); border-top-color: rgb(var(--fl-control-stroke-top));
   border-radius: var(--fl-control-radius, 4px); corner-shape: round; box-shadow: none; filter: none; text-shadow: none;
-  min-height: var(--fl-btn-min-h, 32px); padding: var(--fl-btn-pad, 5px 12px); font-size: var(--fl-btn-size, 14px); font-weight: 400;
+  min-height: var(--fl-btn-min-h, 32px); padding: var(--fl-btn-pad, 5px 12px);
   transition: background .083s linear, color .083s linear; }
 html[data-skin~="fluent"] .btn:not(.swatch):not(.on):not(.destructive):is(:hover, .hov) { background: rgb(var(--fl-control-hover)); transform: none; box-shadow: none; filter: none; }
 html[data-skin~="fluent"] .btn:not(.swatch):not(.on):not(.destructive):active { background: rgb(var(--fl-control-press)); color: rgb(var(--fl-text-2)); transform: none; }
 /* accent: the filled primary action (Yes, Send, a primary, any tone) in the Windows accent, dark text */
 html[data-skin~="fluent"] :is(.btn.primary, .btn.good, .btn[data-tone]):not(.swatch):not(.on):not(.destructive) {
   --fill-c: var(--btn-tone, var(--accent));
-  background: hsl(var(--fill-c)); color: hsl(var(--fl-on-accent)); border: 1px solid rgb(0 0 0 / .14); border-top-color: rgb(255 255 255 / .08); font-weight: 600; }
+  background: hsl(var(--fill-c)); color: hsl(var(--fl-on-accent)); border: 1px solid rgb(0 0 0 / .14); border-top-color: rgb(255 255 255 / .08); }
 html[data-skin~="fluent"] :is(.btn.primary, .btn.good, .btn[data-tone]):not(.swatch):not(.on):not(.destructive):is(:hover, .hov) { background: hsl(var(--fill-c) / .9); }
 html[data-skin~="fluent"] :is(.btn.primary, .btn.good, .btn[data-tone]):not(.swatch):not(.on):not(.destructive):active { background: hsl(var(--fill-c) / .8); color: rgb(0 0 0 / .5); }
 html[data-skin~="fluent"] .btn.icon-only { border-radius: var(--fl-control-radius, 4px); background: rgb(var(--fl-control)); border: 1px solid rgb(var(--fl-control-stroke)); box-shadow: none; }
@@ -45,14 +45,14 @@ html[data-skin~="fluent"] :is(.c-list .item, .c-asks .ask, .c-check .row, .c-pas
   background: rgb(var(--fl-card)); border: 1px solid rgb(var(--fl-card-stroke)); border-radius: var(--fl-row-radius, 6px); corner-shape: round; box-shadow: none; }
 html[data-skin~="fluent"] :is(.c-list .item.act, .c-check .row, .c-pastes .paste):is(:hover, .hov) { background: rgb(var(--fl-card-hover)); box-shadow: none; }
 html[data-skin~="fluent"] .c-asks .ask { padding: var(--fl-row-pad, 10px 12px); }
-html[data-skin~="fluent"] :is(.c-asks .q, .c-list .ttl, .c-check .t) { font-size: var(--fl-body-size, 15px); color: hsl(0 0% 100%); }
+html[data-skin~="fluent"] :is(.c-asks .q, .c-list .ttl, .c-check .t) { color: hsl(0 0% 100%); }
 html[data-skin~="fluent"] .c-asks .pick.on { box-shadow: 0 0 0 2px hsl(var(--accent)); }
 /* the number strip stays plain on the plate (theme rule 12), with the accent line under each number */
 html[data-skin~="fluent"] #stage[data-size="chip"] .row:has(> .stat + .stat) > .stat { background: none; border: 0; border-radius: 0; }
 
 /* ---------- badges: a small subtle chip; tones keep their meaning ---------- */
 html[data-skin~="fluent"] .badge { background: rgb(var(--fl-control-hover)); color: hsl(0 0% 100%); border: 1px solid rgb(var(--fl-control-stroke));
-  border-radius: var(--fl-control-radius, 4px); corner-shape: round; box-shadow: none; font-weight: 600; }
+  border-radius: var(--fl-control-radius, 4px); corner-shape: round; box-shadow: none; }
 html[data-skin~="fluent"] .badge.tone-good { color: hsl(var(--good)); } html[data-skin~="fluent"] .badge.tone-warn { color: hsl(var(--warn)); } html[data-skin~="fluent"] .badge.tone-bad { color: hsl(var(--bad)); }
 
 /* ---------- checklist: Fluent check boxes ---------- */

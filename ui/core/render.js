@@ -161,12 +161,14 @@ export class Renderer {
    * This is how a click transforms the surface: the question hides, the result shows. Changes animate and the window re-fits.
    */
   applyWhen(el, w) {
+    // an empty list or object counts as empty, so `truthy` hides a list with no items (11-16: empty lists rendered as blank boxes)
+    const has = (v) => Array.isArray(v) ? v.length > 0 : v && typeof v === 'object' ? Object.keys(v).length > 0 : !!v;
     const test = (v) => {
       if ('eq' in w) return v === w.eq;
       if ('ne' in w) return v !== w.ne;
-      if (w.truthy) return !!v;
-      if (w.falsy) return !v;
-      return !!v;
+      if (w.truthy) return has(v);
+      if (w.falsy) return !has(v);
+      return has(v);
     };
     let shown = null;
     const apply = (v) => {

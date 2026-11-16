@@ -29,6 +29,7 @@ function applyZoom(z) {
   zoom = z;
   window.__zoom = z;
   document.body.style.zoom = String(z);
+  document.documentElement.style.setProperty('--zoom', String(z));   // the type scale keeps text at the floor after zoom (ui/preset.css)
   // the card's own buttons keep ONE size whatever the card's zoom (nested zoom multiplies: 1/z cancels it)
   const ctl = document.getElementById('controls');
   if (ctl) ctl.style.zoom = String(1 / z);
