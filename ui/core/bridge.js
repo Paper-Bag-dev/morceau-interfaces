@@ -29,7 +29,6 @@ function applyZoom(z) {
   zoom = z;
   window.__zoom = z;
   document.body.style.zoom = String(z);
-  document.documentElement.style.setProperty('--zoom', String(z));   // the type scale keeps text at the floor after zoom (ui/preset.css)
   // the card's own buttons keep ONE size whatever the card's zoom (nested zoom multiplies: 1/z cancels it)
   const ctl = document.getElementById('controls');
   if (ctl) ctl.style.zoom = String(1 / z);
@@ -82,6 +81,10 @@ export function setView(v) {
   // compact by default: a card shows at `compact` of its size until hovered (then it grows to full, below)
   // medium (info-dense working cards: pastes, to-dos, asks) start a little bigger (limits medium-scale); large (charts, graphs) bigger still
   const sizeK = stage.dataset.size === 'medium' ? lim('medium-scale', 1.12) : stage.dataset.size === 'large' ? lim('large-scale', 1.3) : 1;   // charts and graphs start big
+  // the type scale cancels only this BASE zoom (host scale x size kind): text is the same size in every card, while the resting fold,
+  // hover grow and fit still zoom it with the card, so growing and shrinking stay animated (11-16, user: "did the animations die down?")
+  window.__baseZoom = Math.max(FLOOR(), (view.scale || 1) * sizeK);
+  document.documentElement.style.setProperty('--zoom', String(window.__baseZoom));
   applyZoom(Math.max(FLOOR(), (view.scale || 1) * sizeK * (grownFrom ? 1 : COMPACT())));
   // squeezed: lists show their first rows with the next one fading out, the plate gets a solid accent edge (plate.css #stage.compact)
   setCompact(FOLDS() && !grownFrom);
